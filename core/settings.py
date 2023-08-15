@@ -38,10 +38,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_jalali',
     # custom apps
     'adminpanel.apps.AdminpanelConfig',
     'front.apps.FrontConfig',
-    'billbord.apps.BillbordConfig'
+    'billboard.apps.BillboardConfig'
 ]
 
 MIDDLEWARE = [
