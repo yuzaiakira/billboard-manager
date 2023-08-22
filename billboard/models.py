@@ -4,17 +4,29 @@ from django.db import models
 from django_jalali.db import models as jmodels
 
 from adminpanel.models import UserModel
+from .utils import billboard_path
 
 # Create your models here.
+
+
+class SEOModel(models.Model):
+    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
+    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
+    description = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
+
+    class Meta:
+        verbose_name_plural = "محتوا های سئو شده"
+        verbose_name = "محتوای سئو شده"
+
+    def __str__(self):
+        return self.title
 
 
 class StateModel(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام استان")
 
-    # SEO Parameter
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
-    description = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
+    seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOState",
+                               verbose_name="محتوای سئو", blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "استان ها"
@@ -28,10 +40,8 @@ class CityModel(models.Model):
     state = models.ForeignKey('StateModel', related_name='CityModel', on_delete=models.CASCADE, verbose_name="استان")
     name = models.CharField(max_length=100, verbose_name="نام شهر")
 
-    # SEO Parameter
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
-    description = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
+    seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOCity",
+                               verbose_name="محتوای سئو", blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "شهر ها"
@@ -52,13 +62,37 @@ class BillboardAttributeModel(models.Model):
         return self.name
 
 
+class BillboardFinalPriceModel(models.Model):
+    add_price = models.PositiveBigIntegerField(verbose_name="قیمت افزوده",  default=0, blank=True)
+    final_price = models.PositiveBigIntegerField(verbose_name="قیمت نهایی",  default=0, blank=True)
+
+    class Meta:
+        verbose_name_plural = "قیمت های نهایی"
+        verbose_name = "قیمت نهایی"
+
+    def __str__(self):
+        return self.BillboardFinalPrice.name
+
+
+class BillboardImageModel(models.Model):
+    title = models.CharField(max_length=255, verbose_name="عنوان عکس", blank=True)
+    image = models.ImageField(upload_to=billboard_path, verbose_name="عکس")
+
+    class Meta:
+        verbose_name_plural = "عکس های بیلبورد"
+        verbose_name = "عکس بیلبورد"
+
+    def __str__(self):
+        return self.title
+
+
 class BillboardModel(models.Model):
-    city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL, verbose_name="شهر", null=True)
+    city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
+                             verbose_name="شهر", null=True)
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")
     attribute = models.ManyToManyField(BillboardAttributeModel, verbose_name="ویژگی های بیلبورد")
     description = models.TextField(verbose_name='توضیحات صفحه', blank=True)
-    billboard_code = models.CharField(max_length=100, verbose_name="کد بیلبورد", blank=True, null=True)
 
     has_power = models.BooleanField(verbose_name="برق دارد؟", default=False)
     billboard_length = models.PositiveSmallIntegerField(verbose_name="طول بیلبورد")
@@ -67,13 +101,20 @@ class BillboardModel(models.Model):
     price = models.PositiveBigIntegerField(verbose_name="قیمت")
     reservation_date = jmodels.jDateField(verbose_name="قابل اجاره در", null=True)
     reseller = models.ForeignKey(UserModel, on_delete=models.SET_NULL, verbose_name="نماینده", blank=True, null=True)
-    latitude = models.DecimalField(max_digits=14, decimal_places=10, blank=True, null=True)
-    longitude = models.DecimalField(max_digits=14, decimal_places=10, blank=True, null=True)
 
-    # SEO Parameter
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
-    seo_description = models.TextField(max_length=160, verbose_name='توضیحات سئو', blank=True)
+    map_iframe = models.TextField(verbose_name='نقشه', blank=True, null=True)
+    billboard_pic = models.ImageField(upload_to=billboard_path, verbose_name="تصویر اصلی بیلبورد",
+                                      blank=True, null=True)  # TODO: add location
+    billboard_pictures = models.ForeignKey(BillboardImageModel, related_name="BillboardImage",
+                                           verbose_name="تصاویر بیلبورد",
+                                           on_delete=models.CASCADE, blank=True, null=True)
+
+    final_price = models.OneToOneField(BillboardFinalPriceModel,
+                                       related_name='BillboardFinalPrice', verbose_name="قیمت نهایی",
+                                       on_delete=models.CASCADE, blank=True, null=True)
+
+    seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOBillboard",
+                               verbose_name="محتوای سئو", blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "بیلبورد ها"
@@ -81,4 +122,3 @@ class BillboardModel(models.Model):
 
     def __str__(self):
         return self.name
-
