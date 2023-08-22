@@ -172,6 +172,9 @@ cython_debug/
 
 # added by Akira
 
-# delete migrations file
+# ignore migrations file
 */migrations/*
 !*/migrations/__init__.py
+
+# ignore upload direction files
+upload/*

@@ -63,6 +63,8 @@ class BillboardAttributeModel(models.Model):
 
 
 class BillboardFinalPriceModel(models.Model):
+    billboard = models.OneToOneField('BillboardModel', on_delete=models.CASCADE,
+                                     related_name="BillboardFinalPriceModel", null=True)
     add_price = models.PositiveBigIntegerField(verbose_name="قیمت افزوده",  default=0, blank=True)
     final_price = models.PositiveBigIntegerField(verbose_name="قیمت نهایی",  default=0, blank=True)
 
@@ -71,13 +73,14 @@ class BillboardFinalPriceModel(models.Model):
         verbose_name = "قیمت نهایی"
 
     def __str__(self):
-        return self.BillboardFinalPrice.name
+        return self.billboard.name
 
 
 class BillboardImageModel(models.Model):
     title = models.CharField(max_length=255, verbose_name="عنوان عکس", blank=True)
-    image = models.ImageField(upload_to=billboard_path, verbose_name="عکس")
-
+    image = models.ImageField(upload_to=billboard_path, verbose_name="عکس") # TODO: delete file when delete model
+    billboard = models.ForeignKey('BillboardModel', related_name="BillboardImageModel",
+                                  verbose_name="تصویر بیلبورد",  on_delete=models.CASCADE, null=True)
     class Meta:
         verbose_name_plural = "عکس های بیلبورد"
         verbose_name = "عکس بیلبورد"
@@ -104,14 +107,7 @@ class BillboardModel(models.Model):
 
     map_iframe = models.TextField(verbose_name='نقشه', blank=True, null=True)
     billboard_pic = models.ImageField(upload_to=billboard_path, verbose_name="تصویر اصلی بیلبورد",
-                                      blank=True, null=True)  # TODO: add location
-    billboard_pictures = models.ForeignKey(BillboardImageModel, related_name="BillboardImage",
-                                           verbose_name="تصاویر بیلبورد",
-                                           on_delete=models.CASCADE, blank=True, null=True)
-
-    final_price = models.OneToOneField(BillboardFinalPriceModel,
-                                       related_name='BillboardFinalPrice', verbose_name="قیمت نهایی",
-                                       on_delete=models.CASCADE, blank=True, null=True)
+                                      blank=True, null=True)
 
     seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOBillboard",
                                verbose_name="محتوای سئو", blank=True, null=True)
