@@ -176,5 +176,5 @@ cython_debug/
 */migrations/*
 !*/migrations/__init__.py
 
-# ignore upload direction files
+# ignore upload directions files
 upload/*
