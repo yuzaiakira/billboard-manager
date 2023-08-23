@@ -9,24 +9,13 @@ from .utils import billboard_path
 # Create your models here.
 
 
-class SEOModel(models.Model):
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
-    description = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
-
-    class Meta:
-        verbose_name_plural = "محتوا های سئو شده"
-        verbose_name = "محتوای سئو شده"
-
-    def __str__(self):
-        return self.title
-
-
 class StateModel(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام استان")
 
-    seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOState",
-                               verbose_name="محتوای سئو", blank=True, null=True)
+    # SEO fields
+    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
+    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
+    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "استان ها"
@@ -40,8 +29,10 @@ class CityModel(models.Model):
     state = models.ForeignKey('StateModel', related_name='CityModel', on_delete=models.CASCADE, verbose_name="استان")
     name = models.CharField(max_length=100, verbose_name="نام شهر")
 
-    seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOCity",
-                               verbose_name="محتوای سئو", blank=True, null=True)
+    # SEO fields
+    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
+    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
+    desc= models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "شهر ها"
@@ -109,8 +100,10 @@ class BillboardModel(models.Model):
     billboard_pic = models.ImageField(upload_to=billboard_path, verbose_name="تصویر اصلی بیلبورد",
                                       blank=True, null=True)
 
-    seo = models.OneToOneField(SEOModel, on_delete=models.CASCADE, related_name="SEOBillboard",
-                               verbose_name="محتوای سئو", blank=True, null=True)
+    # SEO fields
+    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
+    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
+    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "بیلبورد ها"

@@ -13,13 +13,9 @@ class BillboardImageInline(admin.TabularInline):
 
 
 # Register models admin class
-@admin.register(models.SEOModel)
-class SEOAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'url': ('title',), }
-
-
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'url': ('title',), }
     filter_horizontal = ('attribute',)
     inlines = (BillboardFinalPriceInline, BillboardImageInline)
 
@@ -29,9 +25,17 @@ class BillboardAdmin(admin.ModelAdmin):
         obj.save()
 
 
+@admin.register(models.StateModel)
+class StateAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'url': ('title',), }
+
+
+@admin.register(models.CityModel)
+class CityAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'url': ('title',), }
+
+
 # Register models
-admin.site.register(models.StateModel)
-admin.site.register(models.CityModel)
 admin.site.register(models.BillboardImageModel)
 admin.site.register(models.BillboardFinalPriceModel)
 admin.site.register(models.BillboardAttributeModel)
