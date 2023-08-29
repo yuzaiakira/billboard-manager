@@ -43,23 +43,34 @@ class BillboardAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
     def response_add(self, request, obj, post_url_continue=None):
-        final_price = (obj.price * self.commission) + obj.BillboardFinalPriceModel.add_price
         final_price_model, created = models.BillboardFinalPriceModel.objects.get_or_create(billboard=obj)
-        if not created:
+        if obj.reseller.user_group == UserModel.ADMIN_USER:
+            final_price = obj.price
+        else:
+            final_price = (obj.price * self.commission) + obj.BillboardFinalPriceModel.add_price
+
+        if created:
             final_price_model.final_price = final_price
             final_price_model.add_price = obj.BillboardFinalPriceModel.add_price
-            final_price_model.save()
+
+        else:
+            final_price_model.final_price = final_price
+
+        final_price_model.save()
 
         return super(BillboardAdmin, self).response_add(request, obj, post_url_continue)
 
     def response_change(self, request, obj):
-        final_price = (obj.price * self.commission) + obj.BillboardFinalPriceModel.add_price
+        final_price_model = models.BillboardFinalPriceModel.objects.get(billboard=obj)
+        if obj.reseller.user_group != UserModel.ADMIN_USER:
+            final_price = (obj.price * self.commission) + obj.BillboardFinalPriceModel.add_price
+            if final_price != obj.BillboardFinalPriceModel.final_price:
+                final_price_model.final_price = final_price
+        else:
+            final_price_model.final_price = obj.price
 
-        if final_price != obj.BillboardFinalPriceModel.final_price:
-            final_price_model = models.BillboardFinalPriceModel.objects.get(billboard=obj)
-            final_price_model.final_price = final_price
-            final_price_model.add_price = obj.BillboardFinalPriceModel.add_price
-            final_price_model.save()
+        final_price_model.add_price = obj.BillboardFinalPriceModel.add_price
+        final_price_model.save()
 
         return super(BillboardAdmin, self).response_change(request, obj)
 
