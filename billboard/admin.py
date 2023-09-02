@@ -18,6 +18,7 @@ class BillboardImageInline(admin.TabularInline):
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
     commission = 1.2
+    list_display = ('__str__', 'reseller',)
     prepopulated_fields = {'url': ('title',), }
     filter_horizontal = ('attribute',)
     inlines = (BillboardImageInline, )
@@ -97,11 +98,18 @@ class BillboardAdmin(admin.ModelAdmin):
         return [(None, {'fields': self.get_fields(request, obj)})]
 
     def get_inlines(self, request, obj):
-        if request.user.user_group == UserModel.ADMIN_USER:
+        if request.user.user_group == UserModel.ADMIN_USER and not obj.reseller.user_group == UserModel.ADMIN_USER:
             new_inlines = (BillboardFinalPriceInline, BillboardImageInline)
             return new_inlines
         else:
             return super().get_inlines(request, obj)
+
+    def get_queryset(self, request):
+        qs = self.model.object.by_reseller(request)
+        ordering = self.get_ordering(request)
+        if ordering:
+            qs = qs.order_by(*ordering)
+        return qs
 
 
 @admin.register(models.StateModel)

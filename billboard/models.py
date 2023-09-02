@@ -53,6 +53,15 @@ class BillboardAttributeModel(models.Model):
         return self.name
 
 
+class BillboardManager(models.Manager):
+
+    def by_reseller(self, request, *args, **kwargs):
+        if request.user.user_group == UserModel.ADMIN_USER:
+            return super().get_queryset(*args, **kwargs)
+        else:
+            return super().get_queryset(*args, **kwargs).filter(reseller=request.user)
+
+
 class BillboardModel(models.Model):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
@@ -77,6 +86,9 @@ class BillboardModel(models.Model):
     title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
     url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
     desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
+
+    # manager
+    object = BillboardManager()
 
     class Meta:
         verbose_name_plural = "بیلبورد ها"
