@@ -18,7 +18,9 @@ class BillboardImageInline(admin.TabularInline):
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
     commission = 1.2
-    list_display = ('__str__', 'reseller',)
+    list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price')
+    list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length', 'billboard_width', 'has_power')
+    search_fields = ('name', 'reseller', 'city', 'address')
     prepopulated_fields = {'url': ('title',), }
     filter_horizontal = ('attribute',)
     inlines = (BillboardImageInline, )
@@ -36,6 +38,11 @@ class BillboardAdmin(admin.ModelAdmin):
                   }),
 
                  )
+
+    def get_final_price(self, obj):
+        return obj.BillboardFinalPriceModel.final_price
+
+    get_final_price.short_description = 'قیمت'
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'reseller') is None:
