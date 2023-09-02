@@ -98,8 +98,8 @@ class BillboardAdmin(admin.ModelAdmin):
 
     def get_inlines(self, request, obj):
         if request.user.user_group == UserModel.ADMIN_USER:
-            inline = (BillboardFinalPriceInline, BillboardImageInline)
-            return inline
+            new_inlines = (BillboardFinalPriceInline, BillboardImageInline)
+            return new_inlines
         else:
             return super().get_inlines(request, obj)
 

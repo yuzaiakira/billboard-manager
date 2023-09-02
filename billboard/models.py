@@ -32,7 +32,7 @@ class CityModel(models.Model):
     # SEO fields
     title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
     url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
-    desc= models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
+    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "شهر ها"
@@ -51,33 +51,6 @@ class BillboardAttributeModel(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class BillboardFinalPriceModel(models.Model):
-    billboard = models.OneToOneField('BillboardModel', on_delete=models.CASCADE,
-                                     related_name="BillboardFinalPriceModel", null=True)
-    add_price = models.PositiveBigIntegerField(verbose_name="قیمت افزوده",  default=0, blank=True)
-    final_price = models.PositiveBigIntegerField(verbose_name="قیمت نهایی",  default=0, blank=True)
-
-    class Meta:
-        verbose_name_plural = "قیمت های نهایی"
-        verbose_name = "قیمت نهایی"
-
-    def __str__(self):
-        return self.billboard.name
-
-
-class BillboardImageModel(models.Model):
-    title = models.CharField(max_length=255, verbose_name="عنوان عکس", blank=True)
-    image = models.ImageField(upload_to=billboard_path, verbose_name="عکس") # TODO: delete file when delete model
-    billboard = models.ForeignKey('BillboardModel', related_name="BillboardImageModel",
-                                  verbose_name="تصویر بیلبورد",  on_delete=models.CASCADE, null=True)
-    class Meta:
-        verbose_name_plural = "عکس های بیلبورد"
-        verbose_name = "عکس بیلبورد"
-
-    def __str__(self):
-        return self.title
 
 
 class BillboardModel(models.Model):
@@ -111,3 +84,31 @@ class BillboardModel(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class BillboardFinalPriceModel(models.Model):
+    billboard = models.OneToOneField(BillboardModel, on_delete=models.CASCADE,
+                                     related_name="BillboardFinalPriceModel", null=True)
+    add_price = models.PositiveBigIntegerField(verbose_name="قیمت افزوده",  default=0, blank=True)
+    final_price = models.PositiveBigIntegerField(verbose_name="قیمت نهایی",  default=0, blank=True)
+
+    class Meta:
+        verbose_name_plural = "قیمت های نهایی"
+        verbose_name = "قیمت نهایی"
+
+    def __str__(self):
+        return self.billboard.name
+
+
+class BillboardImageModel(models.Model):
+    title = models.CharField(max_length=255, verbose_name="عنوان عکس", blank=True)
+    image = models.ImageField(upload_to=billboard_path, verbose_name="عکس")  # TODO: delete file when delete model
+    billboard = models.ForeignKey(BillboardModel, related_name="BillboardImageModel",
+                                  verbose_name="تصویر بیلبورد",  on_delete=models.CASCADE, null=True)
+
+    class Meta:
+        verbose_name_plural = "عکس های بیلبورد"
+        verbose_name = "عکس بیلبورد"
+
+    def __str__(self):
+        return self.title
