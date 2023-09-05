@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.templatetags.static import static
 # source: https://pypi.org/project/django-jalali/
 from django_jalali.db import models as jmodels
 
@@ -67,7 +67,8 @@ class BillboardModel(models.Model):
                              verbose_name="شهر", null=True)
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")
-    attribute = models.ManyToManyField(BillboardAttributeModel, verbose_name="ویژگی های بیلبورد")
+    attribute = models.ManyToManyField(BillboardAttributeModel,
+                                       verbose_name="ویژگی های بیلبورد", blank=True, null=True)
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
     has_power = models.BooleanField(verbose_name="برق دارد؟", default=False)
@@ -96,6 +97,38 @@ class BillboardModel(models.Model):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def get_recent(cls, number: int, only: list):
+        """Return of newest object the number of "number"
+
+        ...
+
+        Parameters
+        ----------
+        number : int
+            the number of object to returned
+
+        only : list
+            list of the field in the model that you want to be return
+            like: only=['name', 'price', ... ]
+
+        Returns
+        -------
+        return a  QuerySet[BillboardModel] by number of 'number'
+
+        """
+        return cls.object.all()[:number].only(*only)
+
+    @property
+    def billboard_pic_url(self):
+        """Get picture form model if picture is null change by default picture
+        you can use it in template
+        """
+        if self.billboard_pic and hasattr(self.billboard_pic, 'url'):
+            return self.billboard_pic.url
+        else:
+            return static('template/images/no-image.png')
 
 
 class BillboardFinalPriceModel(models.Model):
