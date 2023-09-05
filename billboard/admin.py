@@ -19,7 +19,8 @@ class BillboardImageInline(admin.TabularInline):
 class BillboardAdmin(admin.ModelAdmin):
     commission = 1.2
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price')
-    list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length', 'billboard_width', 'has_power')
+    list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length',
+                   'billboard_width', 'has_power')
     search_fields = ('name', 'reseller', 'city', 'address')
     prepopulated_fields = {'url': ('title',), }
     filter_horizontal = ('attribute',)
@@ -105,9 +106,16 @@ class BillboardAdmin(admin.ModelAdmin):
         return [(None, {'fields': self.get_fields(request, obj)})]
 
     def get_inlines(self, request, obj):
-        if request.user.user_group == UserModel.ADMIN_USER and not obj.reseller.user_group == UserModel.ADMIN_USER:
-            new_inlines = (BillboardFinalPriceInline, BillboardImageInline)
+        if request.user.user_group == UserModel.ADMIN_USER:
+            try:
+                if obj.reseller.user_group == UserModel.ADMIN_USER:
+                    new_inlines = (BillboardImageInline, )
+
+            except AttributeError:
+                new_inlines = (BillboardFinalPriceInline, BillboardImageInline)
+
             return new_inlines
+
         else:
             return super().get_inlines(request, obj)
 
