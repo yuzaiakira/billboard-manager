@@ -41,8 +41,8 @@ INSTALLED_APPS = [
     'django_jalali',
     # custom apps
     'adminpanel.apps.AdminpanelConfig',
-    'front.apps.FrontConfig',
-    'billboard.apps.BillboardConfig'
+    'billboard.apps.BillboardConfig',
+    'template.apps.TemplateConfig',
 ]
 
 MIDDLEWARE = [
