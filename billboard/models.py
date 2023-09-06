@@ -131,6 +131,8 @@ class BillboardModel(models.Model):
             return static('template/images/no-image.png')
 
 
+
+
 class BillboardFinalPriceModel(models.Model):
     billboard = models.OneToOneField(BillboardModel, on_delete=models.CASCADE,
                                      related_name="BillboardFinalPriceModel", null=True)
@@ -142,7 +144,13 @@ class BillboardFinalPriceModel(models.Model):
         verbose_name = "قیمت نهایی"
 
     def __str__(self):
-        return self.billboard.name
+        try:
+            name = self.billboard.name
+
+        except AttributeError :
+            name = "حذف شده"
+
+        return name
 
 
 class BillboardImageModel(models.Model):
@@ -150,6 +158,8 @@ class BillboardImageModel(models.Model):
     image = models.ImageField(upload_to=billboard_path, verbose_name="عکس")  # TODO: delete file when delete model
     billboard = models.ForeignKey(BillboardModel, related_name="BillboardImageModel",
                                   verbose_name="تصویر بیلبورد",  on_delete=models.CASCADE, null=True)
+    uploader = models.ForeignKey(UserModel, related_name="BillboardImageModel",
+                                 verbose_name="آپلود کننده", on_delete=models.SET_NULL, null=True)
 
     class Meta:
         verbose_name_plural = "عکس های بیلبورد"

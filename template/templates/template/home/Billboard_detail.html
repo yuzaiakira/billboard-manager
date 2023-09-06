@@ -1,0 +1,263 @@
+{% extends 'template/home/base_body.html' %}
+{% load static %}
+{% load change_bool_value %}
+
+{% block title %}{% if object.title %}{{ object.title }}{% else %}{{ object.name }}{% endif %}{% endblock %}
+
+
+{% block content %}
+
+    <!-- ==== details section start ==== -->
+    <div class="property__details__banner bg__img clear__top"
+        data-background="{{ object.billboard_pic_url }}">
+    </div>
+    <section class="p__details faq section__space__bottom">
+        <div class="container">
+            <div class="p__details__area">
+                <div class="row">
+                    <div class="col-lg-7">
+                        <div class="p__details__content">
+                            <a href="#gallery" class="button button--effect button--secondary"><i
+                                    class="fa-solid fa-images"></i> مشاهده بیلبورد</a>
+                            <div class="intro">
+                                <h3>{{ object.name }}</h3>
+                                <p><i class="fa-solid fa-location-dot"></i><span> آدرس:</span>
+
+                                    {{ object.address }}
+                                </p>
+                            </div>
+                            <div class="group__one">
+                                <h4>توضیحات بیلبورد</h4>
+                                <p>
+                                    {{object.desc}}
+                                </p>
+                            </div>
+                            {% if object.attribute %}
+                            <div class="group__two">
+                                <h5>برخی از ویژگی های بیلبورد</h5>
+                                <ul>
+                                    {% for attr in object.attribute.all %}
+                                    <li><img src="{% static 'template/images/check.png' %}" alt="Check" />{{ attr.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endif %}
+                            <div class="terms">
+                                <h5>برخی از ویژگی های بیلبورد</h5>
+                                <div class="terms__wrapper">
+                                    <div class="terms__single">
+                                        <img src="{% static 'template/images/icons/loan.png' %}" alt="Maximum Loan" />
+                                        <p>نوع پرداخت</p>
+                                        <h5 class="neutral-bottom">ماهانه</h5>
+                                    </div>
+                                    <div class="terms__single">
+                                        <img src="{% static 'template/images/icons/charge.png' %}" alt="Charge" />
+                                        <p>برق</p>
+                                        <h5 class="neutral-bottom">{{ object.has_power|boolean_value }}</h5>
+                                    </div>
+                                    <div class="terms__single">
+                                        <img src="{% static 'template/images/icons/revest.png' %}" alt="Annual" />
+                                        <p>کد تابلو</p>
+                                        <h5 class="neutral-bottom">{{ object.pk }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="group__one">
+                                <h4>مکان بیلبورد</h4>
+                                <p>شما میتوانید مکان فعلی این بیلبورد را گوگل مپ زیر مشاهده بفرمایید</p>
+                                <div class="map__wrapper">
+                                    <iframe
+                                        src="{{ object.map_iframe }}"
+                                        width="746" height="312" style="border:0;" allowfullscreen="" loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5">
+                        <div class="p__details__sidebar">
+                            <div class="intro">
+
+                                <h5>قابل اجاره در: <span>{{ object.reservation_date }}</span></h5>
+
+                            </div>
+                            <div class="group brin">
+
+                                <div class="capital detail">
+                                    <p>قیمت:</p>
+                                    <p>{{ object.BillboardFinalPriceModel.final_price }} <span>تومان</span>
+                                    </p>
+                                </div>
+
+                                <div class="capital detail">
+                                    <p>عرض:</p>
+                                    <p>{{ object.billboard_width }} متر
+                                    </p>
+                                </div>
+
+                                <div class="capital detail">
+                                    <p>طول:</p>
+                                    <p>{{ object.billboard_length }} متر
+                                    </p>
+                                </div>
+
+                                <div class="capital detail">
+                                    <p>محل بیلبورد:</p>
+                                    <p><a href="#">{{ object.city.state.name }}</a> / <a href="#">{{ object.city.name }}</a>
+                                    </p>
+                                </div>
+
+                            </div>
+
+                            <div class="group birinit">
+                                <h6>اشتراک در شبکه های اجتماعی</h6>
+                                <div class="social text-start">
+                                    <a href="javascript:void(0)">
+                                        <i class="fab fa-facebook-f"></i>
+                                    </a>
+                                    <a href="javascript:void(0)">
+                                        <i class="fab fa-twitter"></i>
+                                    </a>
+                                    <a href="javascript:void(0)">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
+                                    <a href="javascript:void(0)">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="group alt__brin__last">
+                                <h5>چاپ</h5>
+                                <hr />
+                                <h6>چاپ به صورت تکی</h6>
+                                <p>تنها از اطلاعات این بیلبورد برای شما چاپ گرفته میشود</p>
+                                <a href="javascript:void(0)" class="button">
+                                    <i class="fa-solid fa-print"></i>
+                                    چاپ صفحه </a>
+                                <h6>چاپ دسته ای</h6>
+                                <p>به افزودن این بیلبورد به لیست شما میتوانید از اطلاعات تمام بیلبود های انتخاب شده خود چاپ بگیرید</p>
+                                <a href="javascript:void(0)" class="button button-add-list">
+                                    <i class="fa-solid fa-plus"></i>
+                                    افزودن به لیست</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ==== #details section end ==== -->
+
+    <!-- ==== property gallery two section start ==== -->
+    <section class="p__gallery wow fadeInUp" id="gallery">
+        <div class="container">
+            <hr class="divider" />
+            <div class="p__gallery__area section__space">
+                <div class="title__with__cta">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-lg-8">
+                            <h2>گالری عکس های بیلبورد</h2>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="text-start text-lg-end">
+                                <a href="contact-us.html" class="button button--secondary button--effect">درخواست برای اطلاعات بیشتر</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row p__gallery__single">
+                    {% if object.billboard_pic %}
+                        <div class="col-md-6 col-lg-4 gallery__single__two">
+                            <a href="{{ object.billboard_pic_url }}">
+                                <img src="{{ object.billboard_pic_url }}" alt="{{ object.name }}" />
+                            </a>
+                        </div>
+                    {% endif %}
+
+                {% if object.BillboardImageModel %}
+                    {% for image in object.BillboardImageModel.all %}
+                        <div class="col-md-6 col-lg-4 gallery__single__two">
+                            <a href="{{ image.image.url }}">
+                                <img src="{{ image.image.url }}" alt="{{ image.title|default:object.name }}" />
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ==== property gallery two section end ==== -->
+
+    <!-- ==== all properties in grid section start ==== -->
+    <section class="properties__grid section__space">
+        <div class="container">
+            <div class="properties__grid__area wow fadeInUp">
+
+                <div class="title__with__cta">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-lg-8">
+                            <h2>بیلبورد های مشابه</h2>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="text-start text-lg-end">
+                                <a href="properties.html" class="button button--secondary button--effect">مشاهده همه بیلبورد ها</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="property__grid__wrapper">
+                    <div class="row">
+{#                        {% for related in object.get_related_billboard %}#}
+                        <div class="col-lg-4 col-xl-4">
+                            <div class="property__grid__single">
+                                <div class="img__effect">
+                                    <a href="property-details.html">
+                                        <img src="assets/images/property/grid-one.jpg" alt="Property">
+                                    </a>
+                                </div>
+
+                                <div class="property__grid__single__inner">
+                                    <h4>بیلبورد 7936 در سبزوار</h4>
+                                    <p class="sub__info"><i class="fa-solid fa-location-dot"></i>  استان خراسان رضوی - شهر سبزوار - ریوند - 30 کیلومتری سبزوار</p>
+
+                                    <div class="item__info">
+                                        <div class="item__info__single">
+                                            <p>روشنایی</p>
+                                            <h6>دارد</h6>
+                                        </div>
+                                        <div class="item__info__single">
+                                            <p>قابل اجاره در</p>
+                                            <h6>1402/06/01</h6>
+                                        </div>
+                                    </div>
+                                    <div class="invest__cta__wrapper">
+
+                                        <div class="invest__cta">
+                                            <a href="property-details.html" class="button button--effect">
+                                                مشاهده بیشتر
+                                            </a>
+                                        </div>
+                                        <div class="invest__cta ">
+                                            <a href="property-details.html" class="button button--effect button-add-list">
+                                                افزودن به لیست
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+{#                        {% endfor %}#}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ==== #all properties in grid section end ==== -->
+
+
+{% endblock %}

@@ -91,7 +91,7 @@
                         <div class="col-lg-4 col-xl-4">
                             <div class="property__grid__single">
                                 <div class="img__effect">
-                                    <a href="property-details.html">
+                                    <a href="{% url 'billboard-detail' billboard.pk %}">
                                         <img src="{{ billboard.billboard_pic_url }}" alt="{{ billboard.name }}" />
                                     </a>
                                 </div>
@@ -114,7 +114,7 @@
                                     <div class="invest__cta__wrapper">
 
                                         <div class="invest__cta">
-                                            <a href="property-details.html" class="button button--effect">
+                                            <a href="{% url 'billboard-detail' billboard.pk %}" class="button button--effect">
                                                 مشاهده بیشتر
                                             </a>
                                         </div>
