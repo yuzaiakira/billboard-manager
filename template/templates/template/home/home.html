@@ -91,7 +91,7 @@
                         <div class="col-lg-4 col-xl-4">
                             <div class="property__grid__single">
                                 <div class="img__effect">
-                                    <a href="{% url 'billboard-detail' billboard.pk %}">
+                                    <a href="{{ billboard.get_absolute_url }}">
                                         <img src="{{ billboard.billboard_pic_url }}" alt="{{ billboard.name }}" />
                                     </a>
                                 </div>

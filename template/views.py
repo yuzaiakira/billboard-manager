@@ -19,4 +19,5 @@ class Home(View):
 
 class BillboardDetail(DetailView):
     model = BillboardModel
+    slug_field = 'url'
     template_name = "template/home/Billboard_detail.html"

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from django.templatetags.static import static
 # source: https://pypi.org/project/django-jalali/
 from django_jalali.db import models as jmodels
@@ -85,7 +86,7 @@ class BillboardModel(models.Model):
 
     # SEO fields
     title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, blank=True)
+    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, unique=True)
     desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     # manager
@@ -130,6 +131,12 @@ class BillboardModel(models.Model):
         else:
             return static('template/images/no-image.png')
 
+    def get_absolute_url(self):
+        url = self.url
+        if url is None or url == "" or url == " ":
+            return reverse('billboard-detail-id', args=[self.id])
+
+        return reverse('billboard-detail', args=[self.url])
 
 
 
@@ -159,7 +166,7 @@ class BillboardImageModel(models.Model):
     billboard = models.ForeignKey(BillboardModel, related_name="BillboardImageModel",
                                   verbose_name="تصویر بیلبورد",  on_delete=models.CASCADE, null=True)
     uploader = models.ForeignKey(UserModel, related_name="BillboardImageModel",
-                                 verbose_name="آپلود کننده", on_delete=models.SET_NULL, null=True)
+                                 verbose_name="آپلود کننده", on_delete=models.SET_NULL, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "عکس های بیلبورد"
