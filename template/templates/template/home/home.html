@@ -114,7 +114,7 @@
                                     <div class="invest__cta__wrapper">
 
                                         <div class="invest__cta">
-                                            <a href="{% url 'billboard-detail' billboard.pk %}" class="button button--effect">
+                                            <a href="{{ billboard.get_absolute_url }}" class="button button--effect">
                                                 مشاهده بیشتر
                                             </a>
                                         </div>

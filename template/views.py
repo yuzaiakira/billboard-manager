@@ -1,4 +1,3 @@
-from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
 from django.views import View
@@ -8,7 +7,7 @@ from billboard.models import BillboardModel
 
 
 class Home(View):
-    queryset = BillboardModel.get_recent(9,['name', 'address', 'has_power', 'reservation_date', 'billboard_pic'])
+    queryset = BillboardModel.get_recent(9)
 
     def get(self, request):
         contex = {

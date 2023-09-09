@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from django.templatetags.static import static
 # source: https://pypi.org/project/django-jalali/
@@ -92,6 +93,9 @@ class BillboardModel(models.Model):
     # manager
     object = BillboardManager()
 
+    # The fields that show in short property
+    fields_property = ['name', 'address', 'has_power', 'reservation_date']
+
     class Meta:
         verbose_name_plural = "بیلبورد ها"
         verbose_name = "بیلبورد"
@@ -100,7 +104,7 @@ class BillboardModel(models.Model):
         return self.name
 
     @classmethod
-    def get_recent(cls, number: int, only: list):
+    def get_recent(cls, number, only=fields_property):
         """Return of newest object the number of "number"
 
         ...
@@ -113,6 +117,7 @@ class BillboardModel(models.Model):
         only : list
             list of the field in the model that you want to be return
             like: only=['name', 'price', ... ]
+            default is self.fields_property
 
         Returns
         -------
@@ -120,6 +125,12 @@ class BillboardModel(models.Model):
 
         """
         return cls.object.all()[:number].only(*only)
+
+    @property
+    def get_related(self, obj=None):
+        return BillboardModel.object.filter(~Q(id=self.id), city=self.city, billboard_length=self.billboard_length,
+                                            billboard_width=self.billboard_width,
+                                            has_power=self.has_power)[:3].only(*self.fields_property)
 
     @property
     def billboard_pic_url(self):
@@ -139,7 +150,6 @@ class BillboardModel(models.Model):
         return reverse('billboard-detail', args=[self.url])
 
 
-
 class BillboardFinalPriceModel(models.Model):
     billboard = models.OneToOneField(BillboardModel, on_delete=models.CASCADE,
                                      related_name="BillboardFinalPriceModel", null=True)
@@ -154,7 +164,7 @@ class BillboardFinalPriceModel(models.Model):
         try:
             name = self.billboard.name
 
-        except AttributeError :
+        except AttributeError:
             name = "حذف شده"
 
         return name
