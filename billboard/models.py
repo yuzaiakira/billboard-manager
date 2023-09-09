@@ -104,7 +104,7 @@ class BillboardModel(models.Model):
         return self.name
 
     @classmethod
-    def get_recent(cls, number, only=fields_property):
+    def get_recent(cls, number, only=None):
         """Return of newest object the number of "number"
 
         ...
@@ -124,6 +124,9 @@ class BillboardModel(models.Model):
         return a  QuerySet[BillboardModel] by number of 'number'
 
         """
+        if only is None:
+            only = cls.fields_property
+
         return cls.object.all()[:number].only(*only)
 
     @property
