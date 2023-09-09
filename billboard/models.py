@@ -127,7 +127,9 @@ class BillboardModel(models.Model):
         return cls.object.all()[:number].only(*only)
 
     @property
-    def get_related(self, obj=None):
+    def get_related(self):
+        """Return related object with count of 3"""
+
         return BillboardModel.object.filter(~Q(id=self.id), city=self.city, billboard_length=self.billboard_length,
                                             billboard_width=self.billboard_width,
                                             has_power=self.has_power)[:3].only(*self.fields_property)
