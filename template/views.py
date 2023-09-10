@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 from django.views import View
 
 from billboard.models import BillboardModel
@@ -20,3 +21,8 @@ class BillboardDetail(DetailView):
     model = BillboardModel
     slug_field = 'url'
     template_name = "template/home/Billboard_detail.html"
+
+class BillboardList(ListView):
+    model = BillboardModel
+    paginate_by = 12
+    template_name = "template/home/Billboard_list.html"

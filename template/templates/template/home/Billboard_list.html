@@ -1,0 +1,164 @@
+{% extends 'template/home/base_body.html' %}
+{% load change_bool_value %}
+{% load paginator_tags %}
+{% block content %}
+    <!-- ==== banner section start ==== -->
+    <section class="banner__alt bg__img" data-background="./assets/images/banner/banner-two-bg.png">
+        <div class="container">
+            <div class="banner__alt__area">
+                <h1 class="neutral-top neutral-bottom">Browse Properties</h1>
+            </div>
+        </div>
+    </section>
+    <!-- ==== banner section end ==== -->
+
+
+    <!-- ==== property filter start ==== -->
+    <div class="property__filter">
+        <div class="container">
+            <div class="property__filter__area">
+                <div class="row d-flex align-items-center">
+                    <div class="col-lg-12 col-xl-6">
+                        <div class="property__search__wrapper">
+                            <form action="#" method="post">
+                                <div class="input">
+                                    <input type="search" name="property__search" id="propertySearch"
+                                        placeholder="عنوان بیلبورد" />
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </div>
+                                <button type="submit" class="button button--effect">جستجو</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-xl-3">
+                        <div class="property__select__wrapper">
+                            <select class="location__select">
+                                <option data-display="انتخاب شهر">انتخاب شهر</option>
+                                <option value="angeles">سبزوار</option>
+                                <option value="francis">مشهد</option>
+                                <option value="weldon">نیشابور</option>
+                                <option value="diego">تهران</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-xl-3">
+                        <div class="property__select__wrapper">
+                            <select class="property__select">
+                                <option data-display="وضعیت بیلبورد">وضعیت بیلبورد</option>
+                                <option value="commercial">اجاره شده</option>
+                                <option value="residential">قابل اجاره</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ==== #property filter end ==== -->
+
+
+
+    <!-- ==== properties grid section start ==== -->
+    <section class="properties__filter section__space__bottom">
+        <div class="container wow fadeInUp">
+            <div class="properties__filter__wrapper">
+                <h6>Showing <span>{{ object_list.count }}</span> properties</h6>
+
+            </div>
+            <div class="row property__grid__area__wrapper">
+                {% for billboard in object_list  %}
+                        <div class="col-lg-4 col-xl-4">
+                            <div class="property__grid__single">
+                                <div class="img__effect">
+                                    <a href="{{ billboard.get_absolute_url }}">
+                                        <img src="{{ billboard.billboard_pic_url }}" alt="{{ billboard.name }}" />
+                                    </a>
+                                </div>
+                                <div class="property__grid__single__inner">
+                                    <h4>{{ billboard.name}}</h4>
+                                    <p class="sub__info"><i class="fa-solid fa-location-dot"></i>
+                                    {{ billboard.address }}
+                                    </p>
+
+                                    <div class="item__info">
+                                        <div class="item__info__single">
+                                            <p>روشنایی</p>
+                                            <h6>{{ billboard.has_power|boolean_value }}</h6>
+                                        </div>
+                                        <div class="item__info__single">
+                                            <p>قابل اجاره در</p>
+                                            <h6>{{ billboard.reservation_date }}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="invest__cta__wrapper">
+
+                                        <div class="invest__cta">
+                                            <a href="{{ billboard.get_absolute_url }}" class="button button--effect">
+                                                مشاهده بیشتر
+                                            </a>
+                                        </div>
+                                        <div class="invest__cta ">
+                                            <a href="property-details.html" class="button button--effect button-add-list">
+                                                افزودن به لیست
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+
+            </div>
+
+
+
+
+            <div class="cta__btn">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                    {% get_proper_elided_page_range paginator page_obj.number as page_range %}
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </li>
+                        {% if page_obj.number > 3 %}
+                            <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+                        {% endif %}
+                    {% endif %}
+
+                    {% for page in page_range %}
+                        {% if page == page_obj.number %}
+                            <li class="page-item"><span class="page-link" >{{ page }}</span></li>
+                        {% elif page_obj.number|add:"2" < page or page < page_obj.number|add:"-2" %}
+                            {% if  page_obj.number|add:"2" ==  page_obj.paginator.num_pages %}
+                                <li class="page-item"><span class="page-link">{{ paginator.ELLIPSIS }}</span></li>
+                            {% endif %}
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    {% if page_obj.has_next %}
+                        {% if  page_obj.paginator.num_pages|add:"-1" > page_obj.next_page_number  %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
+                        {% endif %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-arrow-left"></i></a>
+                        </li>
+                    {% endif %}
+
+                    </ul>
+                </nav>
+
+
+
+            </div>
+        </div>
+    </section>
+    <!-- ==== properties grid section end ==== -->
+
+{% endblock %}
