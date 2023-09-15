@@ -1,12 +1,13 @@
 {% extends 'template/home/base_body.html' %}
 {% load change_bool_value %}
 {% load paginator_tags %}
+{% load static %}
 {% block content %}
     <!-- ==== banner section start ==== -->
-    <section class="banner__alt bg__img" data-background="./assets/images/banner/banner-two-bg.png">
+    <section class="banner__alt bg__img" data-background="{% static 'template/images/banner/banner-two-bg.png' %}">
         <div class="container">
             <div class="banner__alt__area">
-                <h1 class="neutral-top neutral-bottom">Browse Properties</h1>
+                <h1 class="neutral-top neutral-bottom">لیست بیلبورد ها</h1>
             </div>
         </div>
     </section>
@@ -62,7 +63,7 @@
     <section class="properties__filter section__space__bottom">
         <div class="container wow fadeInUp">
             <div class="properties__filter__wrapper">
-                <h6>Showing <span>{{ object_list.count }}</span> properties</h6>
+
 
             </div>
             <div class="row property__grid__area__wrapper">
@@ -119,7 +120,7 @@
                     {% get_proper_elided_page_range paginator page_obj.number as page_range %}
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+                            <a class="page-btn" href="?page={{ page_obj.previous_page_number }}">
                                 <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         </li>
@@ -130,7 +131,7 @@
 
                     {% for page in page_range %}
                         {% if page == page_obj.number %}
-                            <li class="page-item"><span class="page-link" >{{ page }}</span></li>
+                            <li class="page-item"><span class="page-link page-active" >{{ page }}</span></li>
                         {% elif page_obj.number|add:"2" < page or page < page_obj.number|add:"-2" %}
                             {% if  page_obj.number|add:"2" ==  page_obj.paginator.num_pages %}
                                 <li class="page-item"><span class="page-link">{{ paginator.ELLIPSIS }}</span></li>
@@ -147,7 +148,7 @@
                             <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
                         {% endif %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-arrow-left"></i></a>
+                            <a class="page-btn" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-arrow-left"></i></a>
                         </li>
                     {% endif %}
 

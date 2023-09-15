@@ -22,6 +22,7 @@ class BillboardDetail(DetailView):
     slug_field = 'url'
     template_name = "template/home/Billboard_detail.html"
 
+
 class BillboardList(ListView):
     model = BillboardModel
     paginate_by = 12

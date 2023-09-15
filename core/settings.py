@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'adminpanel.apps.AdminpanelConfig',
     'billboard.apps.BillboardConfig',
     'template.apps.TemplateConfig',
+    'addlist.apps.AddlistConfig',
 ]
 
 MIDDLEWARE = [
