@@ -1,6 +1,6 @@
 from django.contrib import admin
 from billboard import models
-from adminpanel.models import UserModel
+from account.models import UserModel
 
 
 # Register inlines admin class

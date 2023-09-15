@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_jalali',
     # custom apps
-    'adminpanel.apps.AdminpanelConfig',
+    'account.apps.AccountConfig',
     'billboard.apps.BillboardConfig',
     'template.apps.TemplateConfig',
     'addlist.apps.AddlistConfig',
@@ -131,7 +131,7 @@ STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'adminpanel.UserModel'
+AUTH_USER_MODEL = 'account.UserModel'
 
 MEDIA_URL = "/upload/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "upload")

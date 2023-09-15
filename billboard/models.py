@@ -5,7 +5,7 @@ from django.templatetags.static import static
 # source: https://pypi.org/project/django-jalali/
 from django_jalali.db import models as jmodels
 
-from adminpanel.models import UserModel
+from account.models import UserModel
 from .utils import billboard_path
 
 # Create your models here.

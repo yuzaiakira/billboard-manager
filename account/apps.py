@@ -1,7 +1,7 @@
 from django.apps import AppConfig
 
 
-class AdminpanelConfig(AppConfig):
+class AccountConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'adminpanel'
+    name = 'account'
     verbose_name = 'پنل مدیریت کاربر'
