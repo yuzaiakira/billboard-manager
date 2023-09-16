@@ -1,0 +1,97 @@
+{% extends 'template/home/base_body.html' %}
+{% load static %}
+{% load change_bool_value %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <!-- ==== banner section start ==== -->
+    <section class="banner__alt bg__img" data-background="{% static 'template/images/banner/banner-two-bg.png' %}">
+        <div class="container">
+            <div class="banner__alt__area">
+                <h1 class="neutral-top neutral-bottom">{{ title }}</h1>
+            </div>
+        </div>
+    </section>
+    <!-- ==== banner section end ==== -->
+
+
+    <!-- ==== property filter start ==== -->
+    <div class="property__filter">
+        <div class="container">
+            <div class="property__filter__area">
+                <div class="row d-flex align-items-center" style="justify-content: center;">
+                    <div class="col-lg-12 col-xl-6">
+                        <div class="nav__group__btn" style="justify-content: center;">
+                            <a href="{% url 'get-pdf' %}" class="button button--effect" style="background-color: #dc3545; box-shadow:0px 4px 24px 0px #dc354587">خروجی pdf</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ==== #property filter end ==== -->
+
+
+
+    <!-- ==== properties grid section start ==== -->
+    <section class="properties__filter section__space__bottom">
+        <div class="container wow fadeInUp">
+            <div class="properties__filter__wrapper">
+
+
+            </div>
+            <div class="row property__grid__area__wrapper">
+                {% for item in object_list  %}
+                        <div class="col-lg-4 col-xl-4">
+                            <div class="property__grid__single">
+                                <div class="img__effect">
+                                    <a href="{{ item.billboard.billboard.get_absolute_url }}">
+                                        <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" />
+                                    </a>
+                                </div>
+                                <div class="property__grid__single__inner">
+                                    <h4>{{  item.billboard.name}}</h4>
+                                    <p class="sub__info"><i class="fa-solid fa-location-dot"></i>
+                                    {{ item.billboard.address }}
+                                    </p>
+
+                                    <div class="item__info">
+                                        <div class="item__info__single">
+                                            <p>روشنایی</p>
+                                            <h6>{{ item.billboard.has_power|boolean_value }}</h6>
+                                        </div>
+                                        <div class="item__info__single">
+                                            <p>قابل اجاره در</p>
+                                            <h6>{{ item.billboard.reservation_date }}</h6>
+                                        </div>
+                                    </div>
+                                    <div class="invest__cta__wrapper">
+
+                                        <div class="invest__cta">
+                                            <a href="{{ item.billboard.get_absolute_url }}" class="button button--effect">
+                                                مشاهده بیشتر
+                                            </a>
+                                        </div>
+                                        <div class="invest__cta ">
+                                            <a href="{% url 'add-to-list' item.billboard.pk %}" class="button button--effect button-add-list">
+                                                حذف از لیست
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                {% endfor %}
+
+            </div>
+
+
+
+
+
+        </div>
+    </section>
+    <!-- ==== properties grid section end ==== -->
+
+{% endblock %}
