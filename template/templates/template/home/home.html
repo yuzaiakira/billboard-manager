@@ -258,33 +258,8 @@
     </section>
     <!-- ==== #numbers section end ==== -->
 {% endblock %}
+
+
 {% block script %}
-    <script>
-
-        item = document.getElementsByClassName('button-add-list') // get all billboard
-        for (let i=0; i <item.length; i++){
-            item[i].addEventListener('click',
-            function (e) {
-                e.preventDefault() // do not redirect page
-                send_data(this) // send element in send_data function
-            }
-            )
-        }
-
-        function send_data(obj){
-            // check obj is added in list
-            if(!obj.classList.contains("button-added-list")) {
-
-                const xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                            obj.classList.add("button-added-list"); // add css class when send a request
-                    }
-                }
-                xhttp.open("GET", obj.getAttribute('href')); // set request GET url
-                xhttp.send(); // send request
-              }
-        }
-    </script>
-
+{% include 'template/home/add_list_ajax.html' %}
 {% endblock %}
