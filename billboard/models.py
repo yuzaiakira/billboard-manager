@@ -70,7 +70,7 @@ class BillboardModel(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")
     attribute = models.ManyToManyField(BillboardAttributeModel,
-                                       verbose_name="ویژگی های بیلبورد", blank=True, null=True)
+                                       verbose_name="ویژگی های بیلبورد")
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
     has_power = models.BooleanField(verbose_name="برق دارد؟", default=False)
