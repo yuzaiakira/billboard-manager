@@ -27,3 +27,13 @@ class BillboardList(ListView):
     model = BillboardModel
     paginate_by = 12
     template_name = "template/home/Billboard_list.html"
+
+
+class BillboardCityList(BillboardList):
+    def get_queryset(self):
+        return self.model.object.filter(city__url=self.kwargs['slug'])
+
+
+class BillboardStateList(BillboardList):
+    def get_queryset(self):
+        return self.model.object.filter(city__state__url=self.kwargs['slug'])

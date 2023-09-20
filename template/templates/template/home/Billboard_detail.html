@@ -109,7 +109,7 @@
 
                                 <div class="capital detail">
                                     <p>محل بیلبورد:</p>
-                                    <p><a href="#">{{ object.city.state.name }}</a> / <a href="#">{{ object.city.name }}</a>
+                                    <p><a href="{{ object.city.state.get_absolute_url }}">{{ object.city.state.name }}</a> / <a href="{{ object.city.get_absolute_url }}">{{ object.city.name }}</a>
                                     </p>
                                 </div>
 

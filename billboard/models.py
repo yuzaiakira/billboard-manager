@@ -26,6 +26,10 @@ class StateModel(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('billboard-state-list', args=[self.url])
+
+
 
 class CityModel(models.Model):
     state = models.ForeignKey('StateModel', related_name='CityModel', on_delete=models.CASCADE, verbose_name="استان")
@@ -42,6 +46,9 @@ class CityModel(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('billboard-city-list', args=[self.url])
 
 
 class BillboardAttributeModel(models.Model):
