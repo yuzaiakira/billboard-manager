@@ -21,9 +21,9 @@
                 <div class="row d-flex align-items-center">
                     <div class="col-lg-12 col-xl-6">
                         <div class="property__search__wrapper">
-                            <form action="#" method="post">
+                             <form action="{% url 'search' %}" method="get">
                                 <div class="input">
-                                    <input type="search" name="property__search" id="propertySearch"
+                                    <input type="search" name="q" id="propertySearch"
                                         placeholder="عنوان بیلبورد" />
                                     <i class="fa-solid fa-magnifying-glass"></i>
                                 </div>
@@ -64,9 +64,10 @@
         <div class="container wow fadeInUp">
             <div class="properties__filter__wrapper">
 
-
             </div>
             <div class="row property__grid__area__wrapper">
+            {% if object_list %}
+
                 {% for billboard in object_list  %}
                         <div class="col-lg-4 col-xl-4">
                             <div class="property__grid__single">
@@ -108,12 +109,13 @@
                             </div>
                         </div>
                 {% endfor %}
-
+    {% else %}
+                {% include 'template/home/404_page.html' %}
+    {% endif %}
             </div>
 
 
-
-
+        {% if object_list %}
             <div class="cta__btn">
                 <nav aria-label="Page navigation">
                     <ul class="pagination justify-content-center">
@@ -158,8 +160,10 @@
 
 
             </div>
+        {% endif %}
         </div>
     </section>
+
     <!-- ==== properties grid section end ==== -->
 
 {% endblock %}
