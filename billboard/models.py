@@ -30,7 +30,6 @@ class StateModel(models.Model):
         return reverse('billboard-state-list', args=[self.url])
 
 
-
 class CityModel(models.Model):
     state = models.ForeignKey('StateModel', related_name='CityModel', on_delete=models.CASCADE, verbose_name="استان")
     name = models.CharField(max_length=100, verbose_name="نام شهر")
