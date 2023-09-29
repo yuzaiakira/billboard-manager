@@ -74,7 +74,7 @@
                                             </a>
                                         </div>
                                         <div class="invest__cta ">
-                                            <a href="{% url 'add-to-list' item.billboard.pk %}" class="button button--effect button-add-list">
+                                            <a href="{% url 'remove-from-list' item.billboard.pk %}" class="button button--effect button-add-list">
                                                 حذف از لیست
                                             </a>
                                         </div>
@@ -94,4 +94,8 @@
     </section>
     <!-- ==== properties grid section end ==== -->
 
+{% endblock %}
+
+{% block script %}
+{% include 'template/home/add_list_ajax.html' %}
 {% endblock %}

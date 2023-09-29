@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from addlist.views import AddToList
+from addlist.views import AddToList, RemoveFromList
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
     path('<int:pk>/', views.BillboardDetail.as_view(), name='billboard-detail-id'),
@@ -9,6 +9,6 @@ urlpatterns = [
     path('city/<slug>', views.BillboardCityList.as_view(), name='billboard-city-list'),
     path('state/<slug>', views.BillboardStateList.as_view(), name='billboard-state-list'),
     path('add-to-list/<int:pk>', AddToList.as_view(), name="add-to-list"),
+    path('remove-from-list/<int:pk>', RemoveFromList.as_view(), name="remove-from-list"),
     path('search', views.BillboardSearch.as_view(), name="search"),
-
 ]
