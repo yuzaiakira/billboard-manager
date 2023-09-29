@@ -15,7 +15,7 @@
                     <div class="navbar__out order-2 order-xl-3">
                         <div class="nav__group__btn">
                             <a href="{% url 'home' %}" class="log d-none d-sm-block">برگشت به خانه</a>
-                            <a href="{% url 'register' %}" class="button button--effect d-none d-sm-block"> ساخت حساب <i
+                            <a href="{% url 'login' %}" class="button button--effect d-none d-sm-block"> ورود <i
                                     class="fa-solid fa-arrow-left-long"></i> </a>
                         </div>
                         <button class="navbar-toggler d-block d-sm-none" type="button" data-bs-toggle="collapse"
@@ -32,7 +32,7 @@
                                 <a href="{% url 'home' %}" class="nav-link">برگشت به خانه</a>
                             </li>
                             <li class="nav-item d-block d-sm-none">
-                                <a href="{% url 'register' %}" class="button button--effect button--last">ساخت حساب <i
+                                <a href="{% url 'login' %}" class="button button--effect button--last">ورود <i
                                         class="fa-solid fa-arrow-left-long"></i></a>
                             </li>
                         </ul>
@@ -46,7 +46,7 @@
         <section class="registration clear__top">
             <div class="container">
                 <div class="registration__area">
-                    <h4 class="neutral-top">ورود به حساب</h4>
+                    <h4 class="neutral-top">ساخت حساب</h4>
                     <form method="post" class="form__login">
                         {% csrf_token %}
 
@@ -55,7 +55,7 @@
                             {{ field.label_tag }}
                             {{ field }}
                             {% if field.errors %}
-                                <small>{{ field.errors|striptags }}</small>
+                                <small>{{ field.errors }}</small>
                             {% endif %}
                         </div>
                     {% endfor %}

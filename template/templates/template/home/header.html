@@ -14,7 +14,7 @@
                     <div class="nav__group__btn">
                          {% if not request.user.is_authenticated %}
                             <a href="{% url 'login' %}" class="log d-none d-sm-block"> ورود</a>
-                            <a href="registration.html" class="button button--effect d-none d-sm-block"> ثبت نام  </a>
+                            <a href="{% url 'register' %}" class="button button--effect d-none d-sm-block"> ثبت نام  </a>
                          {% else %}
                              <a href="{% url 'logout' %}" class="log d-none d-sm-block">خروج از حساب</a>
                              <a href="{% url 'WatchList' %}" class="button button--effect d-none d-sm-block">مشاهده لیست</a>
