@@ -108,7 +108,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = BASE_SITE_URL + '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -117,9 +117,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'account.UserModel'
 
-MEDIA_URL = "/upload/"
+MEDIA_URL = BASE_SITE_URL + "/upload/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "upload")
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 LOGIN_URL = 'login'
-
-

@@ -19,11 +19,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('billboard/', include([
-        path('admin/', admin.site.urls),
-        path('account/', include('account.urls')),
-        path('', include('template.urls'))
-    ]))
+    path('admin/', admin.site.urls),
+    path('account/', include('account.urls')),
+    path('', include('template.urls'))
 ]
 
 if settings.DEBUG:
