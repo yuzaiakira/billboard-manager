@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'billboard.apps.BillboardConfig',
     'template.apps.TemplateConfig',
     'addlist.apps.AddlistConfig',
+    'reservation.apps.ReservationConfig',
+    'siteoption.apps.SiteoptionConfig'
 ]
 
 MIDDLEWARE = [
