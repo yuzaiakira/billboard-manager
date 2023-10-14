@@ -91,6 +91,21 @@ class BillboardModel(models.Model):
     billboard_pic = models.ImageField(upload_to=billboard_path, verbose_name="تصویر اصلی بیلبورد",
                                       blank=True, null=True)
 
+    BILLBOARD_PUBLIC = 0
+    BILLBOARD_DRAFT = 1
+    BILLBOARD_ARCHIVE = 2
+    BILLBOARD_NO_SELL = 3
+
+    billboard_group_status = (
+        (BILLBOARD_PUBLIC, 'نمایش در سایت'),
+        (BILLBOARD_DRAFT, 'پیش نویس'),
+        (BILLBOARD_ARCHIVE, 'آرشیو'),
+        (BILLBOARD_NO_SELL, 'غیر قابل فروش'),
+    )
+
+    billboard_status = models.PositiveSmallIntegerField(choices=billboard_group_status,
+                                                        verbose_name="وضعیت بیلبورد", default=0)
+
     # SEO fields
     title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
     url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, unique=True)
