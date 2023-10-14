@@ -50,6 +50,18 @@ class CityModel(models.Model):
         return reverse('billboard-city-list', args=[self.url])
 
 
+class BillboardCategory(models.Model):
+    parent = models.ForeignKey('self', related_name='BillboardCategory',
+                               on_delete=models.CASCADE, verbose_name="دسته بندی", blank=True, null=True)
+    name = models.CharField(max_length=255, verbose_name="اسم دسته بندی")
+    billboard_visibility = models.BooleanField(verbose_name="نمایش بیلبورد ها در این دسته بندی؟", default=True)
+
+    # SEO fields
+    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
+    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, unique=True)
+    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
+
+
 class BillboardAttributeModel(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام ویژگی بیلبورد")
 
@@ -73,6 +85,9 @@ class BillboardManager(models.Manager):
 class BillboardModel(models.Model):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
+    category = models.ForeignKey(BillboardCategory, related_name='BillboardModel', on_delete=models.SET_NULL,
+                             verbose_name="دسته بندی", blank=True, null=True)
+
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")
     attribute = models.ManyToManyField(BillboardAttributeModel,
