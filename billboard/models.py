@@ -61,6 +61,13 @@ class BillboardCategory(models.Model):
     url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, unique=True)
     desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
+    class Meta:
+        verbose_name_plural = "دسته بندی ها"
+        verbose_name = "دسته بندی"
+
+    def __str__(self):
+        return self.name
+
 
 class BillboardAttributeModel(models.Model):
     name = models.CharField(max_length=100, verbose_name="نام ویژگی بیلبورد")
@@ -86,7 +93,7 @@ class BillboardModel(models.Model):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
     category = models.ForeignKey(BillboardCategory, related_name='BillboardModel', on_delete=models.SET_NULL,
-                             verbose_name="دسته بندی", blank=True, null=True)
+                                 verbose_name="دسته بندی", blank=True, null=True)
 
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")

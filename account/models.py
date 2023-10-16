@@ -32,3 +32,10 @@ class BrandModel(models.Model):
     agency = models.CharField(max_length=355, verbose_name="نمایندگی", blank=True, null=True)
     address = models.TextField(verbose_name="آدرس", blank=True, null=True)
     detail = models.TextField(verbose_name="توضیحات بیشتر", blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "برند ها"
+        verbose_name = "برند"
+
+    def __str__(self):
+        return self.brand_name
