@@ -24,7 +24,7 @@ class UserModel(AbstractUser):
 class BrandModel(models.Model):
     user = models.ForeignKey(UserModel, verbose_name="کاربر", related_name='BrandModel',
                              on_delete=models.SET_NULL, blank=True, null=True)
-    brand_name = models.CharField(max_length=255, verbose_name="نام", blank=True, null=True)
+    brand_name = models.CharField(max_length=255, verbose_name="نام برند", blank=True, null=True)
     id_code = models.CharField(max_length=10, verbose_name="کد ملی", blank=True, null=True)
     first_name = models.CharField(max_length=255, verbose_name="نام", blank=True, null=True)
     last_name = models.CharField(max_length=255, verbose_name="نام خانوادگی", blank=True, null=True)
@@ -38,4 +38,9 @@ class BrandModel(models.Model):
         verbose_name = "برند"
 
     def __str__(self):
-        return self.brand_name
+        if self.brand_name is not None:
+            return self.brand_name
+        elif self.agency is not None:
+            return self.agency
+
+        return "وارد نشده"

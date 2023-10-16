@@ -141,3 +141,4 @@ class CityAdmin(admin.ModelAdmin):
 admin.site.register(models.BillboardImageModel)
 admin.site.register(models.BillboardFinalPriceModel)
 admin.site.register(models.BillboardAttributeModel)
+admin.site.register(models.BillboardCategory)
