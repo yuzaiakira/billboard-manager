@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'template.apps.TemplateConfig',
     'addlist.apps.AddlistConfig',
     'reservation.apps.ReservationConfig',
-    'siteoption.apps.SiteoptionConfig'
+    'siteoption.apps.SiteoptionConfig',
+    'seo.apps.SeoConfig'
 ]
 
 MIDDLEWARE = [

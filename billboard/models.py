@@ -6,18 +6,14 @@ from django.templatetags.static import static
 from django_jalali.db import models as jmodels
 
 from account.models import UserModel
+from seo.models import SEOBaseModel
 from .utils import billboard_path
 
 # Create your models here.
 
 
-class StateModel(models.Model):
+class StateModel(SEOBaseModel):
     name = models.CharField(max_length=100, verbose_name="نام استان")
-
-    # SEO fields
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True)
-    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "استان ها"
@@ -30,14 +26,9 @@ class StateModel(models.Model):
         return reverse('billboard-state-list', args=[self.url])
 
 
-class CityModel(models.Model):
+class CityModel(SEOBaseModel):
     state = models.ForeignKey('StateModel', related_name='CityModel', on_delete=models.CASCADE, verbose_name="استان")
     name = models.CharField(max_length=100, verbose_name="نام شهر")
-
-    # SEO fields
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True)
-    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "شهر ها"
@@ -50,16 +41,11 @@ class CityModel(models.Model):
         return reverse('billboard-city-list', args=[self.url])
 
 
-class BillboardCategory(models.Model):
+class BillboardCategory(SEOBaseModel):
     parent = models.ForeignKey('self', related_name='BillboardCategory',
                                on_delete=models.CASCADE, verbose_name="دسته بندی", blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name="اسم دسته بندی")
     billboard_visibility = models.BooleanField(verbose_name="نمایش بیلبورد ها در این دسته بندی؟", default=True)
-
-    # SEO fields
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, unique=True)
-    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     class Meta:
         verbose_name_plural = "دسته بندی ها"
@@ -89,7 +75,7 @@ class BillboardManager(models.Manager):
             return super().get_queryset(*args, **kwargs).filter(reseller=request.user)
 
 
-class BillboardModel(models.Model):
+class BillboardModel(SEOBaseModel):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
     category = models.ForeignKey(BillboardCategory, related_name='BillboardModel', on_delete=models.SET_NULL,
@@ -128,10 +114,6 @@ class BillboardModel(models.Model):
     billboard_status = models.PositiveSmallIntegerField(choices=billboard_group_status,
                                                         verbose_name="وضعیت بیلبورد", default=0)
 
-    # SEO fields
-    title = models.CharField(max_length=255, verbose_name="عنوان صفحه", blank=True)
-    url = models.SlugField(max_length=255, verbose_name='آدرس صفحه', allow_unicode=True, unique=True)
-    desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True)
 
     # manager
     object = BillboardManager()
