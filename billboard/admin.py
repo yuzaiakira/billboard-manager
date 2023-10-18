@@ -1,6 +1,10 @@
 from django.contrib import admin
+
 from billboard import models
 from account.models import UserModel
+
+admin.site.site_header = 'Billboard Manager'
+admin.site.index_title = 'ANTEN'
 
 
 # Register inlines admin class
