@@ -116,7 +116,7 @@ class BillboardModel(SEOBaseModel):
 
 
     # manager
-    objectss = BillboardManager()
+    objects = BillboardManager()
 
     # The fields that show in short property
     fields_property = ['name', 'address', 'has_power', 'reservation_date']

@@ -23,15 +23,18 @@ class BillboardAdmin(admin.ModelAdmin):
                    'billboard_width', 'has_power')
     search_fields = ('name', 'reseller', 'city', 'address')
     prepopulated_fields = {'url': ('title',), }
-    filter_horizontal = ('attribute',)
+    filter_horizontal = ('attribute', )
     inlines = (BillboardImageInline, )
+    raw_id_fields = ('category', )
     fieldsets = (("توضیحات بیلبورد",
                   {
                       "fields": ("city", "name", "address", "attribute", "description",),
                   }),
                  ("ویژگی های بیلورد",
                   {
-                      "fields": ("has_power", ("billboard_length", "billboard_width", "price", "reservation_date")),
+                      "fields": ("has_power",
+                                 ("billboard_length", "billboard_width", "price", "reservation_date"),
+                                 "category"),
                   }),
                  ("سئو",
                   {
@@ -92,7 +95,7 @@ class BillboardAdmin(admin.ModelAdmin):
                  ("ویژگی های بیلورد",
                   {
                       "fields": ("has_power", "reseller", ("billboard_length", "billboard_width",
-                                                           "price", "reservation_date")),
+                                                           "price", "reservation_date"), "category"),
                   }),
                  ("سئو",
                   {
@@ -107,6 +110,8 @@ class BillboardAdmin(admin.ModelAdmin):
 
     def get_inlines(self, request, obj):
         if request.user.user_group == UserModel.ADMIN_USER:
+            new_inlines = (BillboardFinalPriceInline, BillboardImageInline)
+
             try:
                 if obj.reseller.user_group == UserModel.ADMIN_USER:
                     new_inlines = (BillboardImageInline, )
@@ -137,8 +142,19 @@ class CityAdmin(admin.ModelAdmin):
     prepopulated_fields = {'url': ('title',), }
 
 
+@admin.display(description="مادر")
+def display_parent(obj):
+    return obj.parent
+
+
+@admin.register(models.BillboardCategory)
+class CategoryAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'url': ('title',), }
+    list_display = ('name', display_parent, 'billboard_visibility')
+    search_fields = ('name',)
+
+
 # Register models
 admin.site.register(models.BillboardImageModel)
 admin.site.register(models.BillboardFinalPriceModel)
 admin.site.register(models.BillboardAttributeModel)
-admin.site.register(models.BillboardCategory)
