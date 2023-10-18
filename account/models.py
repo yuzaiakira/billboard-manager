@@ -20,6 +20,10 @@ class UserModel(AbstractUser):
     phone_number = models.CharField(max_length=15, verbose_name="شماره تماس", blank=True, null=True)
     display_name = models.CharField(max_length=50, verbose_name="نام نمایشی در سایت", blank=True, null=True)
 
+    @property
+    def can_check_reservation(self):
+        return self.has_perm("reservation.can_check_reservation")
+
 
 class BrandModel(models.Model):
     user = models.ForeignKey(UserModel, verbose_name="کاربر", related_name='BrandModel',

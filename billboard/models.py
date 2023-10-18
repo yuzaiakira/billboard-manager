@@ -114,7 +114,6 @@ class BillboardModel(SEOBaseModel):
     billboard_status = models.PositiveSmallIntegerField(choices=billboard_group_status,
                                                         verbose_name="وضعیت بیلبورد", default=0)
 
-
     # manager
     objects = BillboardManager()
 

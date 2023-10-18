@@ -15,3 +15,4 @@ class RentalListAdmin(admin.ModelAdmin):
     list_display = ('contract', 'billboard', 'start_date', 'end_date', 'months')
     list_filter = ('start_date', 'end_date')
     search_fields = ('contract', 'billboard', 'start_date', 'end_date')
+    raw_id_fields = ('contract', 'billboard')

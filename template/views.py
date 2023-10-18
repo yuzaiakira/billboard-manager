@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 from django.views import View
 
 from billboard.models import BillboardModel
+from reservation.models import RentalListModel
 # Create your views here.
 
 
@@ -23,6 +24,11 @@ class BillboardDetail(DetailView):
     model = BillboardModel
     slug_field = 'url'
     template_name = "template/home/Billboard_detail.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(BillboardDetail, self).get_context_data(*args, **kwargs)
+        context['rental_list'] = RentalListModel.get_rental_list(billboard_id=self.object.id)
+        return context
 
 
 class BillboardList(ListView):

@@ -33,11 +33,16 @@ class RentalListModel(models.Model):
     start_date = jmodels.jDateField(verbose_name="تاریخ شروع قراداد")
     end_date = jmodels.jDateField(verbose_name="تاریخ پایان قراداد")
     months = models.PositiveSmallIntegerField(verbose_name="تعداد ماه های قراداد", blank=True, null=True)
-    price = models.PositiveBigIntegerField(verbose_name="قیمت هر ماه")
+    price = models.PositiveBigIntegerField(verbose_name="قیمت هر ماه", blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "رزرو ها"
         verbose_name = "رزرو"
+        permissions = (("can_check_reservation", "اجاره برسی رزرو ها"),)
 
     def __str__(self):
         return f"{self.billboard.name} - {self.contract.brand.brand_name}"
+
+    @classmethod
+    def get_rental_list(cls, billboard_id):
+        return RentalListModel.objects.filter(billboard_id=billboard_id)

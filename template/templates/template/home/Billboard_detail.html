@@ -196,6 +196,34 @@
     </section>
     <!-- ==== property gallery two section end ==== -->
 
+{% if request.user.can_check_reservation %}
+ <!-- ==== reservation section start ==== -->
+    <section class="p__gallery wow fadeInUp" id="gallery">
+        <div class="container">
+            <hr class="divider" />
+            <div class="p__gallery__area section__space">
+                <div class="title__with__cta">
+                    <div class="row d-flex align-items-center">
+                        <div class="col-lg-8">
+                            <h2>تاریخ های رزرو</h2>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="text-start text-lg-end">
+                                <a href="contact-us.html" class="button button--secondary button--effect">افزودن</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row p__gallery__single">
+                    {% for rent in rental_list %}
+                    <p>{{ rent.contract.brand }}: {{ rent.start_date }} - {{ rent.end_date }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ==== reservation section end ==== -->
+{% endif %}
 {% if object.get_related %}
     <!-- ==== all properties in grid section start ==== -->
     <section class="properties__grid section__space">
