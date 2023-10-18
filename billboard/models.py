@@ -116,7 +116,7 @@ class BillboardModel(SEOBaseModel):
 
 
     # manager
-    object = BillboardManager()
+    objectss = BillboardManager()
 
     # The fields that show in short property
     fields_property = ['name', 'address', 'has_power', 'reservation_date']
@@ -152,15 +152,15 @@ class BillboardModel(SEOBaseModel):
         if only is None:
             only = cls.fields_property
 
-        return cls.object.all()[:number].only(*only)
+        return cls.objects.all()[:number].only(*only)
 
     @property
     def get_related(self):
         """Return related object with count of 3"""
 
-        return BillboardModel.object.filter(~Q(id=self.id), city=self.city, billboard_length=self.billboard_length,
-                                            billboard_width=self.billboard_width,
-                                            has_power=self.has_power)[:3].only(*self.fields_property)
+        return BillboardModel.objects.filter(~Q(id=self.id), city=self.city, billboard_length=self.billboard_length,
+                                             billboard_width=self.billboard_width,
+                                             has_power=self.has_power)[:3].only(*self.fields_property)
 
     @property
     def billboard_pic_url(self):

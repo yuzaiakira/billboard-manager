@@ -120,7 +120,7 @@ class BillboardAdmin(admin.ModelAdmin):
             return super().get_inlines(request, obj)
 
     def get_queryset(self, request):
-        qs = self.model.object.by_reseller(request)
+        qs = self.model.objects.by_reseller(request)
         ordering = self.get_ordering(request)
         if ordering:
             qs = qs.order_by(*ordering)

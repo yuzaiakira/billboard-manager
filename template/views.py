@@ -33,12 +33,12 @@ class BillboardList(ListView):
 
 class BillboardCityList(BillboardList):
     def get_queryset(self):
-        return self.model.object.filter(city__url=self.kwargs['slug'])
+        return self.model.objects.filter(city__url=self.kwargs['slug'])
 
 
 class BillboardStateList(BillboardList):
     def get_queryset(self):
-        return self.model.object.filter(city__state__url=self.kwargs['slug'])
+        return self.model.objects.filter(city__state__url=self.kwargs['slug'])
 
 
 class BillboardSearch(BillboardList):
@@ -46,7 +46,7 @@ class BillboardSearch(BillboardList):
     def get_queryset(self):
         query = self.request.GET.get("q")
         if query is not None:
-            object_list = self.model.object.filter(
+            object_list = self.model.objects.filter(
                 Q(name__icontains=query) | Q(city__name__icontains=query) | Q(city__state__name__icontains=query) |
                 Q(address__icontains=query)
             )
