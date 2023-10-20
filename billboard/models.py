@@ -23,7 +23,8 @@ class StateModel(SEOBaseModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('billboard-state-list', args=[self.url])
+        # return reverse('billboard-state-list', args=[self.url])
+        return reverse('billboard-state-list', args=[self.id])
 
 
 class CityModel(SEOBaseModel):
@@ -38,7 +39,8 @@ class CityModel(SEOBaseModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('billboard-city-list', args=[self.url])
+        # return reverse('billboard-city-list', args=[self.url])
+        return reverse('billboard-city-list', args=[self.id])
 
 
 class BillboardCategory(SEOBaseModel):
@@ -172,11 +174,11 @@ class BillboardModel(SEOBaseModel):
             return static('template/images/no-image.png')
 
     def get_absolute_url(self):
-        url = self.url
-        if url is None or url == "" or url == " ":
-            return reverse('billboard-detail-id', args=[self.id])
+        # url = self.url
+        # if url is None or url == "" or url == " ":
+        #     return reverse('billboard-detail-id', args=[self.id])
 
-        return reverse('billboard-detail', args=[self.url])
+        return reverse('billboard-detail', args=[self.id])
 
 
 class BillboardFinalPriceModel(models.Model):

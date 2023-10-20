@@ -5,6 +5,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views import View
 
+from urllib.parse import unquote
+
 from billboard.models import BillboardModel
 from reservation.models import RentalListModel
 # Create your views here.
@@ -39,12 +41,14 @@ class BillboardList(ListView):
 
 class BillboardCityList(BillboardList):
     def get_queryset(self):
-        return self.model.objects.filter(city__url=self.kwargs['slug'])
+        # return self.model.objects.filter(city__url=self.kwargs['slug'])
+        return self.model.objects.filter(city__id=self.kwargs['pk'])
 
 
 class BillboardStateList(BillboardList):
     def get_queryset(self):
-        return self.model.objects.filter(city__state__url=self.kwargs['slug'])
+        # return self.model.objects.filter(city__state__url=self.kwargs['slug'])
+        return self.model.objects.filter(city__state__id=self.kwargs['pk'])
 
 
 class BillboardSearch(BillboardList):
