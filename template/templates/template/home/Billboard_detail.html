@@ -209,7 +209,7 @@
                         </div>
                         <div class="col-lg-4">
                             <div class="text-start text-lg-end">
-                                <a href="contact-us.html" class="button button--secondary button--effect">افزودن</a>
+                                <a href="{% url 'admin:reservation_rentallistmodel_add' %}?billboard_id={{ object.id }}" class="button button--secondary button--effect">افزودن</a>
                             </div>
                         </div>
                     </div>
