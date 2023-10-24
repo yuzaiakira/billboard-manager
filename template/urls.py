@@ -1,9 +1,11 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 from addlist.views import AddToList, RemoveFromList
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
-    path('<int:pk>/', views.BillboardDetail.as_view(), name='billboard-detail'),
+    # path('<slug>/', views.BillboardDetail.as_view(), name='billboard-detail'),
+    # path('<int:pk>/', views.BillboardDetail.as_view(), name='billboard-detail'),
+    re_path(r'^(?P<slug>[^/]+)/?$', views.BillboardDetail.as_view(), name='billboard-detail'),
     path('billboards', views.BillboardList.as_view(), name='billboard-list'),
     # path('state/<slug>', views.BillboardStateList.as_view(), name='billboard-state-list'),
     # path('city/<slug>', views.BillboardCityList.as_view(), name='billboard-city-list'),

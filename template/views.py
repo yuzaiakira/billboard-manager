@@ -1,3 +1,4 @@
+from django.http import Http404
 from django.shortcuts import render
 from django.db.models import Q
 
@@ -37,6 +38,23 @@ class BillboardList(ListView):
     model = BillboardModel
     paginate_by = 12
     template_name = "template/home/Billboard_list.html"
+    slug_url_kwarg = 'slug'
+
+    def get(self, request, *args, **kwargs):
+        self.kwargs['slug'] = unquote(self.kwargs['slug'])
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(slug=self.kwargs['slug'])
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = queryset.first()
+        if obj:
+            return obj
+        else:
+            raise Http404("No billboard found")
 
 
 class BillboardCityList(BillboardList):
