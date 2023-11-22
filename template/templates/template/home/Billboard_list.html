@@ -1,6 +1,7 @@
 {% extends 'template/home/base_body.html' %}
 {% load change_bool_value %}
 {% load paginator_tags %}
+{% load check_in_list %}
 {% load static %}
 {% block content %}
     <!-- ==== banner section start ==== -->
@@ -100,7 +101,7 @@
                                             </a>
                                         </div>
                                         <div class="invest__cta ">
-                                            <a href="{% url 'add-to-list' billboard.pk %}" class="button button--effect button-add-list">
+                                            <a href="{% url 'add-to-list' billboard.pk %}" class="button button--effect button-add-list {% if billboard|on_list:request.user %}button-added-list{% endif %}">
                                                 افزودن به لیست
                                             </a>
                                         </div>

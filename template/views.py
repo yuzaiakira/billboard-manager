@@ -25,7 +25,7 @@ class Home(View):
 
 class BillboardDetail(DetailView):
     model = BillboardModel
-    slug_field = 'url'
+    slug_field = 'slug'
     template_name = "template/home/Billboard_detail.html"
 
     def get_context_data(self, *args, **kwargs):
@@ -40,6 +40,10 @@ class BillboardList(ListView):
     template_name = "template/home/Billboard_list.html"
     slug_url_kwarg = 'slug'
 
+
+
+
+class BillboardCityList(BillboardList):
     def get(self, request, *args, **kwargs):
         self.kwargs['slug'] = unquote(self.kwargs['slug'])
         return super().get(request, *args, **kwargs)
@@ -56,17 +60,14 @@ class BillboardList(ListView):
         else:
             raise Http404("No billboard found")
 
-
-class BillboardCityList(BillboardList):
     def get_queryset(self):
-        # return self.model.objects.filter(city__url=self.kwargs['slug'])
-        return self.model.objects.filter(city__id=self.kwargs['pk'])
+        return self.model.objects.filter(city__slug=self.kwargs['slug'])
+        # return self.model.objects.filter(city__id=self.kwargs['pk'])
 
 
-class BillboardStateList(BillboardList):
+class BillboardStateList(BillboardCityList):
     def get_queryset(self):
-        # return self.model.objects.filter(city__state__url=self.kwargs['slug'])
-        return self.model.objects.filter(city__state__id=self.kwargs['pk'])
+        return self.model.objects.filter(city__state__slug=self.kwargs['slug'])
 
 
 class BillboardSearch(BillboardList):
@@ -80,4 +81,3 @@ class BillboardSearch(BillboardList):
             )
             return object_list
         return super().get_queryset()
-        

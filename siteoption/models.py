@@ -7,14 +7,12 @@ class OptionModel(models.Model):
     INTEGER = 0
     STRING = 1
     FLOAT = 2
-    DOUBLE = 3
-    BOOLEAN = 4
+    BOOLEAN = 3
 
     type_group_status = (
         (INTEGER, "integer"),
         (STRING, "string"),
         (FLOAT, "float"),
-        (DOUBLE, "double"),
         (BOOLEAN, "boolean"),
     )
 
@@ -22,4 +20,20 @@ class OptionModel(models.Model):
 
     key = models.CharField(max_length=200, unique=True)
     value = models.TextField()
+
+    def clean_value(self):
+        if self.type == self.INTEGER:
+            return int(self.value)
+        elif self.type == self.STRING:
+            return str(self.value)
+        elif self.type == self.FLOAT:
+            return float(self.value)
+        elif self.type == self.BOOLEAN:
+            if self.value == "false" or self.value == "False" or self.value == "0":
+                return False
+            return bool(self.value)
+
+
+    def __str__(self):
+        return self.key
 
