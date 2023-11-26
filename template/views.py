@@ -1,9 +1,12 @@
+from django.http import Http404
 from django.shortcuts import render
 from django.db.models import Q
 
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views import View
+from django.shortcuts import get_object_or_404
+from django.utils.encoding import uri_to_iri
 
 from urllib.parse import unquote
 
@@ -24,8 +27,13 @@ class Home(View):
 
 class BillboardDetail(DetailView):
     model = BillboardModel
-    slug_field = 'url'
+    slug_field = 'slug'
     template_name = "template/home/Billboard_detail.html"
+
+    def get_object(self, queryset=None):
+        slug = self.kwargs.get(self.get_slug_field())
+        slug = uri_to_iri(slug)
+        return get_object_or_404(self.model, slug=slug)
 
     def get_context_data(self, *args, **kwargs):
         context = super(BillboardDetail, self).get_context_data(*args, **kwargs)
@@ -37,18 +45,33 @@ class BillboardList(ListView):
     model = BillboardModel
     paginate_by = 12
     template_name = "template/home/Billboard_list.html"
+    slug_url_kwarg = 'slug'
 
 
 class BillboardCityList(BillboardList):
+    def get(self, request, *args, **kwargs):
+        self.kwargs['slug'] = unquote(self.kwargs['slug'])
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
-        # return self.model.objects.filter(city__url=self.kwargs['slug'])
-        return self.model.objects.filter(city__id=self.kwargs['pk'])
+        queryset = super().get_queryset()
+        return queryset.filter(slug=self.kwargs['slug'])
+
+    def get_object(self):
+        queryset = self.get_queryset()
+        obj = queryset.first()
+        if obj:
+            return obj
+        else:
+            raise Http404("No billboard found")
+
+    def get_queryset(self):
+        return self.model.objects.filter(city__slug=self.kwargs['slug'])
 
 
-class BillboardStateList(BillboardList):
+class BillboardStateList(BillboardCityList):
     def get_queryset(self):
-        # return self.model.objects.filter(city__state__url=self.kwargs['slug'])
-        return self.model.objects.filter(city__state__id=self.kwargs['pk'])
+        return self.model.objects.filter(city__state__slug=self.kwargs['slug'])
 
 
 class BillboardSearch(BillboardList):
@@ -62,4 +85,3 @@ class BillboardSearch(BillboardList):
             )
             return object_list
         return super().get_queryset()
-        

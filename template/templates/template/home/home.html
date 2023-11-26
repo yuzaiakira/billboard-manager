@@ -1,6 +1,7 @@
 {% extends 'template/home/base_body.html' %}
 {% load static %}
 {% load change_bool_value %}
+{% load check_in_list %}
 {% block content %}
 <!-- ==== hero section start ==== -->
     <section class="hero pos__rel over__hi bg__img" data-background="./assets/images/hero/light-bg.png">
@@ -119,7 +120,7 @@
                                             </a>
                                         </div>
                                         <div class="invest__cta ">
-                                            <a href="{% url 'add-to-list' billboard.pk %}" class="button button--effect button-add-list">
+                                            <a href="{% url 'add-to-list' billboard.pk %}" class="button button--effect button-add-list {% if billboard|on_list:request.user %}button-added-list{% endif %}">
                                                 افزودن به لیست
                                             </a>
                                         </div>
