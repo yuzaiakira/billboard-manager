@@ -20,6 +20,9 @@ class UserModel(AbstractUser):
     phone_number = models.CharField(max_length=15, verbose_name="شماره تماس", blank=True, null=True)
     display_name = models.CharField(max_length=50, verbose_name="نام نمایشی در سایت", blank=True, null=True)
 
+    company = models.ForeignKey('CompanyModel', verbose_name="شرکت", on_delete=models.SET_NULL,
+                                related_name='UserModel', null=True, blank=True)
+
     @property
     def can_check_reservation(self):
         return self.has_perm("reservation.can_check_reservation")
@@ -48,3 +51,14 @@ class BrandModel(models.Model):
             return self.agency
 
         return "وارد نشده"
+
+
+class CompanyModel(models.Model):
+    name = models.CharField(max_length=255, verbose_name="نام شرکت")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = "شرکت ها"
+        verbose_name = "شرکت"

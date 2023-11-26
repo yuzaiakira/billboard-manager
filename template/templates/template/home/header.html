@@ -16,6 +16,9 @@
                             <a href="{% url 'login' %}" class="log d-none d-sm-block"> ورود</a>
                             <a href="{% url 'register' %}" class="button button--effect d-none d-sm-block"> ثبت نام  </a>
                          {% else %}
+                             {% if request.user.is_staff %}
+                                <a href="{% url 'admin:index' %}" class="log d-none d-sm-block">پنل مدیریت</a>
+                            {% endif %}
                              <a href="{% url 'logout' %}" class="log d-none d-sm-block">خروج از حساب</a>
                              <a href="{% url 'WatchList' %}" class="button button--effect d-none d-sm-block">مشاهده لیست</a>
                          {% endif %}

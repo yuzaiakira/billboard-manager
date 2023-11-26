@@ -23,8 +23,7 @@ class StateModel(SEOBaseModel):
         return self.name
 
     def get_absolute_url(self):
-        # return reverse('billboard-state-list', args=[self.url])
-        return reverse('billboard-state-list', args=[self.id])
+        return reverse('billboard-state-list', args=[self.slug])
 
 
 class CityModel(SEOBaseModel):
@@ -39,8 +38,7 @@ class CityModel(SEOBaseModel):
         return self.name
 
     def get_absolute_url(self):
-        # return reverse('billboard-city-list', args=[self.url])
-        return reverse('billboard-city-list', args=[self.id])
+        return reverse('billboard-city-list', args=[self.slug])
 
 
 class BillboardCategory(SEOBaseModel):
@@ -48,6 +46,7 @@ class BillboardCategory(SEOBaseModel):
                                on_delete=models.CASCADE, verbose_name="دسته بندی", blank=True, null=True)
     name = models.CharField(max_length=255, verbose_name="اسم دسته بندی")
     billboard_visibility = models.BooleanField(verbose_name="نمایش بیلبورد ها در این دسته بندی؟", default=True)
+    priority = models.SmallIntegerField(verbose_name="اولیت", blank=True, default=0)
 
     class Meta:
         verbose_name_plural = "دسته بندی ها"
@@ -90,8 +89,8 @@ class BillboardModel(SEOBaseModel):
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
     has_power = models.BooleanField(verbose_name="برق دارد؟", default=False)
-    billboard_length = models.PositiveSmallIntegerField(verbose_name="طول بیلبورد")
-    billboard_width = models.PositiveSmallIntegerField(verbose_name="عرض بیلبورد")
+    billboard_length = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="طول بیلبورد")
+    billboard_width = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="عرض بیلبورد")
 
     price = models.PositiveBigIntegerField(verbose_name="قیمت")
     reservation_date = jmodels.jDateField(verbose_name="قابل اجاره در", null=True)
@@ -174,11 +173,16 @@ class BillboardModel(SEOBaseModel):
             return static('template/images/no-image.png')
 
     def get_absolute_url(self):
-        # url = self.url
-        # if url is None or url == "" or url == " ":
-        #     return reverse('billboard-detail-id', args=[self.id])
+        url = self.slug
+        if url is None or url == "" or url == " ":
+            return reverse('billboard-detail-id', args=[self.id])
 
-        return reverse('billboard-detail', args=[self.id])
+        return reverse('billboard-detail', args=[url])
+
+    @property
+    def get_add_to_list_class(self):
+        lists = self.ListModel.all()
+        return lists
 
 
 class BillboardFinalPriceModel(models.Model):

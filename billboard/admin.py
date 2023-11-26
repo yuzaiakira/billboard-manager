@@ -3,6 +3,8 @@ from django.contrib import admin
 from billboard import models
 from account.models import UserModel
 
+from siteoption.utils.functions import get_option
+
 admin.site.site_header = 'Billboard Manager'
 admin.site.index_title = 'ANTEN'
 
@@ -21,12 +23,12 @@ class BillboardImageInline(admin.TabularInline):
 # Register models admin class
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
-    commission = 1.2
-    list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price')
+    commission = get_option('BillboardCommission', 1.2)
+    list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price',)
     list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length',
                    'billboard_width', 'has_power')
-    search_fields = ('name', 'reseller', 'city', 'address')
-    prepopulated_fields = {'url': ('title',), }
+    search_fields = ('name', 'address', 'city__name')
+    prepopulated_fields = {'slug': ('title',), }
     filter_horizontal = ('attribute', )
     inlines = (BillboardImageInline, )
     raw_id_fields = ('category', )
@@ -42,7 +44,7 @@ class BillboardAdmin(admin.ModelAdmin):
                   }),
                  ("سئو",
                   {
-                      "fields": ("billboard_pic", "map_iframe", "title", "url", "desc"),
+                      "fields": ("billboard_pic", "map_iframe", "title", "slug", "desc"),
                   }),
 
                  )
@@ -103,7 +105,7 @@ class BillboardAdmin(admin.ModelAdmin):
                   }),
                  ("سئو",
                   {
-                      "fields": ("billboard_pic", "map_iframe", "title", "url", "desc"),
+                      "fields": ("billboard_pic", "map_iframe", "title", "slug", "desc"),
                   }),
 
                  )
@@ -138,12 +140,12 @@ class BillboardAdmin(admin.ModelAdmin):
 
 @admin.register(models.StateModel)
 class StateAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'url': ('title',), }
+    prepopulated_fields = {'slug': ('title',), }
 
 
 @admin.register(models.CityModel)
 class CityAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'url': ('title',), }
+    prepopulated_fields = {'slug': ('title',), }
 
 
 @admin.display(description="مادر")
@@ -153,7 +155,7 @@ def display_parent(obj):
 
 @admin.register(models.BillboardCategory)
 class CategoryAdmin(admin.ModelAdmin):
-    prepopulated_fields = {'url': ('title',), }
+    prepopulated_fields = {'slug': ('title',), }
     list_display = ('name', display_parent, 'billboard_visibility')
     search_fields = ('name',)
 
