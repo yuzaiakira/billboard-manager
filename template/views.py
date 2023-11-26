@@ -5,6 +5,8 @@ from django.db.models import Q
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views import View
+from django.shortcuts import get_object_or_404
+from django.utils.encoding import uri_to_iri
 
 from urllib.parse import unquote
 
@@ -28,6 +30,11 @@ class BillboardDetail(DetailView):
     slug_field = 'slug'
     template_name = "template/home/Billboard_detail.html"
 
+    def get_object(self, queryset=None):
+        slug = self.kwargs.get(self.get_slug_field())
+        slug = uri_to_iri(slug)
+        return get_object_or_404(self.model, slug=slug)
+
     def get_context_data(self, *args, **kwargs):
         context = super(BillboardDetail, self).get_context_data(*args, **kwargs)
         context['rental_list'] = RentalListModel.get_rental_list(billboard_id=self.object.id)
@@ -39,8 +46,6 @@ class BillboardList(ListView):
     paginate_by = 12
     template_name = "template/home/Billboard_list.html"
     slug_url_kwarg = 'slug'
-
-
 
 
 class BillboardCityList(BillboardList):
@@ -62,7 +67,6 @@ class BillboardCityList(BillboardList):
 
     def get_queryset(self):
         return self.model.objects.filter(city__slug=self.kwargs['slug'])
-        # return self.model.objects.filter(city__id=self.kwargs['pk'])
 
 
 class BillboardStateList(BillboardCityList):
