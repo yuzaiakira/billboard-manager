@@ -23,7 +23,6 @@ class BillboardImageInline(admin.TabularInline):
 # Register models admin class
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
-    commission = get_option('BillboardCommission', 1.2)
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price',)
     list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length',
                    'billboard_width', 'has_power')
@@ -49,6 +48,12 @@ class BillboardAdmin(admin.ModelAdmin):
 
                  )
 
+    def get_commission(self):
+        if not hasattr(self, '_commission'):
+            self._commission = get_option('BillboardCommission', 1.2)
+
+        return self._commission
+
     def get_final_price(self, obj):
         return obj.BillboardFinalPriceModel.final_price
 
@@ -65,7 +70,7 @@ class BillboardAdmin(admin.ModelAdmin):
         if obj.reseller.user_group == UserModel.ADMIN_USER:
             final_price = obj.price
         else:
-            final_price = (obj.price * self.commission) + obj.BillboardFinalPriceModel.add_price
+            final_price = (obj.price * self.get_commission()) + obj.BillboardFinalPriceModel.add_price
 
         if created:
             final_price_model.final_price = final_price
@@ -81,7 +86,7 @@ class BillboardAdmin(admin.ModelAdmin):
     def response_change(self, request, obj):
         final_price_model = models.BillboardFinalPriceModel.objects.get(billboard=obj)
         if obj.reseller.user_group != UserModel.ADMIN_USER:
-            final_price = (obj.price * self.commission) + obj.BillboardFinalPriceModel.add_price
+            final_price = (obj.price * self.get_commission()) + obj.BillboardFinalPriceModel.add_price
             if final_price != obj.BillboardFinalPriceModel.final_price:
                 final_price_model.final_price = final_price
         else:
