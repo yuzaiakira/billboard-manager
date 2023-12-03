@@ -23,7 +23,15 @@
                 <div class="row d-flex align-items-center" style="justify-content: center;">
                     <div class="col-lg-12 col-xl-6">
                         <div class="nav__group__btn" style="justify-content: center;">
-                            <a href="{% url 'get-pdf' %}" class="button button--effect" style="background-color: #dc3545; box-shadow:0px 4px 24px 0px #dc354587">خروجی pdf</a>
+
+                            <form method="get" action="{% url 'get-pdf' %}" class="list__form">
+                                <button type="submit" class="button button--effect">خروجی pdf</button>
+                                <ul>
+                                    {{ pdf_form.as_ul }}
+                                </ul>
+
+                            </form>
+
                         </div>
                     </div>
                 </div>
