@@ -4,6 +4,7 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .models import ListsModel
+from .forms import ChoseFieldForm
 # Create your views here.
 
 
@@ -43,6 +44,7 @@ class WatchList(LoginRequiredMixin, View):
     model = ListsModel
     template = 'template/list/Billboard_watch_list.html'
     context = dict()
+    context['pdf_form'] = ChoseFieldForm()
 
     def get(self, request):
         self.context['object_list'] = self.model.objects.filter(user=request.user)
@@ -53,3 +55,12 @@ class WatchList(LoginRequiredMixin, View):
 
 class PrintPDF(WatchList):
     template = 'template/list/Print_PDF.html'
+
+    def get(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            self.context['pdf_form'] = ChoseFieldForm(request.GET)
+            if self.context['pdf_form'].is_valid():
+                print(self.context['pdf_form'].cleaned_data['billboard_pic'])
+                print(self.context['pdf_form'].cleaned_data)
+
+        return super().get(request, *args, **kwargs)

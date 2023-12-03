@@ -94,51 +94,74 @@
                     {% for item in object_list  %}
                             <div >
                                 <div class="property">
+                                {% if pdf_form.billboard_pic.value %}
                                     <div class="image">
                                         <a href="{{ item.billboard.billboard.get_absolute_url }}">
                                             <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" />
                                         </a>
                                     </div>
+                                {% endif %}
                                     <div class="property__grid">
-
+                                    {% if pdf_form.id_code.value %}
+                                        <div class="property-row">
+                                            <span class="property-name">کد بیلبورد: </span>
+                                            <span class="property-value" contenteditable>{{ item.billboard.id }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if pdf_form.name.value %}
                                         <div class="property-row">
                                             <span class="property-name">نام: </span>
-                                            <span class="property-value">{{ item.billboard.name }}</span>
+                                            <span class="property-value" contenteditable>{{ item.billboard.name }}</span>
                                         </div>
-
+                                    {% endif %}
+                                    {% if pdf_form.description.value %}
+                                        <div class="property-row">
+                                            <span class="property-name">توضیحات: </span>
+                                            <span class="property-value" contenteditable>{{ item.billboard.description }}</span>
+                                        </div>
+                                    {% endif %}
+                                    {% if pdf_form.address.value %}
                                         <div class="property-row">
                                             <span class="property-name">محل بیلبورد: </span>
-                                            <span class="property-value">{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
+                                            <span class="property-value" contenteditable>{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
                                         </div>
-
                                         <div class="property-row">
                                             <span class="property-name">آدرس: </span>
-                                            <span class="property-value">{{ item.billboard.address }}</span>
+                                            <span class="property-value" contenteditable>{{ item.billboard.address }}</span>
                                         </div>
-
+                                    {% endif %}
+                                    {% if pdf_form.has_power.value %}
                                         <div class="property-col">
                                             <div class="property-row">
                                                 <span class="property-name">وضعیت روشنایی: </span>
-                                                <span class="property-value">{{ item.billboard.has_power|boolean_value }}</span>
+                                                <span class="property-value" contenteditable>{{ item.billboard.has_power|boolean_value }}</span>
                                             </div>
+                                    {% endif %}
+                                    {% if pdf_form.size.value %}
+
 
                                             <div class="property-row">
                                                 <span class="property-name">طول: </span>
-                                                <span class="property-value">{{ item.billboard.billboard_length }}</span>
+                                                <span class="property-value" contenteditable>{{ item.billboard.billboard_length }}</span>
                                             </div>
                                             <div class="property-row">
                                                 <span class="property-name">عرض: </span>
-                                                <span class="property-value">{{ item.billboard.billboard_width }}</span>
+                                                <span class="property-value" contenteditable>{{ item.billboard.billboard_width }}</span>
                                             </div>
+                                    {% endif %}
+                                    {% if pdf_form.reservation_date.value %}
                                             <div class="property-row">
                                                 <span class="property-name">تاریخ قابل اجاره: </span>
-                                                <span class="property-value">{{ item.billboard.reservation_date }}</span>
+                                                <span class="property-value" contenteditable>{{ item.billboard.reservation_date }}</span>
                                             </div>
                                         </div>
+                                    {% endif %}
+                                    {% if pdf_form.price.value %}
                                           <div class="property-row">
                                                 <span class="property-name">قیمت: </span>
                                                 <span class="property-value" contenteditable>{{ item.billboard.price }}</span>
                                           </div>
+                                    {% endif %}
 
 
                                     </div>
