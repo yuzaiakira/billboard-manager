@@ -47,6 +47,10 @@ class BillboardList(ListView):
     template_name = "template/home/Billboard_list.html"
     slug_url_kwarg = 'slug'
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.order_by('-id')
+
 
 class BillboardCityList(BillboardList):
     def get(self, request, *args, **kwargs):
@@ -55,7 +59,7 @@ class BillboardCityList(BillboardList):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(slug=self.kwargs['slug'])
+        return queryset.filter(slug=self.kwargs['slug']).order_by('-id')
 
     def get_object(self):
         queryset = self.get_queryset()
@@ -66,12 +70,12 @@ class BillboardCityList(BillboardList):
             raise Http404("No billboard found")
 
     def get_queryset(self):
-        return self.model.objects.filter(city__slug=self.kwargs['slug'])
+        return self.model.objects.filter(city__slug=self.kwargs['slug']).order_by('-id')
 
 
 class BillboardStateList(BillboardCityList):
     def get_queryset(self):
-        return self.model.objects.filter(city__state__slug=self.kwargs['slug'])
+        return self.model.objects.filter(city__state__slug=self.kwargs['slug']).order_by('-id')
 
 
 class BillboardSearch(BillboardList):
@@ -83,5 +87,5 @@ class BillboardSearch(BillboardList):
                 Q(name__icontains=query) | Q(city__name__icontains=query) | Q(city__state__name__icontains=query) |
                 Q(address__icontains=query)
             )
-            return object_list
+            return object_list.order_by('-id')
         return super().get_queryset()
