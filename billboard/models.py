@@ -88,9 +88,9 @@ class BillboardModel(SEOBaseModel):
                                        verbose_name="ویژگی های بیلبورد")
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
-    has_power = models.BooleanField(verbose_name="برق دارد؟", default=False)
-    billboard_length = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="طول بیلبورد")
-    billboard_width = models.DecimalField(max_digits=6, decimal_places=2, verbose_name="عرض بیلبورد")
+    has_power = models.BooleanField(verbose_name="برق دارد؟", default=True)
+    billboard_length = models.DecimalField(max_digits=7, decimal_places=3, verbose_name="طول بیلبورد")
+    billboard_width = models.DecimalField(max_digits=7, decimal_places=3, verbose_name="عرض بیلبورد")
 
     price = models.PositiveBigIntegerField(verbose_name="قیمت")
     reservation_date = jmodels.jDateField(verbose_name="قابل اجاره در", null=True)
@@ -152,7 +152,7 @@ class BillboardModel(SEOBaseModel):
         if only is None:
             only = cls.fields_property
 
-        return cls.objects.all()[:number].only(*only)
+        return cls.objects.order_by('-id').only(*only)[:number]
 
     @property
     def get_related(self):
