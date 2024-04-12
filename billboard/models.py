@@ -7,7 +7,8 @@ from django_jalali.db import models as jmodels
 
 from account.models import UserModel
 from seo.models import SEOBaseModel
-from .utils import billboard_path
+from billboard.utils import billboard_path
+from billboard.manager import BillboardManager
 
 # Create your models here.
 
@@ -67,15 +68,6 @@ class BillboardAttributeModel(models.Model):
         return self.name
 
 
-class BillboardManager(models.Manager):
-
-    def by_reseller(self, request, *args, **kwargs):
-        if request.user.user_group == UserModel.ADMIN_USER:
-            return super().get_queryset(*args, **kwargs)
-        else:
-            return super().get_queryset(*args, **kwargs).filter(reseller=request.user)
-
-
 class BillboardModel(SEOBaseModel):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
@@ -88,12 +80,12 @@ class BillboardModel(SEOBaseModel):
                                        verbose_name="ویژگی های بیلبورد")
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
-    has_power = models.BooleanField(verbose_name="برق دارد؟", default=True)
+    has_power = models.BooleanField(verbose_name="روشنایی", default=True)
     billboard_length = models.DecimalField(max_digits=7, decimal_places=3, verbose_name="طول بیلبورد")
     billboard_width = models.DecimalField(max_digits=7, decimal_places=3, verbose_name="عرض بیلبورد")
 
     price = models.PositiveBigIntegerField(verbose_name="قیمت")
-    reservation_date = jmodels.jDateField(verbose_name="قابل اجاره در", null=True)
+    reservation_date = jmodels.jDateField(verbose_name="تاریخ اکران", null=True)
     reseller = models.ForeignKey(UserModel, on_delete=models.SET_NULL, verbose_name="نماینده", blank=True, null=True)
 
     map_iframe = models.TextField(verbose_name='نقشه', blank=True, null=True)
@@ -124,6 +116,7 @@ class BillboardModel(SEOBaseModel):
     class Meta:
         verbose_name_plural = "بیلبورد ها"
         verbose_name = "بیلبورد"
+        permissions = (("can_import_billboard", "اجاره وارد کردن گروهی بیلبورد"),)
 
     def __str__(self):
         return self.name

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     # custom apps
     'account.apps.AccountConfig',
     'billboard.apps.BillboardConfig',
+    # 'billboard.apps.MyAdminConfig',
     'template.apps.TemplateConfig',
     'addlist.apps.AddlistConfig',
     'reservation.apps.ReservationConfig',
