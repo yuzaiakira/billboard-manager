@@ -1,6 +1,8 @@
+from functools import update_wrapper
+
 from django.contrib import admin
 
-from billboard import models
+from billboard import models, views
 from account.models import UserModel
 
 from siteoption.utils.functions import get_option
@@ -23,6 +25,7 @@ class BillboardImageInline(admin.TabularInline):
 # Register models admin class
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
+    change_list_template = 'template/admin/admin-change-list.html'
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price',)
     list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length',
                    'billboard_width', 'has_power')
@@ -141,6 +144,25 @@ class BillboardAdmin(admin.ModelAdmin):
         if ordering:
             qs = qs.order_by(*ordering)
         return qs
+
+    def get_urls(self):
+        from django.urls import path
+        info = self.opts.app_label, self.opts.model_name
+
+        def wrap(view):
+            def wrapper(*args, **kwargs):
+                return self.admin_site.admin_view(view)(*args, **kwargs)
+            wrapper.model_admin = self
+            return update_wrapper(wrapper, view)
+
+        return [
+            path(
+                "import/",
+                wrap(views.ImportBillboard.as_view()),
+                name='%s_%s_import' % info,
+            ),
+            *super().get_urls(),
+        ]
 
 
 @admin.register(models.StateModel)
