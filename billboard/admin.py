@@ -87,17 +87,7 @@ class BillboardAdmin(admin.ModelAdmin):
         return super(BillboardAdmin, self).response_add(request, obj, post_url_continue)
 
     def response_change(self, request, obj):
-        final_price_model = models.BillboardFinalPriceModel.objects.get(billboard=obj)
-        if obj.reseller.user_group != UserModel.ADMIN_USER:
-            final_price = (obj.price * self.get_commission()) + obj.BillboardFinalPriceModel.add_price
-            if final_price != obj.BillboardFinalPriceModel.final_price:
-                final_price_model.final_price = final_price
-        else:
-            final_price_model.final_price = obj.price
-
-        final_price_model.add_price = obj.BillboardFinalPriceModel.add_price
-        final_price_model.save()
-
+        models.BillboardFinalPriceModel.update_price(obj, self.get_commission())
         return super(BillboardAdmin, self).response_change(request, obj)
 
     def get_fieldsets(self, request, obj=None):

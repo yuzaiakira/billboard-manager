@@ -9,6 +9,8 @@ from account.models import UserModel
 from seo.models import SEOBaseModel
 from billboard.utils import billboard_path
 from billboard.manager import BillboardManager
+from billboard.mixin import ImageCompressMixin
+from siteoption.utils.functions import get_option
 
 # Create your models here.
 
@@ -77,7 +79,7 @@ class BillboardModel(SEOBaseModel):
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")
     attribute = models.ManyToManyField(BillboardAttributeModel,
-                                       verbose_name="ویژگی های بیلبورد")
+                                       verbose_name="ویژگی های بیلبورد", blank=True, null=True)
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
     has_power = models.BooleanField(verbose_name="روشنایی", default=True)
@@ -184,6 +186,7 @@ class BillboardFinalPriceModel(models.Model):
     add_price = models.PositiveBigIntegerField(verbose_name="قیمت افزوده",  default=0, blank=True)
     final_price = models.PositiveBigIntegerField(verbose_name="قیمت نهایی",  default=0, blank=True)
 
+
     class Meta:
         verbose_name_plural = "قیمت های نهایی"
         verbose_name = "قیمت نهایی"
@@ -196,6 +199,23 @@ class BillboardFinalPriceModel(models.Model):
             name = "حذف شده"
 
         return name
+
+    @classmethod
+    def get_commission(cls):
+        return get_option('BillboardCommission', 1.2)
+
+    @classmethod
+    def update_price(cls, billboard, commission):
+        final_price_model, created = cls.objects.get_or_create(billboard=billboard)
+
+        if billboard.reseller.user_group != UserModel.ADMIN_USER:
+            final_price_model.final_price = (billboard.price * commission)\
+                                            + billboard.BillboardFinalPriceModel.add_price
+        else:
+            final_price_model.final_price = billboard.price
+
+        final_price_model.add_price = billboard.BillboardFinalPriceModel.add_price
+        final_price_model.save()
 
 
 class BillboardImageModel(models.Model):

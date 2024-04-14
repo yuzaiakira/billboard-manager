@@ -1,10 +1,12 @@
 {% extends "admin/change_list.html" %}
 
 {% block object-tools-items %}
-  <li>
-    <a href="{% url 'admin:billboard_billboardmodel_import' %}" class="addlink">
-     وارد کردن از excel
-    </a>
-  </li>
+  {% if perms.billboard.can_import_billboard %}
+      <li>
+        <a href="{% url 'admin:billboard_billboardmodel_import' %}" class="addlink">
+         وارد کردن از excel
+        </a>
+      </li>
+  {% endif %}
   {{ block.super }}
 {% endblock %}
