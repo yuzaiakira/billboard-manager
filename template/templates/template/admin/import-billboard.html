@@ -7,7 +7,13 @@
 {{ media }}
 {% endblock %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+<style>
+a.button.default.download {
+    padding: 10px 15px;
+}
+</style>
+{% endblock %}
 
 {% block coltype %}colM{% endblock %}
 
@@ -41,6 +47,7 @@
 
                     <div class="submit-row">
                         <input type="submit" value="آپلود" class="default" name="_save">
+                        <a href="{% static 'template/file/import_billboard_sample.xlsx' %}" class="button default download">دانلود EXCEL نمونه</a>
                     </div>
                 </div>
 
