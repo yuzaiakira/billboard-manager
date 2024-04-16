@@ -1,5 +1,22 @@
-class ImageCompressMixin:
+from io import BytesIO
+from PIL import Image
+from django.core.files import File
 
-    def save(self, *args, **kwargs):
-        print('hiiiiiiiiiiiii')
-        super().save(*args, **kwargs)
+
+class ImageCompressMixin:
+    def compress(self, image):
+        image_name = image.name.split('.')[:-1]
+        image_name = ''.join(image_name)
+        new_image_name = f'{image_name}.jpeg'
+
+        im = Image.open(image)
+        print(image)
+        im = im.convert('RGB')
+
+        im.save(new_image_name)
+        im = Image.open(new_image_name)
+
+        im_io = BytesIO()
+        im.save(im_io, 'JPEG', optimize=True, quality=60)
+
+        return File(im_io, name=new_image_name)

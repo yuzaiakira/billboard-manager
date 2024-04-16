@@ -70,7 +70,7 @@ class BillboardAttributeModel(models.Model):
         return self.name
 
 
-class BillboardModel(SEOBaseModel):
+class BillboardModel(SEOBaseModel, ImageCompressMixin):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
     category = models.ForeignKey(BillboardCategory, related_name='BillboardModel', on_delete=models.SET_NULL,
@@ -122,6 +122,11 @@ class BillboardModel(SEOBaseModel):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        new_image = self.compress(self.billboard_pic)
+        self.billboard_pic = new_image
+        super().save(*args, **kwargs)
 
     @classmethod
     def get_recent(cls, number, only=None):
@@ -186,7 +191,6 @@ class BillboardFinalPriceModel(models.Model):
     add_price = models.PositiveBigIntegerField(verbose_name="قیمت افزوده",  default=0, blank=True)
     final_price = models.PositiveBigIntegerField(verbose_name="قیمت نهایی",  default=0, blank=True)
 
-
     class Meta:
         verbose_name_plural = "قیمت های نهایی"
         verbose_name = "قیمت نهایی"
@@ -218,7 +222,7 @@ class BillboardFinalPriceModel(models.Model):
         final_price_model.save()
 
 
-class BillboardImageModel(models.Model):
+class BillboardImageModel(models.Model, ImageCompressMixin):
     title = models.CharField(max_length=255, verbose_name="عنوان عکس", blank=True)
     image = models.ImageField(upload_to=billboard_path, verbose_name="عکس")  # TODO: delete file when delete model
     billboard = models.ForeignKey(BillboardModel, related_name="BillboardImageModel",
@@ -232,3 +236,8 @@ class BillboardImageModel(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        new_image = self.compress(self.image)
+        self.image = new_image
+        super().save(*args, **kwargs)
