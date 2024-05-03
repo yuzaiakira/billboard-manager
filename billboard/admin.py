@@ -27,16 +27,15 @@ class BillboardImageInline(admin.TabularInline):
 class BillboardAdmin(admin.ModelAdmin):
     change_list_template = 'template/admin/admin-change-list.html'
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price',)
-    list_filter = ('reseller', 'city', 'reservation_date', 'attribute', 'billboard_length',
+    list_filter = ('reseller', 'city', 'reservation_date', 'billboard_length',
                    'billboard_width', 'has_power')
     search_fields = ('name', 'address', 'city__name')
     prepopulated_fields = {'slug': ('title',), }
-    filter_horizontal = ('attribute', )
     inlines = (BillboardImageInline, )
     raw_id_fields = ('category', )
     fieldsets = (("توضیحات بیلبورد",
                   {
-                      "fields": ("city", "name", "address", "attribute", "description",),
+                      "fields": ("city", "name", "address", "description",),
                   }),
                  ("ویژگی های بیلورد",
                   {
@@ -94,7 +93,7 @@ class BillboardAdmin(admin.ModelAdmin):
         if self.fieldsets:
             if request.user.user_group == UserModel.ADMIN_USER:
                 fieldsets = (("توضیحات بیلبورد", {
-                      "fields": ("city", "name", "address", "attribute", "description",),
+                      "fields": ("city", "name", "address", "description",),
                   }),
                  ("ویژگی های بیلورد",
                   {
@@ -180,4 +179,3 @@ class CategoryAdmin(admin.ModelAdmin):
 # Register models
 admin.site.register(models.BillboardImageModel)
 admin.site.register(models.BillboardFinalPriceModel)
-admin.site.register(models.BillboardAttributeModel)

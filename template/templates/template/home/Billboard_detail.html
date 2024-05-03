@@ -33,17 +33,7 @@
                                     {{object.desc}}
                                 </p>
                             </div>
-                            {% if object.attribute.all %}
-                            <div class="group__two">
-                                <h5>برخی از ویژگی های بیلبورد</h5>
-                                <ul>
-                                    {% for attr in object.attribute.all %}
-                                    <li><img src="{% static 'template/images/check.png' %}" alt="Check" />{{ attr.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                            {% endif %}
-
+                            
                             <div class="terms">
                                 <h5>دیگر ویژگی های {{ object.name }}</h5>
                                 <div class="terms__wrapper">
