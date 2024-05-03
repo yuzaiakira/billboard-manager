@@ -59,17 +59,6 @@ class BillboardCategory(SEOBaseModel):
         return self.name
 
 
-class BillboardAttributeModel(models.Model):
-    name = models.CharField(max_length=100, verbose_name="نام ویژگی بیلبورد")
-
-    class Meta:
-        verbose_name_plural = "ویژگی های بیلبورد"
-        verbose_name = "ویژگی بیلبورد"
-
-    def __str__(self):
-        return self.name
-
-
 class BillboardModel(SEOBaseModel, ImageCompressMixin):
     city = models.ForeignKey('CityModel', related_name='BillboardModel', on_delete=models.SET_NULL,
                              verbose_name="شهر", null=True)
@@ -78,8 +67,6 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
 
     name = models.CharField(max_length=100, verbose_name="نام بیلبورد")
     address = models.CharField(max_length=250, verbose_name="محل بیلبورد")
-    attribute = models.ManyToManyField(BillboardAttributeModel,
-                                       verbose_name="ویژگی های بیلبورد", blank=True, null=True)
     description = models.TextField(verbose_name='توضیحات بیلبورد', blank=True)
 
     has_power = models.BooleanField(verbose_name="روشنایی", default=True)
@@ -124,8 +111,10 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
         return self.name
 
     def save(self, *args, **kwargs):
-        new_image = self.compress(self.billboard_pic)
-        self.billboard_pic = new_image
+        if self.billboard_pic:
+            new_image = self.compress(self.billboard_pic)
+            self.billboard_pic = new_image
+        
         super().save(*args, **kwargs)
 
     @classmethod
