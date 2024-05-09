@@ -26,6 +26,7 @@
 
                             <form method="get" action="{% url 'get-pdf' %}" class="list__form">
                                 <button type="submit" class="button button--effect">خروجی pdf</button>
+                                <a class="button button--effect" href="{% url 'get-excel' %}"> خروجی excel </a>
                                 <ul>
                                     {{ pdf_form.as_ul }}
                                 </ul>
