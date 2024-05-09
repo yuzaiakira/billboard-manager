@@ -1,7 +1,9 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+
+from openpyxl import Workbook
 
 from .models import ListsModel
 from .forms import ChoseFieldForm
@@ -64,3 +66,32 @@ class PrintPDF(WatchList):
                 print(self.context['pdf_form'].cleaned_data)
 
         return super().get(request, *args, **kwargs)
+
+
+class ExportExcel(LoginRequiredMixin, View):
+    model = ListsModel
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="billboard-list.xlsx"'
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "billboard list"
+
+        # Add headers
+        headers = ["city", "name", "address", "description", "has_power", "billboard_length", "billboard_width",
+                   "price", 'reservation_date']
+        ws.append(headers)
+
+        # Add data from the model
+        items = self.model.objects.filter(user=self.request.user)
+        for item in items:
+            billboard = item.billboard
+            ws.append([str(billboard.city), billboard.name, billboard.address, billboard.description,
+                       billboard.has_power, billboard.billboard_length, billboard.billboard_width, billboard.price,
+                       str(billboard.reservation_date)])
+
+        # Save the workbook to the HttpResponse
+        wb.save(response)
+        return response
