@@ -7,6 +7,7 @@ from openpyxl import Workbook
 
 from .models import ListsModel
 from .forms import ChoseFieldForm
+from billboard.utils import billboard_bool_value
 # Create your views here.
 
 
@@ -91,7 +92,7 @@ class ExportExcel(LoginRequiredMixin, View):
         ws.title = "billboard list"
 
         # Add headers
-        headers = ["city", "name", "address", "description", "has_power", "billboard_length", "billboard_width",
+        headers = ["id", "city", "name", "address", "description", "has_power", "billboard_length", "billboard_width",
                    "price", 'reservation_date']
         ws.append(headers)
 
@@ -99,9 +100,9 @@ class ExportExcel(LoginRequiredMixin, View):
         items = self.model.objects.filter(user=self.request.user)
         for item in items:
             billboard = item.billboard
-            ws.append([str(billboard.city), billboard.name, billboard.address, billboard.description,
-                       billboard.has_power, billboard.billboard_length, billboard.billboard_width, billboard.price,
-                       str(billboard.reservation_date)])
+            ws.append([str(billboard.id), str(billboard.city), billboard.name, billboard.address, billboard.description,
+                       billboard_bool_value(billboard.has_power), billboard.billboard_length, billboard.billboard_width,
+                       billboard.price, str(billboard.reservation_date)])
 
         # Save the workbook to the HttpResponse
         wb.save(response)
