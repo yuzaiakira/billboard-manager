@@ -18,3 +18,8 @@ def billboard_path(instance, filename):
         full_path = os.path.join(date_path, filename)
 
     return full_path
+
+def billboard_bool_value(value):
+    if value:
+        return "دارد"
+    return "ندارد"
