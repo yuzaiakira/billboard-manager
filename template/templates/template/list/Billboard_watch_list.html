@@ -25,8 +25,22 @@
                         <div class="nav__group__btn" style="justify-content: center;">
 
                             <form method="get" action="{% url 'get-pdf' %}" class="list__form">
-                                <button type="submit" class="button button--effect">خروجی pdf</button>
-                                <a class="button button--effect" href="{% url 'get-excel' %}"> خروجی excel </a>
+
+                                <div class="container">
+                                  <div class="row">
+                                    <div class="col-sm-6 col-md-4">
+                                      <button type="submit" class="button button--effect">خروجی pdf</button>
+                                    </div>
+                                    <div class="col-sm-6 col-md-4">
+                                      <a class="button button--effect" href="{% url 'get-excel' %}"> خروجی excel </a>
+                                    </div>
+                                    <div class="col-sm-6 col-md-4">
+                                      <a class="button button--effect" href="{% url 'remove-list' %}"> حدف لیست </a>
+                                    </div>
+
+                                  </div>
+                                </div>
+
                                 <ul>
                                     {{ pdf_form.as_ul }}
                                 </ul>

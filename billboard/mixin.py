@@ -10,6 +10,7 @@ class ImageCompressMixin:
         image_name = ''.join(image_name)
         new_image_name = f'{image_name}.jpeg'
         new_image_name = os.path.basename(new_image_name)
+
         im = Image.open(image)
         im = im.convert('RGB')
 
