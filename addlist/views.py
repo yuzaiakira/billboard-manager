@@ -1,5 +1,5 @@
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -53,6 +53,17 @@ class WatchList(LoginRequiredMixin, View):
         self.context['title'] = "لیست بیلبورد های انتخاب شده"
         # TODO: add only
         return render(request, self.template, self.context)
+
+
+class RemoveList(LoginRequiredMixin, View):
+    http_method_names = ['get']
+    model = ListsModel
+
+    def get(self, request):
+        user = request.user
+        list_model = self.model.objects.filter(user=user)
+        list_model.delete()
+        return redirect('WatchList')
 
 
 class PrintPDF(WatchList):
