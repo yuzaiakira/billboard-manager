@@ -11,6 +11,7 @@ from django.utils.encoding import uri_to_iri
 from urllib.parse import unquote
 
 from billboard.models import BillboardModel
+from billboard.forms import SearchForm
 from reservation.models import RentalListModel
 # Create your views here.
 
@@ -19,10 +20,17 @@ class Home(View):
     queryset = BillboardModel.get_recent(9)
 
     def get(self, request):
-        contex = {
-            'queryset': self.queryset
+
+        context = self.get_context_data()
+
+        return render(request, 'template/home/home.html', context)
+
+    def get_context_data(self, *args, **kwargs):
+        context = {
+            'queryset': self.queryset,
+            'search_form': SearchForm()
         }
-        return render(request, 'template/home/home.html', contex)
+        return context
 
 
 class BillboardDetail(DetailView):
@@ -50,6 +58,11 @@ class BillboardList(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.order_by('-id')
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['search_form'] = SearchForm()
+        return context
 
 
 class BillboardCityList(BillboardList):
@@ -82,10 +95,16 @@ class BillboardSearch(BillboardList):
 
     def get_queryset(self):
         query = self.request.GET.get("q")
+        cities = self.request.GET.get("cities")
         if query is not None:
-            object_list = self.model.objects.filter(
-                Q(name__icontains=query) | Q(city__name__icontains=query) | Q(city__state__name__icontains=query) |
-                Q(address__icontains=query)
-            )
+            object_list = (self.model.objects.filter(
+                Q(name__icontains=query) | Q(city__name__icontains=query) |
+                Q(city__state__name__icontains=query) | Q(address__icontains=query)
+            ))
+
+            if cities != SearchForm.ALL_CITY:
+                object_list = object_list.filter(city__id=cities)
+
             return object_list.order_by('-id')
+
         return super().get_queryset()
