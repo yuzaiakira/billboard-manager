@@ -1,0 +1,25 @@
+    
+    <form class="property__filter" action="{% url 'search' %}">
+        <div class="container">
+            <div class="property__filter__area">
+                <div class="row d-flex align-items-center">
+
+
+                    <div class="property__search__wrapper col-lg-12 col-xl-8">
+                         {{ search_form.q }}
+                     </div>
+
+                     <div class="col-lg-12 col-xl-2">
+                        <button type="submit" class="button form--btn button--effect">جستجو</button>
+                    </div>
+
+                    <div class="col-lg-12 col-xl-2">
+                        <div class="property__select__wrapper">
+                            {{ search_form.cities }}
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </form>

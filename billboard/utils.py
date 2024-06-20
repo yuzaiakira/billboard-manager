@@ -19,6 +19,7 @@ def billboard_path(instance, filename):
 
     return full_path
 
+
 def billboard_bool_value(value):
     if value:
         return "دارد"

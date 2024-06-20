@@ -61,3 +61,16 @@ class ImportBillboardForm(forms.Form):
                 destination.write(chunk)
 
         return base_file
+
+
+class SearchForm(forms.Form):
+    ALL_CITY = "all"
+    q = forms.CharField(label='جستجو')
+    cities = forms.ChoiceField(choices=[(ALL_CITY, "همه شهرها")], label="انتخاب شهر")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['cities'].choices += [(x.pk, x.name) for x in CityModel.objects.all()]
+        self.fields['cities'].widget.attrs['class'] = 'location__select'
+        self.fields['q'].widget.attrs['placeholder'] = 'جستجو برای بیلبورد'
