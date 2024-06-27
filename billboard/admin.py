@@ -1,12 +1,13 @@
 from functools import update_wrapper
+from openpyxl import Workbook
 
 from django.contrib import admin
+from django.http import HttpResponse
 
 from billboard import models, views
 from account.models import UserModel
 
 from siteoption.utils.functions import get_option
-
 admin.site.site_header = 'Billboard Manager'
 admin.site.index_title = 'ANTEN'
 
@@ -30,6 +31,7 @@ class BillboardAdmin(admin.ModelAdmin):
     list_filter = ('reseller', 'city', 'reservation_date', 'billboard_length',
                    'billboard_width', 'has_power')
     search_fields = ('name', 'address', 'city__name')
+    actions = ['make_export', ]
     prepopulated_fields = {'slug': ('title',), }
     inlines = (BillboardImageInline, )
     raw_id_fields = ('category', )
@@ -152,6 +154,27 @@ class BillboardAdmin(admin.ModelAdmin):
             ),
             *super().get_urls(),
         ]
+
+    @admin.action(description="خروجی از بیلبورد ها")
+    def make_export(self, request, queryset) -> HttpResponse:
+        response = HttpResponse(content_type='application/ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="billboard-list.xlsx"'
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "billboard list"
+
+        # Add headers
+        headers = ["id", "name", "price", 'reservation_date']
+        ws.append(headers)
+
+        # Add data from the model
+        for item in queryset.all():
+            ws.append([str(item.id), item.name, item.price, str(item.reservation_date)])
+
+        # Save the workbook to the HttpResponse
+        wb.save(response)
+        return response
 
 
 @admin.register(models.StateModel)

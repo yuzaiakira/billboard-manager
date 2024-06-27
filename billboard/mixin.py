@@ -4,6 +4,7 @@ from django.core.files import File
 
 
 class ImageCompressMixin:
+
     @staticmethod
     def compress(image):
         im = Image.open(image)
