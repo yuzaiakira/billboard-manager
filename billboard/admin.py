@@ -152,6 +152,11 @@ class BillboardAdmin(admin.ModelAdmin):
                 wrap(views.ImportBillboard.as_view()),
                 name='%s_%s_import' % info,
             ),
+            path(
+                "update/",
+                wrap(views.UpdateBillboard.as_view()),
+                name='%s_%s_update' % info,
+            ),
             *super().get_urls(),
         ]
 
