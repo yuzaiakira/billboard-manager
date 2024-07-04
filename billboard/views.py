@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib import admin
 
 from billboard.models import BillboardModel
-from billboard.forms import ImportBillboardForm
+from billboard.forms import ImportBillboardForm, UpdateBillboardForm
 
 
 # Create your views here.
@@ -27,3 +27,8 @@ class ImportBillboard(PermissionRequiredMixin, FormView):
     def form_valid(self, form):
         form.import_from_file(self.request)
         return super().form_valid(form)
+
+
+class UpdateBillboard(ImportBillboard):
+    permission_required = 'billboard.change_billboardmodel'
+    form_class = UpdateBillboardForm

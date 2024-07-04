@@ -28,7 +28,7 @@ class ImportBillboardForm(forms.Form):
 
         for index, row in dataframe.iterrows():
 
-            reservation_date = datetime.strptime(row['reservation_date'], '%Y/%m/%d')
+            reservation_date = self.get_reservation_date(row['reservation_date'])
             reservation_date = jdatetime.date(reservation_date.year, reservation_date.month, reservation_date.day)
 
             billboard = BillboardModel(reseller=request.user,
@@ -61,6 +61,44 @@ class ImportBillboardForm(forms.Form):
                 destination.write(chunk)
 
         return base_file
+
+    @staticmethod
+    def get_reservation_date(reservation_date):
+        try:
+            reservation_date = datetime.strptime(reservation_date, '%Y/%m/%d')
+        except ValueError:
+            reservation_date = datetime.strptime(reservation_date, '%Y-%m-%d')
+
+        return reservation_date
+
+
+class UpdateBillboardForm(ImportBillboardForm):
+    file = forms.FileField(label='فایل')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields.pop('city', None)
+
+    def import_from_file(self, request):
+        base_file = self.make_file()
+        dataframe = pd.read_excel(base_file)
+
+        for index, row in dataframe.iterrows():
+
+            try:
+                billboard = BillboardModel.objects.get(id=row['id'])
+                reservation_date = self.get_reservation_date(row['reservation_date'])
+                reservation_date = jdatetime.date(reservation_date.year, reservation_date.month, reservation_date.day)
+                billboard.reservation_date = reservation_date
+                billboard.price = row['price']
+                BillboardFinalPriceModel.update_price(billboard, BillboardFinalPriceModel.get_commission())
+                billboard.save()
+
+            except BillboardModel.DoesNotExist:
+                continue
+
+        # remove file
+        os.remove(base_file)
 
 
 class SearchForm(forms.Form):
