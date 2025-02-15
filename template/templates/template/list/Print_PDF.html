@@ -12,7 +12,10 @@
         *{
             direction: rtl;
         }
-
+        .list-print{
+            display: block;
+        }
+        
         .image a img{
            height: 500px;
 
@@ -92,10 +95,15 @@
         }
         /* print styles */
         @media print {
+         .list-print{
+            display: block;
+        }
+        
           img {
-            margin-top: 2rem;
-            max-width: 100%;
-            height: auto !important;
+              margin-top: 2rem; /* Add margin to the top */
+        max-width: 100%;
+        max-height: 28vh; /* Set max height to one-third of the page */
+        height: auto !important; /* Maintain aspect ratio */
           }
           .container{
             position: relative;
@@ -130,98 +138,134 @@
           clear: both;
         }
 
+    img {
+        margin-top: 2rem; /* Add margin to the top */
+        max-width: 100%;
+        height: auto !important; /* Maintain aspect ratio */
+    }
+
+    .container {
+        position: relative;
+        max-width: 100%;
+        max-height: 100%;
+        padding-top: 100px; /* Add padding to avoid overlap with header */
+        padding-bottom: 100px; /* Add padding to avoid overlap with footer */
+    }
+
+    .header-img, .footer-img {
+        display: block;
+        position: fixed; /* Keep header and footer fixed */
+        left: 0;
+        right: 0;
+        text-align: center;
+        margin: 0;
+        z-index: 1000; /* Ensure header is above other content */
+    }
+
+    .header-img {
+        top: 0; /* Position header at the top */
+        max-width: 100%;
+        height: auto; 
+    }
+
+    .footer-img {
+        bottom: 0; /* Position footer at the bottom */
+        max-width: 100%; 
+        height: auto; 
+    }
+
         }
     </style>
 
 </head>
 <body>
-{% for item in object_list  %}
+<div class="list-print">
+    {% for item in object_list %}
     <div class="container">
-    {% if pdf_form.brand.value %}
-       <div  class="header">
-           <img src="{% static 'template/images/print/header.png' %}" class="header-img">
-       </div>
-    {% endif %}                
+        {% if pdf_form.brand.value %}
+        <div class="header">
+            <img src="{% static 'template/images/print/header.png' %}" class="header-img">
+        </div>
+        {% endif %}
         <div class="property">
             {% if pdf_form.billboard_pic.value %}
-                <div class="image">
-                    <a href="{{ item.billboard.billboard.get_absolute_url }}">
-                        <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" />
-                    </a>
-                </div>
+            <div class="image">
+                <a href="{{ item.billboard.billboard.get_absolute_url }}">
+                    <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" />
+                </a>
+            </div>
             {% endif %}
-             <div class="property__grid">
+            <div class="property__grid">
                 {% if pdf_form.id_code.value %}
-                    <div class="property-row">
-                        <span class="property-name">کد بیلبورد: </span>
-                        <span class="property-value" contenteditable>{{ item.billboard.id }}</span>
-                    </div>
+                <div class="property-row">
+                    <span class="property-name">کد بیلبورد: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.id }}</span>
+                </div>
                 {% endif %}
                 {% if pdf_form.name.value %}
-                    <div class="property-row">
-                        <span class="property-name">نام: </span>
-                        <span class="property-value" contenteditable>{{ item.billboard.name }}</span>
-                    </div>
+                <div class="property-row">
+                    <span class="property-name">نام: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.name }}</span>
+                </div>
                 {% endif %}
                 {% if pdf_form.description.value %}
-                    <div class="property-row">
-                        <span class="property-name">توضیحات: </span>
-                        <span class="property-value" contenteditable>{{ item.billboard.description }}</span>
-                    </div>
+                <div class="property-row">
+                    <span class="property-name">توضیحات: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.description }}</span>
+                </div>
                 {% endif %}
                 {% if pdf_form.address.value %}
-                    <div class="property-row">
-                        <span class="property-name">محل بیلبورد: </span>
-                        <span class="property-value" contenteditable>{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
-                    </div>
-                    <div class="property-row">
-                        <span class="property-name">آدرس: </span>
-                        <span class="property-value" contenteditable>{{ item.billboard.address }}</span>
-                    </div>
+                <div class="property-row">
+                    <span class="property-name">محل بیلبورد: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
+                </div>
+                <div class="property-row">
+                    <span class="property-name">آدرس: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.address }}</span>
+                </div>
                 {% endif %}
                 {% if pdf_form.has_power.value %}
-                    <div class="property-col">
-                        <div class="property-row">
-                            <span class="property-name">وضعیت روشنایی: </span>
-                            <span class="property-value" contenteditable>{{ item.billboard.has_power|boolean_value }}</span>
-                        </div>
+                <div class="property-col">
+                    <div class="property-row">
+                        <span class="property-name">وضعیت روشنایی: </span>
+                        <span class="property-value" contenteditable>{{ item.billboard.has_power|boolean_value }}</span>
+                    </div>
+                <!-- تگ بسته اضافه شده -->
                 {% endif %}
                 {% if pdf_form.size.value %}
-    
-    
-                        <div class="property-row">
-                            <span class="property-name">طول: </span>
-                            <span class="property-value" contenteditable>{{ item.billboard.billboard_length }}</span>
-                        </div>
-                        <div class="property-row">
-                            <span class="property-name">عرض: </span>
-                            <span class="property-value" contenteditable>{{ item.billboard.billboard_width }}</span>
-                        </div>
+                <div class="property-row">
+                    <span class="property-name">طول: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.billboard_length }}</span>
+                </div>
+                <div class="property-row">
+                    <span class="property-name">عرض: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.billboard_width }}</span>
+                </div>
                 {% endif %}
                 {% if pdf_form.reservation_date.value %}
-                        <div class="property-row">
-                            <span class="property-name">تاریخ قابل اجاره: </span>
-                            <span class="property-value" contenteditable>{{ item.billboard.reservation_date }}</span>
-                        </div>
-                    </div>
+                <div class="property-row">
+                    <span class="property-name">تاریخ قابل اجاره: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.reservation_date }}</span>
+                </div>
                 {% endif %}
                 {% if pdf_form.price.value %}
-                      <div class="property-row">
-                            <span class="property-name">قیمت: </span>
-                            <span class="property-value" contenteditable>{{ item.billboard.price }}</span>
-                      </div>
+                <div class="property-row">
+                    <span class="property-name">قیمت: </span>
+                    <span class="property-value" contenteditable>{{ item.billboard.price }}</span>
+                </div>
                 {% endif %}
-                
-             </div>
+            </div> </div>
         </div>
-    {% if pdf_form.brand.value %}
-       <div  class="footer">
-           <img src="{% static 'template/images/print/footer.png' %}" class="footer-img">
-       </div>
-    {% endif %}  
+        {% if pdf_form.brand.value %}
+        <div class="footer">
+            <img src="{% static 'template/images/print/footer.png' %}" class="footer-img">
+        </div>
+        {% endif %}
     </div>
     <div class="pagebreak"></div>
-{% endfor %}
+    {% endfor %}
+</div>
+
 <div class="container" id="btn-section">
     <div class="row">
         <button class="button button--effect" id="get-pdf">
