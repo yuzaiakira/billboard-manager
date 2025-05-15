@@ -103,7 +103,7 @@ class UpdateBillboardForm(ImportBillboardForm):
 
 class SearchForm(forms.Form):
     ALL_CITY = "all"
-    q = forms.CharField(label='جستجو')
+    q = forms.CharField(label='جستجو', required=False)
     cities = forms.ChoiceField(choices=[(ALL_CITY, "همه شهرها")], label="انتخاب شهر")
 
     def __init__(self, *args, **kwargs):
