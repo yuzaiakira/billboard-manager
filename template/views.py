@@ -41,12 +41,19 @@ class BillboardDetail(DetailView):
     def get_object(self, queryset=None):
         slug = self.kwargs.get(self.get_slug_field())
         slug = uri_to_iri(slug)
-        return get_object_or_404(self.model, slug=slug)
+        objects = self.model.objects.filter(slug=slug)
+
+        if not objects.exists():
+            raise Http404("No BillboardModel matches the given query.")
+        
+        # If you want to return the first object or handle multiple objects differently
+        return objects.first()  # or handle as needed
 
     def get_context_data(self, *args, **kwargs):
         context = super(BillboardDetail, self).get_context_data(*args, **kwargs)
         context['rental_list'] = RentalListModel.get_rental_list(billboard_id=self.object.id)
         return context
+
 
 
 class BillboardList(ListView):

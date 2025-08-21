@@ -3,6 +3,7 @@ from openpyxl import Workbook
 
 from django.contrib import admin
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 from billboard import models, views
 from account.models import UserModel
@@ -28,13 +29,13 @@ class BillboardImageInline(admin.TabularInline):
 class BillboardAdmin(admin.ModelAdmin):
     change_list_template = 'template/admin/admin-change-list.html'
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price',)
-    list_filter = ('reseller', 'city', 'reservation_date', 'billboard_length',
+    list_filter = ('reseller','owner_company', 'city', 'reservation_date', 'billboard_length',
                    'billboard_width', 'has_power')
     search_fields = ('name', 'address', 'city__name')
-    actions = ['make_export', ]
+    actions = ['make_export', 'assign_to_company']
     prepopulated_fields = {'slug': ('title',), }
     inlines = (BillboardImageInline, )
-    raw_id_fields = ('category', )
+    raw_id_fields = ('category', 'reseller', 'owner_company')
     fieldsets = (("توضیحات بیلبورد",
                   {
                       "fields": ("city", "name", "address", "description",),
@@ -43,7 +44,8 @@ class BillboardAdmin(admin.ModelAdmin):
                   {
                       "fields": ("has_power",
                                  ("billboard_length", "billboard_width", "price", "reservation_date"),
-                                 "category"),
+                                 "category", "owner_company"
+                                 ),
                   }),
                  ("سئو",
                   {
@@ -100,7 +102,7 @@ class BillboardAdmin(admin.ModelAdmin):
                  ("ویژگی های بیلورد",
                   {
                       "fields": ("has_power", "reseller", ("billboard_length", "billboard_width",
-                                                           "price", "reservation_date"), "category"),
+                                                           "price", "reservation_date"), "category", "owner_company"),
                   }),
                  ("سئو",
                   {
@@ -146,19 +148,13 @@ class BillboardAdmin(admin.ModelAdmin):
             wrapper.model_admin = self
             return update_wrapper(wrapper, view)
 
-        return [
-            path(
-                "import/",
-                wrap(views.ImportBillboard.as_view()),
-                name='%s_%s_import' % info,
-            ),
-            path(
-                "update/",
-                wrap(views.UpdateBillboard.as_view()),
-                name='%s_%s_update' % info,
-            ),
-            *super().get_urls(),
+        custom_urls = [
+            path("import/", wrap(views.ImportBillboard.as_view()), name='%s_%s_import' % info),
+            path("update/", wrap(views.UpdateBillboard.as_view()), name='%s_%s_update' % info),
+            path("assign-to-company/", self.admin_site.admin_view(views.assign_to_company_view), name='assign_to_company'),
         ]
+
+        return custom_urls + super().get_urls()
 
     @admin.action(description="خروجی از بیلبورد ها")
     def make_export(self, request, queryset) -> HttpResponse:
@@ -180,6 +176,13 @@ class BillboardAdmin(admin.ModelAdmin):
         # Save the workbook to the HttpResponse
         wb.save(response)
         return response
+
+
+    def assign_to_company(self, request, queryset):
+        selected = queryset.values_list('pk', flat=True)
+        return redirect(f'assign-to-company/?ids={",".join(str(pk) for pk in selected)}')
+
+    assign_to_company.short_description = "تعیین شرکت صاحب امتیاز برای بیلبوردهای انتخاب شده"
 
 
 @admin.register(models.StateModel)

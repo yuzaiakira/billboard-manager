@@ -8,7 +8,6 @@ import jdatetime
 
 from billboard.models import BillboardModel, CityModel, BillboardFinalPriceModel
 
-
 class ImportBillboardForm(forms.Form):
     file = forms.FileField(label='فایل')
     city = forms.ChoiceField(choices=[], label="انتخاب شهر")
@@ -100,7 +99,7 @@ class UpdateBillboardForm(ImportBillboardForm):
         # remove file
         os.remove(base_file)
 
-
+    
 class SearchForm(forms.Form):
     ALL_CITY = "all"
     q = forms.CharField(label='جستجو', required=False)
