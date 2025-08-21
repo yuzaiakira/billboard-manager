@@ -9,19 +9,46 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-from core.local_settings import *
 from pathlib import Path
+import environ
 import os
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env(".env")
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-
 ALLOWED_HOSTS = ['*']
 
+# Database
+# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env("DB_NAME"),
+        'USER': env("DB_USER"),
+        'PASSWORD': env("DB_PASSWORD"),
+        'HOST': env("DB_HOST", default='localhost'),
+        'PORT': env("DB_PORT", default=3306),
+        "OPTIONS": {
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            'charset': 'utf8mb4'
+        },
+    }
+}
+
+# SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = False
+DEBUG = env.bool("DJANGO_DEBUG", default=False)
+BASE_SITE_URL = env("BASE_SITE_URL", default="")   
 
 # Application definition
 
@@ -37,7 +64,6 @@ INSTALLED_APPS = [
     # custom apps
     'account.apps.AccountConfig',
     'billboard.apps.BillboardConfig',
-    # 'billboard.apps.MyAdminConfig',
     'template.apps.TemplateConfig',
     'addlist.apps.AddlistConfig',
     'reservation.apps.ReservationConfig',
@@ -113,6 +139,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = BASE_SITE_URL + '/static/'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "staticfiles"),  # Changed to avoid conflict with STATIC_ROOT
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
