@@ -15,10 +15,8 @@
         .list-print{
             display: block;
         }
-        
         .image a img{
-           height: 500px;
-
+            height: 500px;
         }
         .property__grid{
             margin-top: 40px;
@@ -42,11 +40,11 @@
             margin-left: 20px;
             padding-right: 5px;
         }
-         .property-col div:before{
-             content: "|";
-             font-size: 18px;
-             font-weight: 900;
-         }
+        .property-col div:before{
+            content: "|";
+            font-size: 18px;
+            font-weight: 900;
+        }
         .button {
             padding: 14px 30px 16px;
             background-color: #dc3545;
@@ -74,9 +72,7 @@
         .container .row .button {
             margin: 10px;
         }
-        .header-img, .footer-img{
-            display: none;
-        }
+
         #btn-section{
             display: block;
         }
@@ -90,93 +86,92 @@
             background-color: #5927e3;
         }
         .exit:hover{
-          color: #fff;
-          background-color: #5927e3b5;
+            color: #fff;
+            background-color: #5927e3b5;
         }
         /* print styles */
         @media print {
-         .list-print{
-            display: block;
-        }
+            body, html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
         
-          img {
-              margin-top: 2rem; /* Add margin to the top */
-        max-width: 100%;
-        max-height: 28vh; /* Set max height to one-third of the page */
-        height: auto !important; /* Maintain aspect ratio */
-          }
-          .container{
-            position: relative;
-            max-width: 100%;
-            max-height: 100%;
-          }
-          .header-img, .footer-img{
-            display: block;
-          }
-          #btn-section{
-            display: none;
-          }
-         .header-img, .footer-img{
-           position: fixed;
-           left: 0;
-           right: 0;
-           text-align: center;
-           margin: 0;
-         }
-        .container .header-img{
-          top: 0;
-          max-width: 100%;
-          height: auto; 
+            .header, .footer {
+                position: fixed;
+                left: 0;
+                width: 100%;
+                height: 100px; /* Adjust as needed */
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        
+            .header {
+                top: 0;
+                background-image: url('{% static "template/images/print/header.png" %}');
+            }
+        
+            .footer {
+                bottom: 0;
+                background-image: url('{% static "template/images/print/footer.png" %}');
+            }
+            .list-print{
+                display: block;
+            }
+            img {
+                margin-top: 2rem;
+                max-width: 100%;
+                max-height: 28vh;
+                height: auto !important;
+            }
+            .container{
+                position: relative;
+                max-width: 100%;
+                max-height: 100%;
+                margin-top: 220px; /* Adjust based on header height */
+                margin-bottom: 220px; /* Adjust based on footer height */
+                padding: 0;
+
+            }
+            #btn-section{
+                display: none;
+            }
+            
+            .pagebreak {
+                page-break-before: always;
+                clear: both;
+            }
+
+            .image img {
+                max-width: 100%; /* Make sure it adapts to the container */
+                height: auto; /* Maintain aspect ratio */
+                max-height: 500px; /* Prevent overly large images */
+                object-fit: contain; /* Ensures the entire image fits without cropping */
+            }
+
+            .container {
+                position: relative;
+                max-width: 100%;
+                max-height: 100%;
+            }
+            .property {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 80%;
+                height: 80%;
+                margin: 50px auto;
+                text-align: center;
+            }
         }
-        .container .footer-img{
-          bottom: 0;
-          max-width: 100%; 
-          height: auto; 
-        }
-        .pagebreak {
-          page-break-before: always;
-          clear: both;
-        }
 
-    img {
-        margin-top: 2rem; /* Add margin to the top */
-        max-width: 100%;
-        height: auto !important; /* Maintain aspect ratio */
-    }
-
-    .container {
-        position: relative;
-        max-width: 100%;
-        max-height: 100%;
-        padding-top: 100px; /* Add padding to avoid overlap with header */
-        padding-bottom: 100px; /* Add padding to avoid overlap with footer */
-    }
-
-    .header-img, .footer-img {
-        display: block;
-        position: fixed; /* Keep header and footer fixed */
-        left: 0;
-        right: 0;
-        text-align: center;
-        margin: 0;
-        z-index: 1000; /* Ensure header is above other content */
-    }
-
-    .header-img {
-        top: 0; /* Position header at the top */
-        max-width: 100%;
-        height: auto; 
-    }
-
-    .footer-img {
-        bottom: 0; /* Position footer at the bottom */
-        max-width: 100%; 
-        height: auto; 
-    }
-
-        }
     </style>
-
+    
 </head>
 <body>
 <div class="list-print">
@@ -184,7 +179,6 @@
     <div class="container">
         {% if pdf_form.brand.value %}
         <div class="header">
-            <img src="{% static 'template/images/print/header.png' %}" class="header-img">
         </div>
         {% endif %}
         <div class="property">
@@ -258,7 +252,6 @@
         </div>
         {% if pdf_form.brand.value %}
         <div class="footer">
-            <img src="{% static 'template/images/print/footer.png' %}" class="footer-img">
         </div>
         {% endif %}
     </div>

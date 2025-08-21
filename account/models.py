@@ -55,7 +55,10 @@ class BrandModel(models.Model):
 
 class CompanyModel(models.Model):
     name = models.CharField(max_length=255, verbose_name="نام شرکت")
-
+    address = models.CharField(max_length=255, verbose_name="آدرس شرکت", null=True, blank=True)
+    phone = models.CharField(max_length=50, verbose_name="شماره تماس شرکت", null=True, blank=True)
+    detail = models.TextField("توضیحات", null=True, blank=True)
+    
     def __str__(self):
         return self.name
 

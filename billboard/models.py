@@ -5,12 +5,13 @@ from django.templatetags.static import static
 # source: https://pypi.org/project/django-jalali/
 from django_jalali.db import models as jmodels
 
-from account.models import UserModel
+from account.models import UserModel, CompanyModel
 from seo.models import SEOBaseModel
 from billboard.utils import billboard_path
 from billboard.manager import BillboardManager
 from billboard.mixin import ImageCompressMixin
 from siteoption.utils.functions import get_option
+
 
 # Create your models here.
 
@@ -95,6 +96,15 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
 
     billboard_status = models.PositiveSmallIntegerField(choices=billboard_group_status,
                                                         verbose_name="وضعیت بیلبورد", default=0)
+    
+    owner_company = models.ForeignKey(
+        CompanyModel,
+        on_delete=models.SET_NULL,
+        verbose_name="شرکت صاحب امتیاز",
+        null=True,
+        blank=True,
+        related_name='billboards'
+    )
 
     # manager
     objects = BillboardManager()
