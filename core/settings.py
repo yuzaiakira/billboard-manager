@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     # custom apps
     'account.apps.AccountConfig',
     'billboard.apps.BillboardConfig',
-    'template.apps.TemplateConfig',
     'addlist.apps.AddlistConfig',
     'reservation.apps.ReservationConfig',
     'siteoption.apps.SiteoptionConfig',
@@ -141,7 +140,7 @@ USE_TZ = True
 STATIC_URL = BASE_SITE_URL + '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "staticfiles"),  # Changed to avoid conflict with STATIC_ROOT
+    os.path.join(BASE_DIR, "static"),  # Point to the actual static directory
 ]
 
 # Default primary key field type
@@ -153,5 +152,5 @@ AUTH_USER_MODEL = 'account.UserModel'
 
 MEDIA_URL = BASE_SITE_URL + "/upload/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "upload")
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")  # Changed to avoid conflict with STATICFILES_DIRS
 LOGIN_URL = 'login'
