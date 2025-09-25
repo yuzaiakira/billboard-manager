@@ -1,96 +1,76 @@
 {% load static %}
-    <!-- ==== footer section start ==== -->
-    <footer class="footer pos__rel over__hi">
-        <div class="container">
 
-            <div class="footer__area section__space">
-                <div class="row">
-                    <div class="col-md-12 col-lg-4 col-xl-4">
-                        <div class="footer__intro">
-                            <a href="index.html">
-                                <img src="{% static 'template/images/logo-light.png' %}" alt="Revest" class="logo" />
-                            </a>
-                            <p>لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است
+    <!-- Footer Section -->
+    <footer class="bg-gray-100 pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+                <div>
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center ml-3">
+                            <i class="fas fa-bullhorn text-white text-xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-primary">آنتن</h2>
+                    </div>
+                    <p class="text-gray-600 mb-6">پلتفرم برتر اجاره بیلبورد در مکان‌های شهری و جاده‌ای در سراسر ایران.</p>
+                    <div class="flex space-x-reverse space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
 
-                            </p>
-                            <div class="social">
-                                <a href="javascript:void(0)">
-                                    <i class="fa-brands fa-facebook-f"></i>
-                                </a>
-                                <a href="javascript:void(0)">
-                                    <i class="fa-brands fa-twitter"></i>
-                                </a>
-                                <a href="javascript:void(0)">
-                                    <i class="fa-brands fa-instagram"></i>
-                                </a>
-                                <a href="javascript:void(0)">
-                                    <i class="fa-brands fa-linkedin-in"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-3 col-lg-2 col-xl-2">
-                        <div class="footer__links footer__links--alt">
-                            <h5>صفحات مهم</h5>
-                            <ul>
-                                <li>
-                                    <a href="about-us.html">درباره آنتن</a>
-                                </li>
-                                <li>
-                                    <a href="career.html">نمونه کارها</a>
-                                </li>
-                                <li>
-                                    <a href="blog.html">وبلاگ</a>
-                                </li>
-                                <li>
-                                    <a href="contact-us.html">تماس باما</a>
-                                </li>
-                                <li class="neutral-bottom">
-                                    <a href="affiliate-program.html">همکاری</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-3 col-lg-2 col-xl-2">
-                        <div class="footer__links footer__links--alt">
-                            <h5>بخش ها</h5>
-                            <ul>
-                                <li>
-                                    <a href="properties.html">بیلبورد ها</a>
-                                </li>
-                                <li>
-                                    <a href="how-it-works.html">جستجو</a>
-                                </li>
-                                <li>
-                                    <a href="loan-application.html">سوالات متداول</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                                 </div>
+                <div>
+                    <h3 class="text-lg font-bold text-dark mb-6">لینک‌های سریع</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">خانه</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">همه بیلبوردها</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">بیلبوردهای منتخب</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">جستجو</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">تماس با ما</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-dark mb-6">منابع</h3>
+                    <ul class="space-y-3">
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">وبلاگ</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">سوالات متداول</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">قیمت‌گذاری</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">نظرات مشتریان</a></li>
+                        <li><a href="#" class="text-gray-600 hover:text-primary transition duration-300">پشتیبانی</a></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-bold text-dark mb-6">تماس با ما</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-map-marker-alt text-primary mt-1 ml-3"></i>
+                            <span>خیابان تجاری ۱۲۳، تهران، ایران</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone-alt text-primary ml-3"></i>
+                            <span>۵۶۷۸ ۱۲۳۴ ۲۱ ۹۸+</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope text-primary ml-3"></i>
+                            <span>info@anten.ir</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="footer__credit">
-                <div class="row d-flex align-items-center">
-                    <div class="col-sm-12 order-1 order-sm-0">
-                        <div class="footer__copyright">
-                            <p>نوشته شده با عشق توسط <a
-                                    href="https://github.com/yuzaiakira">Akira</a></p>
-                        </div>
-                    </div>
 
-                </div>
+            <div class="pt-8 border-t border-gray-200 text-center text-gray-600">
+                <p>&copy; ۲۰۲۳ آنتن. کلیه حقوق محفوظ است. | <a href="#" class="hover:text-primary">سیاست حفظ حریم خصوصی</a> | <a href="#" class="hover:text-primary">شرایط خدمات</a></p>
             </div>
-        </div>
-        <div class="footer__animation">
-            <img src="{% static 'template/images/footer/footer__left__circle.png' %}" alt="Circle" class="left__circle" />
-            <img src="{% static 'template/images/footer/footer__right__circle.png' %}" alt="Circle" class="right__circle" />
-            <img src="{% static 'template/images/footer/footer__home___illustration.png' %}" alt="Home" class="home__illustration" />
         </div>
     </footer>
-    <!-- ==== #footer section end ==== -->
-
-    <!-- Scroll To Top -->
-    <a href="javascript:void(0)" class="scrollToTop">
-        <i class="fa-solid fa-angles-up"></i>
-    </a>

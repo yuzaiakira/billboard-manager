@@ -109,5 +109,6 @@ class SearchForm(forms.Form):
         super().__init__(*args, **kwargs)
 
         self.fields['cities'].choices += [(x.pk, x.name) for x in CityModel.objects.all()]
-        self.fields['cities'].widget.attrs['class'] = 'location__select'
+        self.fields['cities'].widget.attrs['class'] = 'search__cities__select'
+        self.fields['q'].widget.attrs['class'] = 'search__input'
         self.fields['q'].widget.attrs['placeholder'] = 'جستجو برای بیلبورد'
