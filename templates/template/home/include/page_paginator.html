@@ -1,40 +1,36 @@
 {% load paginator_tags %}
-<nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center">
-                    {% get_proper_elided_page_range paginator page_obj.number as page_range %}
-                    {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-btn" href="?page={{ page_obj.previous_page_number }}">
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </li>
-                        {% if page_obj.number > 3 %}
-                            <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
-                        {% endif %}
-                    {% endif %}
+{% get_proper_elided_page_range paginator page_obj.number as page_range %}
 
-                    {% for page in page_range %}
-                        {% if page == page_obj.number %}
-                            <li class="page-item"><span class="page-link page-active" >{{ page }}</span></li>
-                        {% elif page_obj.number|add:"2" < page or page < page_obj.number|add:"-2" %}
-                            {% if  page_obj.number|add:"2" ==  page_obj.paginator.num_pages %}
-                                <li class="page-item"><span class="page-link">{{ paginator.ELLIPSIS }}</span></li>
-                            {% endif %}
-                        {% else %}
-                            <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
-                        {% endif %}
+<nav class="flex items-center space-x-reverse space-x-2">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        {% if page_obj.number > 3 %}
+            <a href="?page=1" class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">
+                1
+            </a>
+        {% endif %}
+    {% endif %}
 
-                    {% endfor %}
+    {% for page in page_range %}
+        {% if page == paginator.ELLIPSIS %}
+            <span class="w-10 h-10 flex items-center justify-center">{{ page }}</span>
+        {% elif page == page_obj.number %}
+            <a class="w-10 h-10 flex items-center justify-center rounded-lg bg-primary text-white font-medium hover:bg-secondary transition duration-300">{{ page }}</a>
+        {% else %}
+            <a href="?page={{ page }}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">{{ page }}</a>
+        {% endif %}
+    {% endfor %}
 
-
-                    {% if page_obj.has_next %}
-                        {% if  page_obj.paginator.num_pages|add:"-1" > page_obj.next_page_number  %}
-                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a></li>
-                        {% endif %}
-                        <li class="page-item">
-                            <a class="page-btn" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-arrow-left"></i></a>
-                        </li>
-                    {% endif %}
-
-                    </ul>
-                </nav>
+    {% if page_obj.has_next %}
+        {% if  page_obj.paginator.num_pages|add:"-1" > page_obj.next_page_number  %}
+           <a href="?page={{ page_obj.paginator.num_pages }}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">
+           {{ page_obj.paginator.num_pages }}
+           </a>
+        {% endif %}
+             <a href="?page={{ page_obj.next_page_number }}" class="w-10 h-10 flex items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-100 transition duration-300">
+               <i class="fas fa-chevron-left"></i>
+            </a>
+    {% endif %}
+</nav>

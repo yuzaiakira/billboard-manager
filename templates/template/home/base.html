@@ -1,84 +1,121 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fa-IR">
-
+<html lang="fa" dir="rtl">
 <head>
-    <!-- required meta -->
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- #favicon -->
-    <link rel="shortcut icon" href="{% static 'template/images/favicon.png' %}" type="image/x-icon" />
-    <!-- #title -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}کانون اگهی تبلیغاتی آنتن{% endblock %}</title>
-    <!-- #keywords -->
-    <meta name="keywords" content="Real Estate, Investment, Properties, Rent" />
-    <!-- #description -->
-    <meta name="description" content="Real Estate Investment For Everyone" />
-    <!-- #author -->
-    <meta name="author" content="Pixelaxis" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* RTL specific styles */
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            direction: rtl;
+            text-align: right;
+        }
+        .fa-map-marker-alt, .fa-lightbulb, .fa-search, .fa-filter, .fa-phone-alt, .fa-envelope {
+            margin-right: 0 !important;
+            margin-left: 0.5rem;
+        }
+        .hero-bg {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .btn-hover {
+            transition: all 0.2s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background-color: #ff8000;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        .search__cities__select{
+          width: 100%;
+          padding: 0.75rem 1rem;
+          border-radius: 0.5rem;
+          border: 1px solid #d1d5db;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search__cities__select:focus {
+          border-color: transparent;
+          box-shadow: 0 0 0 2px #3b82f6;
+        }
+        .search__input{
 
-    <!-- ==== css dependencies start ==== -->
+        }
+        .search__input {
+          width: 100%;
+          padding-top: 0.75rem;
+          padding-bottom: 0.75rem;
+          padding-right: 1rem;
+          padding-left: 2.5rem;
+          border-radius: 0.5rem;
+          border: 1px solid #d1d5db;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search__input:focus {
+          border-color: transparent;
+          box-shadow: 0 0 0 2px #3b82f6;
+        }
 
-    <!-- bootstrap five css -->
-    <link rel="stylesheet" href="{% static 'template/vendor/bootstrap/css/bootstrap.min.css' %}" />
-    <!-- font awesome six css -->
-    <link rel="stylesheet" href="{% static 'template/vendor/font-awesome/css/all.min.css' %}" />
-    <!-- nice select css -->
-    <link rel="stylesheet" href="{% static 'template/vendor/nice-select/css/nice-select.css' %}" />
-    <!-- magnific popup css -->
-    <link rel="stylesheet" href="{% static 'template/vendor/magnific-popup/css/magnific-popup.css' %}" />
-    <!-- slick css -->
-    <link rel="stylesheet" href="{% static 'template/vendor/slick/css/slick.css' %}" />
-    <!-- animate css -->
-    <link rel="stylesheet" href="{% static 'template/vendor/animate/animate.css' %}" />
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff8000',
+                        secondary: '#ff9933',
+                        light: '#fff8f0',
+                        dark: '#333333'
+                    },
+                    fontFamily: {
+                        vazir: ['Vazirmatn', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
 
-    <!-- ==== css dependencies end ==== -->
-
-    <!-- main css -->
-    <link rel="stylesheet" href="{% static 'template/css/font-vazir.css' %}">
-    <link rel="stylesheet" href="{% static 'template/css/style.css' %}" />
-    {% block head %}
+    </style>
+        {% block head %}
     {% endblock %}
 </head>
-
 <body>
 {% block body %}
 {% endblock %}
-    <!-- ==== js dependencies start ==== -->
 
-    <!-- jquery -->
-    <script src="{% static 'template/vendor/jquery/jquery-3.6.0.min.js' %}"></script>
-    <!-- bootstrap five js -->
-    <script src="{% static 'template/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-    <!-- nice select js -->
-    <script src="{% static 'template/vendor/nice-select/js/jquery.nice-select.min.js' %}"></script>
-    <!-- magnific popup js -->
-    <script src="{% static 'template/vendor/magnific-popup/js/jquery.magnific-popup.min.js' %}"></script>
-    <!-- slick js -->
-    <script src="{% static 'template/vendor/slick/js/slick.js' %}"></script>
-    <!-- shuffle js -->
-    <script src="{% static 'template/vendor/shuffle/shuffle.min.js' %}"></script>
-    <!-- jquery downcount timer -->
-    <script src="{% static 'template/vendor/downcount/jquery.downCount.js' %}"></script>
-    <!-- waypoints js -->
-    <script src="{% static 'template/vendor/waypoints-js/jquery.waypoints.min.js' %}"></script>
-    <!-- counter up js -->
-    <script src="{% static 'template/vendor/counter-js/jquery.counterup.min.js' %}"></script>
-    <!-- apex chart js -->
-    <script src="{% static 'template/vendor/apex-chart/apexcharts.min.js' %}"></script>
-    <!-- wow js -->
-    <script src="{% static 'template/vendor/wow/wow.min.js' %}"></script>
-
-    <!-- ==== js dependencies end ==== -->
-
-    <!-- plugin js -->
-    <script src="{% static 'template/js/plugin.js' %}"></script>
-    <!-- main js -->
-    <script src="{% static 'template/js/main.js' %}"></script>
     {% block script %}
     {% endblock %}
 
 </body>
-
 </html>

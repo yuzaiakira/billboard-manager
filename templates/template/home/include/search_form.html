@@ -1,25 +1,21 @@
-    
-    <form class="property__filter" action="{% url 'search' %}">
-        <div class="container">
-            <div class="property__filter__area">
-                <div class="row d-flex align-items-center">
-
-
-                    <div class="property__search__wrapper col-lg-12 col-xl-8">
+<!-- Search and Filter Section -->
+<section class="py-8 bg-light">
+    <form action="{% url 'search' %}>
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row-reverse gap-4">
+                <div class="flex-1">
+                    <div class="relative">
                          {{ search_form.q }}
+                         <i class="fas fa-search absolute left-3 top-4 text-gray-400"></i>
                      </div>
-
-                     <div class="col-lg-12 col-xl-2">
-                        <button type="submit" class="button form--btn button--effect">جستجو</button>
-                    </div>
-
-                    <div class="col-lg-12 col-xl-2">
-                        <div class="property__select__wrapper">
-                            {{ search_form.cities }}
-                        </div>
-                    </div>
-                    
                 </div>
+                <div class="w-full md:w-48">
+                    {{ search_form.cities }}
+                </div>
+                <button class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-3 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-filter ml-2"></i> فیلتر
+                </button>
             </div>
         </div>
     </form>
+</section>

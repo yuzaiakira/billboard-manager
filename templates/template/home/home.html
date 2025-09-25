@@ -3,225 +3,80 @@
 {% load change_bool_value %}
 {% load check_in_list %}
 {% block content %}
-<!-- ==== hero section start ==== -->
-    <section class="hero pos__rel over__hi bg__img" data-background="./assets/images/hero/light-bg.png">
-        <div class="container">
-            <div class="hero__area">
-                <div class="row">
-                    <div class="col-lg-6 col-xxl-5">
-                        <div class="hero__content">
-                            <h5 class="neutral-top">روشی هوشمندانه و بهتر برای  تبلیغات</h5>
-                            <h1>سرمایه گذاری در بیلبورد برای <span>همه</span> </h1>
-                            <p class="primary neutral-bottom">
-                                بیلبورد اجاره ای را بخرید، درآمد ماهانه کسب کنید و رشد پول خود را تماشا کنید
-                            </p>
-                            <div class="hero__cta__group">
-                                <a href="{%url 'billboard-list' %}" class="button button--effect">مشاهده بیلبوردها</a>
-                                <a href="business-loan.html" class="button button--secondary button--effect">یافتن بیلبورد</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-xxl-6 offset-xxl-1">
-                        <div class="hero__illustration d-none d-lg-block">
-                            <img src="{% static 'template/images/hero/hero-illustration.png' %}" alt="Hero Illustration" />
-                        </div>
-                    </div>
-                </div>
+
+    <!-- Hero Section -->
+    <section class="hero-bg text-white py-20 md:py-28">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">بهترین بیلبوردها را برای اجاره پیدا کنید!</h1>
+            <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">جدیدترین بیلبوردهای موجود برای تبلیغات شهری و جاده‌ای را کاوش کنید.</p>
+            <div class="flex flex-col sm:flex-row-reverse justify-center gap-4">
+                <a  href="{%url 'billboard-list' %}" class="btn-hover bg-primary hover:bg-secondary text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
+                    مشاهده جدیدترین بیلبوردها
+                </a>
+                <a  href="{%url 'billboard-list' %}" class="btn-hover bg-white text-primary font-bold py-3 px-8 rounded-lg text-lg border-2 border-white hover:bg-transparent hover:text-white transition duration-300">
+                    جستجوی بیلبورد
+                </a>
             </div>
         </div>
     </section>
-    <!-- ==== #hero section end ==== -->
-    
-    
+
+
     <!-- ==== property filter start ==== -->
     {% include  'template/home/include/search_form.html' %}
     <!-- ==== #property filter end ==== -->
-    
-    
-    <!-- ==== all properties in grid section start ==== -->
-    <section class="properties__grid section__space">
-        <div class="container">
-            <div class="properties__grid__area wow fadeInUp">
-                <div class="title__with__cta">
-                    <div class="row d-flex align-items-center">
-                        <div class="col-lg-12">
-                            <h2>جدیدترین بیلبوردها</h2>
-                        </div>
+    <!-- Latest Billboards Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">جدیدترین بیلبوردها</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">جدیدترین لیست بیلبوردهای ما را برای اجاره فوری کشف کنید</p>
+            </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="direction: rtl;">
+            {% for billboard in queryset %}
+                <!-- Billboard Card 1 -->
+                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md">
+                    <div class="h-48 bg-gray-200 relative">
+                        <a href="{{ billboard.get_absolute_url }}">
+                            <img src="{{ billboard.billboard_pic_url }}" alt="{{ billboard.name}}" class="w-full h-full object-cover">
+                        </a>
                     </div>
-                </div>
-                <div class="property__grid__wrapper">
-                    <div class="row">
-                    {% for billboard in queryset %}
-                        <div class="col-lg-4 col-xl-4">
-                            <div class="property__grid__single">
-                                <div class="img__effect">
-                                    <a href="{{ billboard.get_absolute_url }}">
-                                        <img src="{{ billboard.billboard_pic_url }}" alt="{{ billboard.name }}" />
-                                    </a>
-                                </div>
-                                <div class="property__grid__single__inner">
-                                    <h4>{{ billboard.name}}</h4>
-                                    <p class="sub__info"><i class="fa-solid fa-location-dot"></i>
-                                    {{ billboard.address }}
-                                    </p>
-
-                                    <div class="item__info">
-                                        <div class="item__info__single">
-                                            <p>روشنایی</p>
-                                            <h6>{{ billboard.has_power|boolean_value }}</h6>
-                                        </div>
-                                        <div class="item__info__single">
-                                            <p>تاریخ اکران</p>
-                                            <h6>{{ billboard.reservation_date }}</h6>
-                                        </div>
-                                    </div>
-                                    <div class="invest__cta__wrapper">
-
-                                        <div class="invest__cta">
-                                            <a href="{{ billboard.get_absolute_url }}" class="button button--effect">
-                                                مشاهده بیشتر
-                                            </a>
-                                        </div>
-                                        <div class="invest__cta ">
-                                            <a href="{% url 'add-to-list' billboard.pk %}" class="button button--effect button-add-list {% if billboard|on_list:request.user %}button-added-list{% endif %}">
-                                                افزودن به لیست
-                                            </a>
-                                        </div>
-                                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-dark mb-2">{{ billboard.name}}</h3>
+                        <p class="text-gray-600 mb-4"><i class="fas fa-map-marker-alt text-primary ml-2"></i>{{ billboard.address}}</p>
+                        <div class="flex flex-row-reverse justify-between mb-4">
+                            <div>
+                                <p class="text-gray-700 font-medium">نورپردازی</p>
+                                <div class="flex items-center">
+                                    <i class="fas fa-lightbulb text-primary ml-2"></i>
+                                    <span class="text-green-600 font-medium">{{ billboard.has_power|boolean_value }}</span>
                                 </div>
                             </div>
+                            <div>
+                                <p class="text-gray-700 font-medium">تاریخ اکران</p>
+                                <p class="text-gray-600">{{ billboard.reservation_date }}</p>
+                            </div>
                         </div>
-                    {% endfor %}
-
-
+                        <div class="flex gap-3 flex-row-reverse">
+                            <a class="btn-hover text-center flex-1 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300" href="{{ billboard.get_absolute_url }}">
+                                مشاهده بیلبورد
+                            </a>
+                            <a class="btn-hover text-center flex-1 bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300" href="{% url 'add-to-list' billboard.pk %}">
+                                افزودن به لیست
+                            </a>
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+            </div>
 
-
-                <div class="col-12 more-btn">
-                    <div class="text-center">
-                     <a href="{%url 'billboard-list' %}" class="button button--secondary button--effect">مشاهده همه</a>
-                    </div>
-                </div>
+            <div class="text-center mt-12" style="direction: rtl;">
+                <a class="btn-hover bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300" href="{%url 'billboard-list' %}">
+                    مشاهده همه بیلبوردها
+                </a>
             </div>
         </div>
     </section>
-    <!-- ==== #all properties in grid section end ==== -->
-
-    <!-- ==== profit overview section start ==== -->
-    <section class="profit section__space">
-        <div class="container">
-            <div class="profit__area wow fadeInUp">
-                <div class="section__header">
-                    <h5 class="neutral-top">پلتفرمی برای تبلیغات هوشمند</h5>
-                    <h2>
-                        ما کارهای سنگین را انجام می دهیم تا شما بتوانید آرام بنشیند، استراحت کند و سود ببرد.
-                    </h2>
-                    <p class="neutral-bottom">
-                        ما املاک و مستغلات با کیفیت نهادی را در دسترس سرمایه گذاران قرار می دهیم ساده و با روش شفاف
-                    </p>
-                </div>
-                <div class="profit__item__wrapper">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="profit__single__item alt shadow__effect">
-                                <div class="img__box">
-                                    <img src="{% static 'template/images/overview/passive-income.png' %}" alt="Passive Income" />
-                                </div>
-                                <div class="item__content">
-                                    <h4>درآمد فعال</h4>
-                                    <p>کسب درآمد از اجاره و دریافت سپرده به صورت فصلیر</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="profit__single__item shadow__effect">
-                                <div class="img__box">
-                                    <img src="{% static 'template/images/overview/secure.png' %}" alt="secure" />
-                                </div>
-                                <div class="item__content">
-                                    <h4>امن و مقرون به صرفه</h4>
-                                    <p>امنیت دیجیتال از نظر قانونی برای سرمایه گذاران واقعی </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="profit__item__wrapper">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="profit__single__item alt shadow__effect">
-                                <div class="img__box">
-                                    <img src="{% static 'template/images/overview/transparency.png' %}" alt="Transparency" />
-                                </div>
-                                <div class="item__content">
-                                    <h4>شفافیت</h4>
-                                    <p>به راحتی با اسناد کامل برای هر ملک مشورت کنید</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="profit__single__item shadow__effect">
-                                <div class="img__box">
-                                    <img src="{% static 'template/images/overview/support.png' %}" alt="Support" />
-                                </div>
-                                <div class="item__content">
-                                    <h4>پشتیبانی</h4>
-                                    <p>کسب درآمد از اجاره و دریافت سپرده به صورت فصلی</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ==== #profit overview section end ==== -->
-
-    <!-- ==== numbers section start ==== -->
-    <section class="numbers section__space bg__img" data-background="./assets/images/globe.png">
-        <div class="container">
-            <div class="numbers__area wow fadeInUp">
-                <div class="row d-flex align-items-center">
-                    <div class="col-lg-6">
-                        <div class="content column__space">
-                            <h5 class="neutral-top">با ما مطمئن سرمایه گذاری کنید!</h5>
-                            <h2>اعداد بهتر از کلمات حرف میزنند</h2>
-                            <p>
-                                حداقل های پایین ما به شما انعطاف پذیری می دهد تا مقدار مناسب و در زمان مناسب را سرمایه گذاری کنید. برای رسیدن به اهداف خود
-                            </p>
-                            <a href="{%url 'billboard-list' %}" class="button button--effect">جستجو بیلبورد</a>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="row d-flex align-items-start align-items-lg-center">
-                            <div class="col-sm-6">
-                                <div class="numbers__single shadow__effect">
-                                    <img src="{% static 'template/images/platforms.png' %}" alt="platform" />
-                                    <h3><span class="counter">3000</span>+</h3>
-                                    <p class="neutral-bottom">سرمایه گذار فعال</p>
-                                </div>
-                                <div class="numbers__single shadow__effect__secondary">
-                                    <img src="{% static 'template/images/returns.png' %}" alt="Returns" />
-                                    <h3><span class="counter">18</span>%</h3>
-                                    <p class="neutral-bottom">بازگشت سرمایه</p>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="numbers__single alt shadow__effect__secondary">
-                                    <img src="{% static 'template/images/experience.png' %}" alt="Experience" />
-                                    <h3 class="counter">10</h3>
-                                    <p class="neutral-bottom">سال تجربه</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ==== #numbers section end ==== -->
 {% endblock %}
 
 
