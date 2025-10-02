@@ -2,7 +2,6 @@
 {% load change_bool_value %}
 {% load static %}
 {% block title %}{% if object.title %}{{ object.title }}{% else %}{{ object.name }}{% endif %}{% endblock %}
-
 {% block content %}
 
       <!-- Billboard Details Section -->
@@ -17,18 +16,13 @@
                     </div>
 
                     <!-- Billboard Title and Address -->
-                    <h1 class="text-3xl font-bold text-dark mb-2">بیلبورد خیابان اصلی مرکز شهر</h1>
-                    <p class="text-gray-600 mb-6"><i class="fas fa-map-marker-alt text-primary ml-2"></i> خیابان اصلی ۱۲۳، تهران</p>
+                    <h1 class="text-3xl font-bold text-dark mb-2">{{ object.name }}</h1>
+                    <p class="text-gray-600 mb-6"><i class="fas fa-map-marker-alt text-primary ml-2"></i>{{ object.address }}</p>
 
                     <!-- Billboard Description -->
-                    <div class="mb-12">
+                    <div class="mb-12 description">
                         <h2 class="text-2xl font-bold text-dark mb-4">توضیحات</h2>
-                        <p class="text-gray-700 leading-relaxed">
-                            این بیلبورد ویژه در قلب مرکز شهر تهران در خیابان اصلی واقع شده است و روزانه قابلیت دید بالایی برای هزاران عابر پیاده و راننده فراهم می‌کند. این بیلبورد دارای نورپردازی عالی است و در موقعیتی استراتژیک با حداکثر دید قرار گرفته است. مناسب برای برندهایی که به دنبال افزایش دید خود در منطقه پر رفت و آمد مرکز شهر هستند.
-                        </p>
-                        <p class="text-gray-700 leading-relaxed mt-4">
-                            این بیلبورد به خوبی نگهداری شده و برای اجاره فوری در دسترس است. با موقعیت عالی و حجم ترافیک بالا، فرصتی عالی برای تبلیغ‌کنندگان فراهم می‌کند تا به طور موثر به مخاطبان هدف خود دسترسی پیدا کنند.
-                        </p>
+                        {{object.desc}}
                     </div>
 
                     <!-- Three-column Section -->
@@ -39,7 +33,7 @@
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                             <h3 class="font-bold text-dark mb-2">نورپردازی</h3>
-                            <p class="text-green-600 font-medium"><i class="fas fa-lightbulb text-primary ml-2"></i> دارد</p>
+                            <p class="text-green-600 font-medium"><i class="fas fa-lightbulb text-primary ml-2"></i> {{ object.has_power|boolean_value }}</p>
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                             <h3 class="font-bold text-dark mb-2">کد بیلبورد</h3>
