@@ -37,37 +37,38 @@
                         </div>
                         <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
                             <h3 class="font-bold text-dark mb-2">کد بیلبورد</h3>
-                            <p class="text-gray-600">1234</p>
+                            <p class="text-gray-600">{{ object.pk }}</p>
                         </div>
                     </div>
 
                     <!-- Billboard Gallery -->
+                {% if object.BillboardImageModel %}
                      <div class="mb-12">
                         <h2 class="text-2xl font-bold text-dark mb-6">گالری</h2>
                         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {% for image in object.BillboardImageModel.all %}
+
                             <div class="h-40 bg-gray-200 rounded-lg overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1593697821252-0c9137d9fc45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="تصویر گالری 1" class="w-full h-full object-cover">
+                                <img src="{ image.image.url }}" alt="{{ image.title|default:object.name }}" class="w-full h-full object-cover">
                             </div>
-                            <div class="h-40 bg-gray-200 rounded-lg overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1593697821252-0c9137d9fc45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="تصویر گالری 2" class="w-full h-full object-cover">
-                            </div>
-                            <div class="h-40 bg-gray-200 rounded-lg overflow-hidden md:col-span-1 col-span-2">
-                                <img src="https://images.unsplash.com/photo-1593697821252-0c9137d9fc45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="تصویر گالری 3" class="w-full h-full object-cover">
-                            </div>
+
+                        {% endfor %}
                         </div>
                     </div>
+                {% endif %}
 
                     <!-- Google Maps Location -->
+                    {% if object.map_iframe %}
                     <div class="mb-12">
                         <h2 class="text-2xl font-bold text-dark mb-6">موقعیت</h2>
                         <div class="bg-gray-200 h-96 rounded-xl overflow-hidden">
-                            <div class="w-full h-full flex items-center justify-center text-gray-500">
-                                <i class="fas fa-map-marked-alt text-4xl ml-3"></i>
-                                <span class="text-xl">نمایش نقشه گوگل</span>
-                            </div>
+                           <iframe src="{{ object.map_iframe }}"
+                                   width="746" height="312" style="border:0;"
+                                   allowfullscreen="" loading="lazy"
+                                   referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </div>
                     </div>
-
+                    {% endif %}
                 </div>
 
                 <!-- Sidebar -->
@@ -75,29 +76,29 @@
                     <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
                         <div class="mb-6 pb-6 border-b border-gray-200">
                             <h3 class="font-bold text-dark mb-4">تاریخ نمایش</h3>
-                            <p class="text-gray-600">1404-03-01</p>
+                            <p class="text-gray-600">{{ object.reservation_date }}</p>
                         </div>
 
                         <div class="mb-6 pb-6 border-b border-gray-200">
                             <h3 class="font-bold text-dark mb-4">قیمت</h3>
-                            <p class="text-primary font-bold text-xl">5,000,000 تومان</p>
+                            <p class="text-primary font-bold text-xl">{{ object.BillboardFinalPriceModel.final_price }} تومان</p>
                         </div>
 
                         <div class="mb-6 pb-6 border-b border-gray-200">
                             <h3 class="font-bold text-dark mb-4">ابعاد</h3>
                             <div class="flex justify-between mb-2">
                                 <span class="text-gray-600">عرض:</span>
-                                <span class="font-medium">6 متر</span>
+                                <span class="font-medium">{{ object.billboard_width }} متر</span>
                             </div>
                             <div class="flex justify-between">
                                 <span class="text-gray-600">ارتفاع:</span>
-                                <span class="font-medium">3 متر</span>
+                                <span class="font-medium">{{ object.billboard_length }} متر</span>
                             </div>
                         </div>
 
                         <div class="mb-6 pb-6 border-b border-gray-200">
                             <h3 class="font-bold text-dark mb-4">موقعیت</h3>
-                            <p class="text-gray-600">خراسان رضوی / سبزوار</p>
+                            <p class="text-gray-600"><a href="{{ object.city.state.get_absolute_url }}">{{ object.city.state.name }}</a> / <a href="{{ object.city.get_absolute_url }}">{{ object.city.name }}</a></p>
                         </div>
 
                         <div class="mb-6 pb-6 border-b border-gray-200">
@@ -121,7 +122,7 @@
                         <div class="mb-6">
                             <h3 class="font-bold text-dark mb-4">چاپ</h3>
                             <div class="space-y-3">
-                                <button class="btn-hover w-full bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300">
+                                <button onclick="window.print()" class="btn-hover w-full bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300">
                                     <i class="fas fa-print ml-2"></i> چاپ تکی
                                 </button>
                                 <button class="btn-hover w-full bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300">
@@ -135,6 +136,7 @@
         </div>
     </section>
 
+
         <!-- Related Billboards Section -->
     <section class="py-16">
         <div class="container mx-auto px-4">
@@ -142,7 +144,8 @@
                 <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">بیلبوردهای مرتبط</h2>
                 <p class="text-gray-600 max-w-2xl mx-auto">جدیدترین بیلبوردهای ما را که برای اجاره فوری در دسترس هستند کشف کنید</p>
             </div>
-
+{% if object.get_related %}
+    {% for related in object.get_related%}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="direction: rtl;">
                 <!-- Billboard Card 1 -->
                 <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md">
@@ -178,80 +181,13 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Billboard Card 2 -->
-                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md">
-                    <div class="h-48 bg-gray-200 relative">
-                        <img src="https://images.unsplash.com/photo-1593697821252-0c9137d9fc45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Billboard" class="w-full h-full object-cover">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-dark mb-2">بیلبورد بزرگراه ۱۵</h3>
-                        <p class="text-gray-600 mb-4"><i class="fas fa-map-marker-alt text-primary ml-2"></i> بزرگراه ۱۵، اصفهان</p>
-                        <div class="flex flex-row-reverse justify-between mb-4">
-                            <div>
-                                <p class="text-gray-700 font-medium">نورپردازی</p>
-                                <div class="flex flex-row-reverse items-center">
-                                    <i class="fas fa-lightbulb text-gray-400 ml-2"></i>
-                                    <span class="text-red-600 font-medium">ندارد</span>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-gray-700 font-medium">تاریخ شروع</p>
-                                <p class="text-gray-600">2023-09-22</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-row-reverse gap-3">
-                            <button class="btn-hover flex-1 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-                                مشاهده بیلبورد
-                            </button>
-                            <button class="btn-hover flex-1 bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300">
-                                افزودن به لیست
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Billboard Card 3 -->
-                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md">
-                    <div class="h-48 bg-gray-200 relative">
-                        <img src="https://images.unsplash.com/photo-1593697821252-0c9137d9fc45?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Billboard" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-                            موجود
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-dark mb-2">نمایشگر ورودی مرکز خرید</h3>
-                        <p class="text-gray-600 mb-4"><i class="fas fa-map-marker-alt text-primary ml-2"></i> مرکز خرید ولیعصر، تهران</p>
-                        <div class="flex flex-row-reverse justify-between mb-4">
-                            <div>
-                                <p class="text-gray-700 font-medium">نورپردازی</p>
-                                <div class="flex flex-row-reverse items-center">
-                                    <i class="fas fa-lightbulb text-primary ml-2"></i>
-                                    <span class="text-green-600 font-medium">دارد</span>
-                                </div>
-                            </div>
-                            <div>
-                                <p class="text-gray-700 font-medium">تاریخ شروع</p>
-                                <p class="text-gray-600">2023-10-05</p>
-                            </div>
-                        </div>
-                        <div class="flex flex-row-reverse gap-3">
-                            <button class="btn-hover flex-1 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-                                مشاهده بیلبورد
-                            </button>
-                            <button class="btn-hover flex-1 bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300">
-                                افزودن به لیست
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
             </div>
-
+    {% endfor %}
+{% endif %}
             <div class="text-center mt-12">
-                <button class="btn-hover bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
+                <a href="{%url 'billboard-list' %}" class="btn-hover bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
                     مشاهده بیلبوردهای بیشتر
-                </button>
+                </a>
             </div>
         </div>
     </section>
