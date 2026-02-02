@@ -59,11 +59,11 @@
                             </div>
                         </div>
                         <div class="flex gap-3 flex-row-reverse">
-                            <a class="btn-hover text-center flex-1 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300" href="{{ billboard.get_absolute_url }}">
+                            <a class="btn-hover text-center flex-1 bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300" href="{{ billboard.get_absolute_url }}">
                                 مشاهده بیلبورد
                             </a>
-                            <a class="btn-hover text-center flex-1 bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300 button-add-list" href="{% url 'add-to-list' billboard.pk %}">
-                                افزودن به لیست
+                            <a class="btn-hover text-center flex-1 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300 button-add-list" href="{% url 'add-to-list' billboard.pk %}" data-billboard-id="{{ billboard.pk }}">
+                                <span class="button-add-list-text">افزودن به لیست</span>
                             </a>
                         </div>
                     </div>
