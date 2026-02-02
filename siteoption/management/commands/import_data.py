@@ -1,28 +1,40 @@
 from django.core.management.base import BaseCommand
+
+from siteoption.constants import (
+    BILLBOARD_COMMISSION,
+    BILLBOARD_VISIBILITY,
+    SITE_NAME,
+)
 from siteoption.models import OptionModel
 
+
 class Command(BaseCommand):
-    help = 'import site options data to database'
+    help = "Import site options data to database"
 
-    def default_data(self, *args, **kwargs):
-        OptionModel.objects.get_or_create(type=OptionModel.FLOAT,
-                                          key="BillboardCommission",
-                                          value=1.2)
-
-        OptionModel.objects.get_or_create(type=OptionModel.BOOLEAN,
-                                          key="BillboardVisibility",
-                                          value=True)
-        
-        OptionModel.objects.get_or_create(type=OptionModel.STRING,
-                                          key="SiteName",
-                                          value=True)
-
+    def get_default_data(self):
+        return [
+            {
+                "key": BILLBOARD_COMMISSION,
+                "type": OptionModel.FLOAT,
+                "value": "1.2",
+            },
+            {
+                "key": BILLBOARD_VISIBILITY,
+                "type": OptionModel.BOOLEAN,
+                "value": "True",
+            },
+            {
+                "key": SITE_NAME,
+                "type": OptionModel.STRING,
+                "value": "My Site",
+            },
+        ]
 
     def handle(self, *args, **kwargs):
-        self.stdout.write("ready to import data ...")
-
-        self.default_data()
-
-        self.stdout.write(
-            self.style.SUCCESS("all data is importing")
-                               )
+        self.stdout.write("Ready to import data ...")
+        for item in self.get_default_data():
+            OptionModel.objects.get_or_create(
+                key=item["key"],
+                defaults={"type": item["type"], "value": item["value"]},
+            )
+        self.stdout.write(self.style.SUCCESS("All data imported."))
