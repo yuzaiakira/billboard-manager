@@ -6,7 +6,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from openpyxl import Workbook
 
 from .models import ListsModel
-from .forms import ChoseFieldForm
+from .forms import PdfExportFieldForm, ExcelExportFieldForm
 from billboard.utils import billboard_bool_value
 # Create your views here.
 
@@ -47,8 +47,8 @@ class WatchList(LoginRequiredMixin, View):
     model = ListsModel
     template = 'template/list/Billboard_watch_list.html'
     context = dict()
-    context['pdf_form'] = ChoseFieldForm()
-    context['excel_form'] = ChoseFieldForm()
+    context['pdf_form'] = PdfExportFieldForm()
+    context['excel_form'] = ExcelExportFieldForm()
 
     def get(self, request):
         self.context['object_list'] = self.model.objects.filter(user=request.user)
@@ -73,7 +73,7 @@ class PrintPDF(WatchList):
 
     def get(self, request, *args, **kwargs):
         if request.method == 'GET':
-            self.context['pdf_form'] = ChoseFieldForm(request.GET)
+            self.context['pdf_form'] = PdfExportFieldForm(request.GET)
             if self.context['pdf_form'].is_valid():
                 print(self.context['pdf_form'].cleaned_data['billboard_pic'])
                 print(self.context['pdf_form'].cleaned_data)
@@ -84,7 +84,7 @@ class PrintPDF(WatchList):
 class ExportExcel(LoginRequiredMixin, View):
     model = ListsModel
 
-    # Map ChoseFieldForm field names to (excel_header, value_getter key)
+    # Map ExcelExportFieldForm field names to (excel_header, value_getter key)
     _EXCEL_COLUMNS = {
         'id_code': ('کد بیلبورد', 'id'),
         'city': ('شهر', 'city'),
@@ -99,7 +99,7 @@ class ExportExcel(LoginRequiredMixin, View):
     }
 
     def get(self, request, *args, **kwargs):
-        form = ChoseFieldForm(request.GET)
+        form = ExcelExportFieldForm(request.GET)
         if form.is_valid():
             columns = self._build_columns_from_form(form.cleaned_data)
         else:
