@@ -1,29 +1,160 @@
-{% if  request.user.is_authenticated %}
-    <script>
+{% if request.user.is_authenticated %}
+<style>
+    .button-add-list.button-added-list {
+        background-color: #d1d5db !important;
+        color: #ff8000 !important;
+        cursor: default !important;
+        border: 1px solid #d1d5db !important;
+        opacity: 1;
+    }
+    .button-add-list.button-add-list-loading {
+        cursor: wait !important;
+    }
+</style>
+<script>
+(function() {
+    var STORAGE_KEY = 'billboard-in-list-ids';
 
-        item = document.getElementsByClassName('button-add-list') // get all billboard
-        for (let i=0; i <item.length; i++){
-            item[i].addEventListener('click',
-            function (e) {
-                e.preventDefault() // do not redirect page
-                send_data(this) // send element in send_data function
+    function getStoredIds() {
+        try {
+            var raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function setStoredIds(ids) {
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+        } catch (e) {}
+    }
+
+    function addIdToStorage(pk) {
+        var ids = getStoredIds();
+        pk = parseInt(pk, 10);
+        if (pk && ids.indexOf(pk) === -1) {
+            ids.push(pk);
+            setStoredIds(ids);
+        }
+    }
+
+    function getTextNode(btn) {
+        return btn.querySelector('.button-add-list-text') || btn;
+    }
+
+    function setButtonAdded(btn) {
+        btn.classList.add('button-added-list');
+        btn.classList.remove('button-add-list-loading');
+        btn.setAttribute('aria-disabled', 'true');
+        btn.style.pointerEvents = 'none';
+        btn.style.cursor = 'default';
+        var el = getTextNode(btn);
+        if (el === btn) {
+            el.textContent = 'اضافه شد';
+        } else {
+            el.textContent = 'اضافه شد';
+        }
+    }
+
+    function setButtonLoading(btn) {
+        btn.classList.add('button-add-list-loading');
+        btn.setAttribute('aria-busy', 'true');
+        btn.style.pointerEvents = 'none';
+        btn.style.cursor = 'wait';
+        var el = getTextNode(btn);
+        if (el === btn) {
+            el.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال افزودن...';
+        } else {
+            var icon = btn.querySelector('i');
+            el.textContent = ' در حال افزودن...';
+            if (icon) {
+                icon.className = 'fas fa-spinner fa-spin ml-2';
+            } else {
+                el.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال افزودن...';
             }
-            )
         }
+    }
 
-        function send_data(obj){
-            // check obj is added in list
-            if(!obj.classList.contains("button-added-list")) {
+    function restoreButton(btn, label) {
+        btn.classList.remove('button-add-list-loading');
+        btn.removeAttribute('aria-busy');
+        btn.style.pointerEvents = '';
+        btn.style.cursor = '';
+        var el = getTextNode(btn);
+        if (el === btn) {
+            el.textContent = label;
+        } else {
+            el.textContent = label;
+        }
+    }
 
-                const xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                            obj.classList.add("button-added-list"); // add css class when send a request
+    function applyStoredState() {
+        var ids = getStoredIds();
+        var buttons = document.querySelectorAll('.button-add-list');
+        buttons.forEach(function(btn) {
+            var pk = btn.getAttribute('data-billboard-id');
+            if (!pk) {
+                var m = (btn.getAttribute('href') || '').match(/add-to-list\/(\d+)/);
+                pk = m ? m[1] : null;
+            }
+            if (pk && ids.indexOf(parseInt(pk, 10)) !== -1) {
+                setButtonAdded(btn);
+            }
+        });
+    }
+
+    function sendAddRequest(btn, url, pk) {
+        if (btn.classList.contains('button-added-list') || btn.classList.contains('button-add-list-loading')) {
+            return;
+        }
+        setButtonLoading(btn);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState !== 4) return;
+            if (xhr.status === 200) {
+                try {
+                    var res = JSON.parse(xhr.responseText);
+                    if (res.added !== false) {
+                        addIdToStorage(pk);
+                        setButtonAdded(btn);
+                        return;
                     }
-                }
-                xhttp.open("GET", obj.getAttribute('href')); // set request GET url
-                xhttp.send(); // send request
-              }
+                } catch (e) {}
+                restoreButton(btn, 'افزودن به لیست');
+            } else {
+                restoreButton(btn, 'افزودن به لیست');
+            }
+        };
+        xhr.open('GET', url);
+        xhr.send();
+    }
+
+    function init() {
+        applyStoredState();
+        var buttons = document.querySelectorAll('.button-add-list');
+        for (var i = 0; i < buttons.length; i++) {
+            (function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var url = btn.getAttribute('href');
+                    if (!url || url === '#') return;
+                    var pk = btn.getAttribute('data-billboard-id');
+                    if (!pk) {
+                        var m = url.match(/add-to-list\/(\d+)/);
+                        pk = m ? m[1] : null;
+                    }
+                    sendAddRequest(btn, url, pk);
+                });
+            })(buttons[i]);
         }
-    </script>
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
+})();
+</script>
 {% endif %}
