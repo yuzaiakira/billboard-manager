@@ -16,29 +16,44 @@
     <!-- Action Buttons (PDF, Excel, Remove list) -->
     <section class="py-8 bg-light">
         <div class="container mx-auto px-4">
-            <div class="flex flex-wrap justify-center gap-4 mb-4" style="direction: rtl;">
-                <form method="get" action="{% url 'get-pdf' %}" class="flex flex-wrap justify-center gap-4">
-                    <button type="submit" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-                        خروجی PDF
-                    </button>
-                    <details class="mr-4">
-                        <summary class="text-sm text-gray-600 cursor-pointer hover:text-primary">تنظیمات PDF</summary>
-                        <div class="flex flex-wrap gap-4 mt-3 p-3 bg-white rounded-lg shadow-inner">
-                            {% for field in pdf_form %}
-                                <label class="flex items-center gap-2 cursor-pointer text-sm text-dark">
-                                    {{ field }}
-                                    <span>{{ field.label }}</span>
-                                </label>
-                            {% endfor %}
-                        </div>
-                    </details>
-                </form>
+            <div class="flex flex-wrap justify-center gap-4 mb-6" style="direction: rtl;">
+                <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                    <i class="fas fa-file-pdf ml-2"></i>خروجی PDF
+                </button>
                 <a href="{% url 'get-excel' %}" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-                    خروجی Excel
+                    <i class="fas fa-file-excel ml-2"></i>خروجی Excel
                 </a>
                 <a href="{% url 'remove-list' %}" class="btn-hover bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-                    حذف لیست
+                    <i class="fas fa-trash-alt ml-2"></i>حذف لیست
                 </a>
+            </div>
+
+            <!-- PDF options: visible card so users can choose which fields to include -->
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden" style="direction: rtl;">
+                <div class="px-6 py-4 bg-primary/10 border-b border-primary/20 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+                        <i class="fas fa-cog"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark">تنظیمات خروجی PDF</h3>
+                        <p class="text-sm text-gray-600">فیلدهایی که می‌خواهید در فایل PDF قرار بگیرند را انتخاب کنید، سپس دکمه «خروجی PDF» بالا را بزنید.</p>
+                    </div>
+                </div>
+                <form method="get" action="{% url 'get-pdf' %}" id="pdf-options-form" class="p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {% for field in pdf_form %}
+                            <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-primary/50 hover:bg-light/50 cursor-pointer transition">
+                                {{ field }}
+                                <span class="text-sm font-medium text-dark">{{ field.label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-4 flex flex-row-reverse">
+                        <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                            <i class="fas fa-download ml-2"></i>دانلود PDF با تنظیمات بالا
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </section>
