@@ -4,6 +4,8 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
+from openpyxl.utils import get_column_letter
 
 from .models import ListsModel
 from .forms import PdfExportFieldForm, ExcelExportFieldForm
@@ -150,8 +152,62 @@ class ExportExcel(LoginRequiredMixin, View):
                     row.append('')
             ws.append(row)
 
+        if use_persian_headers:
+            self._apply_persian_style(ws, len(columns), len(items))
+
         wb.save(response)
         return response
+
+    def _apply_persian_style(self, ws, num_columns, num_data_rows):
+        """Apply RTL and professional styling when ظاهر فارسی is enabled."""
+        ws.sheet_view.rightToLeft = True
+
+        # Style constants
+        header_fill = PatternFill(start_color="2F5496", end_color="2F5496", fill_type="solid")
+        header_font = Font(name="Tahoma", size=11, bold=True, color="FFFFFF")
+        cell_border = Border(
+            left=Side(style="thin", color="D9D9D9"),
+            right=Side(style="thin", color="D9D9D9"),
+            top=Side(style="thin", color="D9D9D9"),
+            bottom=Side(style="thin", color="D9D9D9"),
+        )
+        data_fill_light = PatternFill(start_color="F2F2F2", end_color="F2F2F2", fill_type="solid")
+        data_fill_white = PatternFill(start_color="FFFFFF", end_color="FFFFFF", fill_type="solid")
+        data_font = Font(name="Tahoma", size=10, color="000000")
+        alignment_rtl = Alignment(horizontal="right", vertical="center", wrap_text=True)
+
+        # Header row (row 1)
+        for col_idx in range(1, num_columns + 1):
+            cell = ws.cell(row=1, column=col_idx)
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.border = cell_border
+            cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
+
+        # Data rows
+        for row_idx in range(2, num_data_rows + 2):
+            row_fill = data_fill_light if row_idx % 2 == 0 else data_fill_white
+            for col_idx in range(1, num_columns + 1):
+                cell = ws.cell(row=row_idx, column=col_idx)
+                cell.fill = row_fill
+                cell.font = data_font
+                cell.border = cell_border
+                cell.alignment = alignment_rtl
+
+        # Column widths: wider than content for readability (min 14, max 40)
+        for col_idx in range(1, num_columns + 1):
+            col_letter = get_column_letter(col_idx)
+            max_length = 0
+            for row_idx in range(1, min(num_data_rows + 2, 102) + 1):
+                cell = ws.cell(row=row_idx, column=col_idx)
+                val = cell.value
+                if val is not None:
+                    try:
+                        max_length = max(max_length, len(str(val)))
+                    except (TypeError, ValueError):
+                        pass
+            adjusted = min(max(max_length + 2, 14), 40)
+            ws.column_dimensions[col_letter].width = adjusted
 
     def _build_columns_from_form(self, cleaned_data, use_persian_headers=True):
         """Build (header, value_key) list from form. Header is Persian or variable name based on style."""
