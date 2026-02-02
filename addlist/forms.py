@@ -4,6 +4,7 @@ from django import forms
 class ChoseFieldForm(forms.Form):
     billboard_pic = forms.BooleanField(label="عکس بیلبورد", required=False, initial=True)
     id_code = forms.BooleanField(label="کد بیلبورد", required=False)
+    city = forms.BooleanField(label="شهر", required=False, initial=True)
     name = forms.BooleanField(label="عنوان بیلبورد", required=False, initial=True)
     description = forms.BooleanField(label="توضیحات بیلبورد", required=False)
     address = forms.BooleanField(label="ادرس بیلبورد", required=False, initial=True)
