@@ -27,4 +27,5 @@ class ExcelExportFieldForm(forms.Form):
     size = forms.BooleanField(label="ابعاد بیلبورد", required=False, initial=True)
     reservation_date = forms.BooleanField(label="تاریخ رزرو بیلبورد", required=False, initial=True)
     price = forms.BooleanField(label="قیمت بیلبورد", required=False)
+    style = forms.BooleanField(label="ظاهر فارسی", required=False, initial=True)
 
