@@ -84,18 +84,18 @@ class PrintPDF(WatchList):
 class ExportExcel(LoginRequiredMixin, View):
     model = ListsModel
 
-    # Map ExcelExportFieldForm field names to (excel_header, value_getter key)
+    # Map ExcelExportFieldForm field names to (persian_header, variable_header, value_key)
     _EXCEL_COLUMNS = {
-        'id_code': ('کد بیلبورد', 'id'),
-        'city': ('شهر', 'city'),
-        'name': ('عنوان بیلبورد', 'name'),
-        'address': ('آدرس بیلبورد', 'address'),
-        'description': ('توضیحات بیلبورد', 'description'),
-        'has_power': ('روشنایی', 'has_power'),
-        'size': ('طول', 'billboard_length'),  # size adds two columns
-        'size_width': ('عرض', 'billboard_width'),
-        'reservation_date': ('تاریخ رزرو', 'reservation_date'),
-        'price': ('قیمت بیلبورد', 'price'),
+        'id_code': ('کد بیلبورد', 'id_code', 'id'),
+        'city': ('شهر', 'city', 'city'),
+        'name': ('عنوان بیلبورد', 'name', 'name'),
+        'address': ('آدرس بیلبورد', 'address', 'address'),
+        'description': ('توضیحات بیلبورد', 'description', 'description'),
+        'has_power': ('روشنایی بیلبورد', 'has_power', 'has_power'),
+        'size': ('طول', 'billboard_length', 'billboard_length'),  # size adds two columns
+        'size_width': ('عرض', 'billboard_width', 'billboard_width'),
+        'reservation_date': ('تاریخ رزرو بیلبورد', 'reservation_date', 'reservation_date'),
+        'price': ('قیمت بیلبورد', 'price', 'price'),
     }
 
     def get(self, request, *args, **kwargs):
@@ -103,11 +103,13 @@ class ExportExcel(LoginRequiredMixin, View):
         initial_data = {f: form.fields[f].initial for f in form.fields}
         if form.is_valid():
             data = form.cleaned_data if request.GET else initial_data
-            columns = self._build_columns_from_form(data)
+            use_persian_headers = data.get('style', True)
+            columns = self._build_columns_from_form(data, use_persian_headers)
         else:
-            columns = self._build_columns_from_form(initial_data)
+            use_persian_headers = initial_data.get('style', True)
+            columns = self._build_columns_from_form(initial_data, use_persian_headers)
         if not columns:
-            columns = self._default_columns()
+            columns = self._default_columns(use_persian_headers)
 
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="billboard-list.xlsx"'
@@ -116,33 +118,33 @@ class ExportExcel(LoginRequiredMixin, View):
         ws = wb.active
         ws.title = "billboard list"
 
-        headers = [col[0] for col in columns]
+        headers = [col[0] for col in columns]  # col = (header, value_key)
         ws.append(headers)
 
         items = self.model.objects.filter(user=request.user)
         for item in items:
             billboard = item.billboard
             row = []
-            for _, key in columns:
-                if key == 'id':
+            for _, value_key in columns:
+                if value_key == 'id':
                     row.append(str(billboard.id))
-                elif key == 'city':
+                elif value_key == 'city':
                     row.append(str(billboard.city))
-                elif key == 'name':
+                elif value_key == 'name':
                     row.append(billboard.name)
-                elif key == 'address':
+                elif value_key == 'address':
                     row.append(billboard.address)
-                elif key == 'description':
+                elif value_key == 'description':
                     row.append(billboard.description or '')
-                elif key == 'has_power':
+                elif value_key == 'has_power':
                     row.append(billboard_bool_value(billboard.has_power))
-                elif key == 'billboard_length':
+                elif value_key == 'billboard_length':
                     row.append(billboard.billboard_length or '')
-                elif key == 'billboard_width':
+                elif value_key == 'billboard_width':
                     row.append(billboard.billboard_width or '')
-                elif key == 'reservation_date':
+                elif value_key == 'reservation_date':
                     row.append(str(billboard.reservation_date))
-                elif key == 'price':
+                elif value_key == 'price':
                     row.append(billboard.price or '')
                 else:
                     row.append('')
@@ -151,27 +153,42 @@ class ExportExcel(LoginRequiredMixin, View):
         wb.save(response)
         return response
 
-    def _build_columns_from_form(self, cleaned_data):
+    def _build_columns_from_form(self, cleaned_data, use_persian_headers=True):
+        """Build (header, value_key) list from form. Header is Persian or variable name based on style."""
         columns = []
-        for field_name, (header, key) in self._EXCEL_COLUMNS.items():
+        for field_name, (persian_header, variable_header, value_key) in self._EXCEL_COLUMNS.items():
             if field_name == 'size_width':
                 if cleaned_data.get('size'):
-                    columns.append((self._EXCEL_COLUMNS['size_width'][0], self._EXCEL_COLUMNS['size_width'][1]))
+                    header = persian_header if use_persian_headers else variable_header
+                    columns.append((header, value_key))
                 continue
             if cleaned_data.get(field_name):
-                columns.append((header, key))
+                header = persian_header if use_persian_headers else variable_header
+                columns.append((header, value_key))
         return columns
 
-    def _default_columns(self):
-        """ستون‌های پیش‌فرض وقتی همه فیلدها خاموش باشند (هماهنگ با initial فرم)."""
+    def _default_columns(self, use_persian_headers=True):
+        """Default columns when all fields are turned off (aligned with the form's initial state)."""
+        if use_persian_headers:
+            return [
+                ('کد بیلبورد', 'id'),
+                ('شهر', 'city'),
+                ('آدرس بیلبورد', 'address'),
+                ('توضیحات بیلبورد', 'description'),
+                ('روشنایی بیلبورد', 'has_power'),
+                ('طول', 'billboard_length'),
+                ('عرض', 'billboard_width'),
+                ('قیمت بیلبورد', 'price'),
+                ('تاریخ رزرو بیلبورد', 'reservation_date'),
+            ]
         return [
-            ('کد بیلبورد', 'id'),
-            ('شهر', 'city'),
-            ('آدرس بیلبورد', 'address'),
-            ('توضیحات بیلبورد', 'description'),
-            ('روشنایی', 'has_power'),
-            ('طول', 'billboard_length'),
-            ('عرض', 'billboard_width'),
-            ('قیمت بیلبورد', 'price'),
-            ('تاریخ رزرو', 'reservation_date'),
+            ('id_code', 'id'),
+            ('city', 'city'),
+            ('address', 'address'),
+            ('description', 'description'),
+            ('has_power', 'has_power'),
+            ('billboard_length', 'billboard_length'),
+            ('billboard_width', 'billboard_width'),
+            ('price', 'price'),
+            ('reservation_date', 'reservation_date'),
         ]
