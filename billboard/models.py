@@ -10,6 +10,7 @@ from seo.models import SEOBaseModel
 from billboard.utils import billboard_path
 from billboard.manager import BillboardManager
 from billboard.mixin import ImageCompressMixin
+from siteoption.constants import BILLBOARD_COMMISSION
 from siteoption.utils.functions import get_option
 
 
@@ -205,7 +206,7 @@ class BillboardFinalPriceModel(models.Model):
 
     @classmethod
     def get_commission(cls):
-        return get_option('BillboardCommission', 1.2)
+        return get_option(BILLBOARD_COMMISSION, 1.2)
 
     @classmethod
     def update_price(cls, billboard, commission):

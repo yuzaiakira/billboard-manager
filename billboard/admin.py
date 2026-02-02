@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from billboard import models, views
 from account.models import UserModel
 
+from siteoption.constants import BILLBOARD_COMMISSION
 from siteoption.utils.functions import get_option
 admin.site.site_header = 'Billboard Manager'
 admin.site.index_title = 'ANTEN'
@@ -56,7 +57,7 @@ class BillboardAdmin(admin.ModelAdmin):
 
     def get_commission(self):
         if not hasattr(self, '_commission'):
-            self._commission = get_option('BillboardCommission', 1.2)
+            self._commission = get_option(BILLBOARD_COMMISSION, 1.2)
 
         return self._commission
 
