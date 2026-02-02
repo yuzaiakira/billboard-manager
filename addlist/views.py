@@ -100,9 +100,13 @@ class ExportExcel(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         form = ExcelExportFieldForm(request.GET)
+        initial_data = {f: form.fields[f].initial for f in form.fields}
         if form.is_valid():
-            columns = self._build_columns_from_form(form.cleaned_data)
+            data = form.cleaned_data if request.GET else initial_data
+            columns = self._build_columns_from_form(data)
         else:
+            columns = self._build_columns_from_form(initial_data)
+        if not columns:
             columns = self._default_columns()
 
         response = HttpResponse(content_type='application/ms-excel')
@@ -156,13 +160,13 @@ class ExportExcel(LoginRequiredMixin, View):
                 continue
             if cleaned_data.get(field_name):
                 columns.append((header, key))
-        return columns if columns else self._default_columns()
+        return columns
 
     def _default_columns(self):
+        """ستون‌های پیش‌فرض وقتی همه فیلدها خاموش باشند (هماهنگ با initial فرم)."""
         return [
             ('کد بیلبورد', 'id'),
             ('شهر', 'city'),
-            ('عنوان بیلبورد', 'name'),
             ('آدرس بیلبورد', 'address'),
             ('توضیحات بیلبورد', 'description'),
             ('روشنایی', 'has_power'),
