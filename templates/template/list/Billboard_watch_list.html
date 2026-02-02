@@ -5,150 +5,123 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-    <!-- ==== banner section start ==== -->
-    <section class="banner__alt bg__img" data-background="{% static 'template/images/banner/banner-two-bg.png' %}">
-        <div class="container">
-            <div class="banner__alt__area">
-                <h1 class="neutral-top neutral-bottom">{{ title }}</h1>
+    <!-- Hero / Banner Section -->
+    <section class="hero-bg text-white py-16 md:py-24">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ title }}</h1>
+            <p class="text-lg text-white/90">بیلبوردهای انتخاب شده شما</p>
+        </div>
+    </section>
+
+    <!-- Action Buttons (PDF, Excel, Remove list) -->
+    <section class="py-8 bg-light">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-4 mb-4" style="direction: rtl;">
+                <form method="get" action="{% url 'get-pdf' %}" class="flex flex-wrap justify-center gap-4">
+                    <button type="submit" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                        خروجی PDF
+                    </button>
+                    <details class="mr-4">
+                        <summary class="text-sm text-gray-600 cursor-pointer hover:text-primary">تنظیمات PDF</summary>
+                        <div class="flex flex-wrap gap-4 mt-3 p-3 bg-white rounded-lg shadow-inner">
+                            {% for field in pdf_form %}
+                                <label class="flex items-center gap-2 cursor-pointer text-sm text-dark">
+                                    {{ field }}
+                                    <span>{{ field.label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </details>
+                </form>
+                <a href="{% url 'get-excel' %}" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                    خروجی Excel
+                </a>
+                <a href="{% url 'remove-list' %}" class="btn-hover bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                    حذف لیست
+                </a>
             </div>
         </div>
     </section>
-    <!-- ==== banner section end ==== -->
 
-
-    <!-- ==== property filter start ==== -->
-    <div class="property__filter">
-        <div class="container">
-            <div class="property__filter__area">
-                <div class="row d-flex align-items-center" style="justify-content: center;">
-                    <div class="col-lg-12 col-xl-6">
-                        <div class="nav__group__btn" style="justify-content: center;">
-
-                            <form method="get" action="{% url 'get-pdf' %}" class="list__form">
-
-                                <div class="container">
-                                  <div class="row">
-                                    <div class="col-sm-6 col-md-4">
-                                      <button type="submit" class="button button--effect">خروجی pdf</button>
+    <!-- Billboards Grid Section -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            {% if object_list %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="direction: rtl;">
+                    {% for item in object_list %}
+                        <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md">
+                            <div class="h-48 bg-gray-200 relative">
+                                <a href="{{ item.billboard.get_absolute_url }}">
+                                    <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" class="w-full h-full object-cover">
+                                </a>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold text-dark mb-2">{{ item.billboard.name }}</h3>
+                                <p class="text-gray-600 mb-4"><i class="fas fa-map-marker-alt text-primary ml-2"></i>{{ item.billboard.address }}</p>
+                                <div class="flex flex-row-reverse justify-between mb-4">
+                                    <div>
+                                        <p class="text-gray-700 font-medium">نورپردازی</p>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-lightbulb text-primary ml-2"></i>
+                                            <span class="text-green-600 font-medium">{{ item.billboard.has_power|boolean_value }}</span>
+                                        </div>
                                     </div>
-                                    <div class="col-sm-6 col-md-4">
-                                      <a class="button button--effect" href="{% url 'get-excel' %}"> خروجی excel </a>
+                                    <div>
+                                        <p class="text-gray-700 font-medium">تاریخ اکران</p>
+                                        <p class="text-gray-600">{{ item.billboard.reservation_date }}</p>
                                     </div>
-                                    <div class="col-sm-6 col-md-4">
-                                      <a class="button button--effect" href="{% url 'remove-list' %}"> حدف لیست </a>
-                                    </div>
-
-                                  </div>
                                 </div>
-
-                                <ul>
-                                    {{ pdf_form.as_ul }}
-                                </ul>
-
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- ==== #property filter end ==== -->
-
-
-
-    <!-- ==== properties grid section start ==== -->
-    <section class="properties__filter section__space__bottom">
-        <div class="container wow fadeInUp">
-            <div class="properties__filter__wrapper">
-
-
-            </div>
-            <div class="row property__grid__area__wrapper">
-                {% for item in object_list  %}
-                        <div class="col-lg-4 col-xl-4">
-                            <div class="property__grid__single">
-                                <div class="img__effect">
-                                    <a href="{{ item.billboard.billboard.get_absolute_url }}">
-                                        <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" />
+                                <div class="flex gap-3 flex-row-reverse">
+                                    <a class="btn-hover text-center flex-1 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300" href="{{ item.billboard.get_absolute_url }}">
+                                        مشاهده بیلبورد
                                     </a>
-                                </div>
-                                <div class="property__grid__single__inner">
-                                    <h4>{{  item.billboard.name}}</h4>
-                                    <p class="sub__info"><i class="fa-solid fa-location-dot"></i>
-                                    {{ item.billboard.address }}
-                                    </p>
-
-                                    <div class="item__info">
-                                        <div class="item__info__single">
-                                            <p>روشنایی</p>
-                                            <h6>{{ item.billboard.has_power|boolean_value }}</h6>
-                                        </div>
-                                        <div class="item__info__single">
-                                            <p>قابل اجاره در</p>
-                                            <h6>{{ item.billboard.reservation_date }}</h6>
-                                        </div>
-                                    </div>
-                                    <div class="invest__cta__wrapper">
-
-                                        <div class="invest__cta">
-                                            <a href="{{ item.billboard.get_absolute_url }}" class="button button--effect">
-                                                مشاهده بیشتر
-                                            </a>
-                                        </div>
-                                        <div class="invest__cta ">
-                                            <a href="{% url 'remove-from-list' item.billboard.pk %}" class="button button--effect button-add-list">
-                                                حذف از لیست
-                                            </a>
-                                        </div>
-                                    </div>
+                                    <a class="btn-hover text-center flex-1 bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300 button-add-list" href="{% url 'remove-from-list' item.billboard.pk %}">
+                                        حذف از لیست
+                                    </a>
                                 </div>
                             </div>
                         </div>
-                {% endfor %}
-
-            </div>
-
-
-
-
-
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-16">
+                    <div class="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-list text-4xl text-gray-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-dark mb-2">لیست شما خالی است</h2>
+                    <p class="text-gray-600 mb-6 max-w-md mx-auto">هنوز بیلبوردی به لیست انتخاب شده اضافه نکرده‌اید.</p>
+                    <a href="{% url 'billboard-list' %}" class="btn-hover inline-block bg-primary hover:bg-secondary text-white font-bold py-3 px-8 rounded-lg transition duration-300">
+                        مشاهده بیلبوردها
+                    </a>
+                </div>
+            {% endif %}
         </div>
     </section>
-    <!-- ==== properties grid section end ==== -->
-
 {% endblock %}
 
 {% block script %}
-{% if  request.user.is_authenticated %}
+{% if request.user.is_authenticated %}
     <script>
-
-        item = document.getElementsByClassName('button-add-list') // get all billboard
-        for (let i=0; i <item.length; i++){
-            item[i].addEventListener('click',
-            function (e) {
-                e.preventDefault() // do not redirect page
-                send_data(this) // send element in send_data function
-            }
-            )
+        item = document.getElementsByClassName('button-add-list');
+        for (let i = 0; i < item.length; i++) {
+            item[i].addEventListener('click', function (e) {
+                e.preventDefault();
+                send_data(this);
+            });
         }
 
-        function send_data(obj){
-            // check obj is added in list
-
-            if(!obj.classList.contains("button-added-list")) {
-
+        function send_data(obj) {
+            if (!obj.classList.contains("button-added-list")) {
                 const xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
-                            obj.classList.add("button-added-list"); // add css class when send a request
-                            obj.parentElement.parentElement.parentElement.parentElement.parentElement.remove()
-
+                        obj.classList.add("button-added-list");
+                        obj.closest('.card-hover').remove();
                     }
-                }
-                xhttp.open("GET", obj.getAttribute('href')); // set request GET url
-                xhttp.send(); // send request
-              }
+                };
+                xhttp.open("GET", obj.getAttribute('href'));
+                xhttp.send();
+            }
         }
     </script>
 {% endif %}
