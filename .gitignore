@@ -177,5 +177,5 @@ upload/*
 
 # ignore static file because the template is premium and i cant show this template in public
 # i comming soon add MIT tempalte
-template/static/*
 static/
+!templates/static/

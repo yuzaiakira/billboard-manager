@@ -16,11 +16,12 @@
     <!-- Action Buttons (PDF, Excel, Remove list) -->
     <section class="py-8 bg-light">
         <div class="container mx-auto px-4">
-            <div class="flex flex-wrap justify-center gap-4 mb-6" style="direction: rtl;">
-                <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+            <!-- Tab triggers: PDF (default) and Excel -->
+            <div class="flex flex-wrap justify-center gap-4 mb-4" style="direction: rtl;">
+                <button type="button" data-tab="pdf" role="tab" aria-selected="true" aria-controls="tab-panel-pdf" id="tab-pdf" class="tab-trigger btn-hover bg-primary text-white font-medium py-2 px-6 rounded-lg transition duration-300 ring-2 ring-offset-2 ring-primary">
                     <i class="fas fa-file-pdf ml-2"></i>خروجی PDF
                 </button>
-                <button type="submit" form="excel-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                <button type="button" data-tab="excel" role="tab" aria-selected="false" aria-controls="tab-panel-excel" id="tab-excel" class="tab-trigger btn-hover bg-gray-200 text-gray-700 hover:bg-gray-300 font-medium py-2 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-file-excel ml-2"></i>خروجی Excel
                 </button>
                 <a href="{% url 'remove-list' %}" class="btn-hover bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
@@ -28,60 +29,63 @@
                 </a>
             </div>
 
-            <!-- PDF options: visible card so users can choose which fields to include -->
-            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden" style="direction: rtl;">
-                <div class="px-6 py-4 bg-primary/10 border-b border-primary/20 flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
-                        <i class="fas fa-cog"></i>
-                    </span>
-                    <div>
-                        <h3 class="text-lg font-bold text-dark">تنظیمات خروجی PDF</h3>
-                        <p class="text-sm text-gray-600">فیلدهایی که می‌خواهید در فایل PDF قرار بگیرند را انتخاب کنید، سپس دکمه «خروجی PDF» بالا را بزنید.</p>
+            <!-- Tab panels: only one visible at a time, PDF default -->
+            <div class="max-w-4xl mx-auto">
+                <!-- PDF options panel (default visible) -->
+                <div id="tab-panel-pdf" role="tabpanel" aria-labelledby="tab-pdf" class="tab-panel bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden" style="direction: rtl;">
+                    <div class="px-6 py-4 bg-primary/10 border-b border-primary/20 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+                            <i class="fas fa-cog"></i>
+                        </span>
+                        <div>
+                            <h3 class="text-lg font-bold text-dark">تنظیمات خروجی PDF</h3>
+                            <p class="text-sm text-gray-600">فیلدهایی که می‌خواهید در فایل PDF قرار بگیرند را انتخاب کنید، سپس دکمه «دانلود PDF با تنظیمات بالا» را بزنید.</p>
+                        </div>
                     </div>
+                    <form method="get" action="{% url 'get-pdf' %}" id="pdf-options-form" class="p-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {% for field in pdf_form %}
+                                <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-primary/50 hover:bg-light/50 cursor-pointer transition">
+                                    {{ field }}
+                                    <span class="text-sm font-medium text-dark">{{ field.label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 flex flex-row-reverse">
+                            <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                                <i class="fas fa-download ml-2"></i>دانلود PDF با تنظیمات بالا
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form method="get" action="{% url 'get-pdf' %}" id="pdf-options-form" class="p-6">
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {% for field in pdf_form %}
-                            <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-primary/50 hover:bg-light/50 cursor-pointer transition">
-                                {{ field }}
-                                <span class="text-sm font-medium text-dark">{{ field.label }}</span>
-                            </label>
-                        {% endfor %}
-                    </div>
-                    <div class="mt-4 flex flex-row-reverse">
-                        <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-                            <i class="fas fa-download ml-2"></i>دانلود PDF با تنظیمات بالا
-                        </button>
-                    </div>
-                </form>
-            </div>
 
-            <!-- Excel options: same style so user can choose which columns to include -->
-            <div class="max-w-4xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden" style="direction: rtl;">
-                <div class="px-6 py-4 bg-green-600/10 border-b border-green-600/20 flex items-center gap-3">
-                    <span class="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center text-white">
-                        <i class="fas fa-cog"></i>
-                    </span>
-                    <div>
-                        <h3 class="text-lg font-bold text-dark">تنظیمات خروجی Excel</h3>
-                        <p class="text-sm text-gray-600">ستون‌هایی که می‌خواهید در فایل Excel قرار بگیرند را انتخاب کنید، سپس دکمه «خروجی Excel» بالا را بزنید.</p>
+                <!-- Excel options panel (hidden by default) -->
+                <div id="tab-panel-excel" role="tabpanel" aria-labelledby="tab-excel" class="tab-panel hidden bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden" style="direction: rtl;">
+                    <div class="px-6 py-4 bg-green-600/10 border-b border-green-600/20 flex items-center gap-3">
+                        <span class="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center text-white">
+                            <i class="fas fa-cog"></i>
+                        </span>
+                        <div>
+                            <h3 class="text-lg font-bold text-dark">تنظیمات خروجی Excel</h3>
+                            <p class="text-sm text-gray-600">ستون‌هایی که می‌خواهید در فایل Excel قرار بگیرند را انتخاب کنید، سپس دکمه «دانلود Excel با تنظیمات بالا» را بزنید.</p>
+                        </div>
                     </div>
+                    <form method="get" action="{% url 'get-excel' %}" id="excel-options-form" class="p-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {% for field in excel_form %}
+                                <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-green-600/50 hover:bg-green-50 cursor-pointer transition">
+                                    {{ field }}
+                                    <span class="text-sm font-medium text-dark">{{ field.label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 flex flex-row-reverse">
+                            <button type="submit" form="excel-options-form" class="btn-hover bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                                <i class="fas fa-download ml-2"></i>دانلود Excel با تنظیمات بالا
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form method="get" action="{% url 'get-excel' %}" id="excel-options-form" class="p-6">
-                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {% for field in excel_form %}
-                            <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-green-600/50 hover:bg-green-50 cursor-pointer transition">
-                                {{ field }}
-                                <span class="text-sm font-medium text-dark">{{ field.label }}</span>
-                            </label>
-                        {% endfor %}
-                    </div>
-                    <div class="mt-4 flex flex-row-reverse">
-                        <button type="submit" form="excel-options-form" class="btn-hover bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
-                            <i class="fas fa-download ml-2"></i>دانلود Excel با تنظیمات بالا
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </section>
@@ -143,29 +147,5 @@
 {% endblock %}
 
 {% block script %}
-{% if request.user.is_authenticated %}
-    <script>
-        item = document.getElementsByClassName('button-add-list');
-        for (let i = 0; i < item.length; i++) {
-            item[i].addEventListener('click', function (e) {
-                e.preventDefault();
-                send_data(this);
-            });
-        }
-
-        function send_data(obj) {
-            if (!obj.classList.contains("button-added-list")) {
-                const xhttp = new XMLHttpRequest();
-                xhttp.onreadystatechange = function() {
-                    if (this.readyState === 4 && this.status === 200) {
-                        obj.classList.add("button-added-list");
-                        obj.closest('.card-hover').remove();
-                    }
-                };
-                xhttp.open("GET", obj.getAttribute('href'));
-                xhttp.send();
-            }
-        }
-    </script>
-{% endif %}
+    <script src="{% static 'js/billboard-watch-list.js' %}"></script>
 {% endblock %}
