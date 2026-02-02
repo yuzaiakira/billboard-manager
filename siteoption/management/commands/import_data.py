@@ -12,6 +12,10 @@ class Command(BaseCommand):
         OptionModel.objects.get_or_create(type=OptionModel.BOOLEAN,
                                           key="BillboardVisibility",
                                           value=True)
+        
+        OptionModel.objects.get_or_create(type=OptionModel.STRING,
+                                          key="SiteName",
+                                          value=True)
 
 
     def handle(self, *args, **kwargs):
