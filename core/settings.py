@@ -142,6 +142,7 @@ STATIC_URL = BASE_SITE_URL + '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),  # Point to the actual static directory
+    os.path.join(BASE_DIR, "templates", "static"),  # Template-related static (e.g. js)
 ]
 
 # Default primary key field type
