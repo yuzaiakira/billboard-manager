@@ -48,6 +48,7 @@ class WatchList(LoginRequiredMixin, View):
     template = 'template/list/Billboard_watch_list.html'
     context = dict()
     context['pdf_form'] = ChoseFieldForm()
+    context['excel_form'] = ChoseFieldForm()
 
     def get(self, request):
         self.context['object_list'] = self.model.objects.filter(user=request.user)
@@ -83,7 +84,27 @@ class PrintPDF(WatchList):
 class ExportExcel(LoginRequiredMixin, View):
     model = ListsModel
 
+    # Map ChoseFieldForm field names to (excel_header, value_getter key)
+    _EXCEL_COLUMNS = {
+        'id_code': ('کد بیلبورد', 'id'),
+        'city': ('شهر', 'city'),
+        'name': ('عنوان بیلبورد', 'name'),
+        'address': ('آدرس بیلبورد', 'address'),
+        'description': ('توضیحات بیلبورد', 'description'),
+        'has_power': ('روشنایی', 'has_power'),
+        'size': ('طول', 'billboard_length'),  # size adds two columns
+        'size_width': ('عرض', 'billboard_width'),
+        'reservation_date': ('تاریخ رزرو', 'reservation_date'),
+        'price': ('قیمت بیلبورد', 'price'),
+    }
+
     def get(self, request, *args, **kwargs):
+        form = ChoseFieldForm(request.GET)
+        if form.is_valid():
+            columns = self._build_columns_from_form(form.cleaned_data)
+        else:
+            columns = self._default_columns()
+
         response = HttpResponse(content_type='application/ms-excel')
         response['Content-Disposition'] = 'attachment; filename="billboard-list.xlsx"'
 
@@ -91,19 +112,62 @@ class ExportExcel(LoginRequiredMixin, View):
         ws = wb.active
         ws.title = "billboard list"
 
-        # Add headers
-        headers = ["id", "city", "name", "address", "description", "has_power", "billboard_length", "billboard_width",
-                   "price", 'reservation_date']
+        headers = [col[0] for col in columns]
         ws.append(headers)
 
-        # Add data from the model
-        items = self.model.objects.filter(user=self.request.user)
+        items = self.model.objects.filter(user=request.user)
         for item in items:
             billboard = item.billboard
-            ws.append([str(billboard.id), str(billboard.city), billboard.name, billboard.address, billboard.description,
-                       billboard_bool_value(billboard.has_power), billboard.billboard_length, billboard.billboard_width,
-                       billboard.price, str(billboard.reservation_date)])
+            row = []
+            for _, key in columns:
+                if key == 'id':
+                    row.append(str(billboard.id))
+                elif key == 'city':
+                    row.append(str(billboard.city))
+                elif key == 'name':
+                    row.append(billboard.name)
+                elif key == 'address':
+                    row.append(billboard.address)
+                elif key == 'description':
+                    row.append(billboard.description or '')
+                elif key == 'has_power':
+                    row.append(billboard_bool_value(billboard.has_power))
+                elif key == 'billboard_length':
+                    row.append(billboard.billboard_length or '')
+                elif key == 'billboard_width':
+                    row.append(billboard.billboard_width or '')
+                elif key == 'reservation_date':
+                    row.append(str(billboard.reservation_date))
+                elif key == 'price':
+                    row.append(billboard.price or '')
+                else:
+                    row.append('')
+            ws.append(row)
 
-        # Save the workbook to the HttpResponse
         wb.save(response)
         return response
+
+    def _build_columns_from_form(self, cleaned_data):
+        columns = []
+        for field_name, (header, key) in self._EXCEL_COLUMNS.items():
+            if field_name == 'size_width':
+                if cleaned_data.get('size'):
+                    columns.append((self._EXCEL_COLUMNS['size_width'][0], self._EXCEL_COLUMNS['size_width'][1]))
+                continue
+            if cleaned_data.get(field_name):
+                columns.append((header, key))
+        return columns if columns else self._default_columns()
+
+    def _default_columns(self):
+        return [
+            ('کد بیلبورد', 'id'),
+            ('شهر', 'city'),
+            ('عنوان بیلبورد', 'name'),
+            ('آدرس بیلبورد', 'address'),
+            ('توضیحات بیلبورد', 'description'),
+            ('روشنایی', 'has_power'),
+            ('طول', 'billboard_length'),
+            ('عرض', 'billboard_width'),
+            ('قیمت بیلبورد', 'price'),
+            ('تاریخ رزرو', 'reservation_date'),
+        ]

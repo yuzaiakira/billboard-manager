@@ -20,9 +20,9 @@
                 <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-file-pdf ml-2"></i>خروجی PDF
                 </button>
-                <a href="{% url 'get-excel' %}" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                <button type="submit" form="excel-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-file-excel ml-2"></i>خروجی Excel
-                </a>
+                </button>
                 <a href="{% url 'remove-list' %}" class="btn-hover bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-trash-alt ml-2"></i>حذف لیست
                 </a>
@@ -51,6 +51,34 @@
                     <div class="mt-4 flex flex-row-reverse">
                         <button type="submit" form="pdf-options-form" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-lg transition duration-300">
                             <i class="fas fa-download ml-2"></i>دانلود PDF با تنظیمات بالا
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Excel options: same style so user can choose which columns to include -->
+            <div class="max-w-4xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden" style="direction: rtl;">
+                <div class="px-6 py-4 bg-green-600/10 border-b border-green-600/20 flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center text-white">
+                        <i class="fas fa-cog"></i>
+                    </span>
+                    <div>
+                        <h3 class="text-lg font-bold text-dark">تنظیمات خروجی Excel</h3>
+                        <p class="text-sm text-gray-600">ستون‌هایی که می‌خواهید در فایل Excel قرار بگیرند را انتخاب کنید، سپس دکمه «خروجی Excel» بالا را بزنید.</p>
+                    </div>
+                </div>
+                <form method="get" action="{% url 'get-excel' %}" id="excel-options-form" class="p-6">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {% for field in excel_form %}
+                            <label class="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-green-600/50 hover:bg-green-50 cursor-pointer transition">
+                                {{ field }}
+                                <span class="text-sm font-medium text-dark">{{ field.label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    <div class="mt-4 flex flex-row-reverse">
+                        <button type="submit" form="excel-options-form" class="btn-hover bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition duration-300">
+                            <i class="fas fa-download ml-2"></i>دانلود Excel با تنظیمات بالا
                         </button>
                     </div>
                 </form>
