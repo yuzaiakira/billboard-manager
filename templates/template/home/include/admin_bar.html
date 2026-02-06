@@ -1,0 +1,12 @@
+{% if request.user.is_authenticated and request.user.is_staff %}
+<!-- نوار مدیریت (فقط برای کاربران دارای دسترسی ادمین) -->
+<div class="admin-top-bar bg-dark text-white text-sm h-[32px] px-4 shadow-sm fixed top-0 left-0 right-0 z-[60] flex items-center">
+    <div class="container mx-auto w-full flex items-center justify-between">
+        <div class="flex items-center gap-4">
+            <a href="{% url 'admin:index' %}" class="text-white hover:text-primary transition duration-200">پنل مدیریت</a>
+            <span class="text-white/40">|</span>
+        </div>
+        <span class="text-white/70 text-xs">{{ request.user.get_full_name|default:request.user.username }}</span>
+    </div>
+</div>
+{% endif %}

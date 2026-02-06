@@ -2,13 +2,18 @@
 {% load static %}
 
 {% block body %}
+    {% block admin_bar %}
+        {% include 'template/home/include/admin_bar.html' %}
+    {% endblock %}
     {% block header %}
         {% include  'template/home/header.html' %}
     {% endblock %}
 
-    {% block content %}
+    <main class="{% if request.user.is_authenticated and request.user.is_staff %}pt-[35px]{% endif %}">
+        {% block content %}
 
-    {% endblock %}
+        {% endblock %}
+    </main>
 
     {% block footer %}
         {% include  'template/home/footer.html' %}
