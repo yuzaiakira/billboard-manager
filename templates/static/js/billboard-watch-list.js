@@ -40,13 +40,40 @@
         if (!items.length) return;
 
         function sendData(obj) {
-            if (obj.classList.contains('button-added-list')) return;
+            // Only prevent if it's an add button that's already added
+            // Remove buttons should always work
+            var isRemoveButton = obj.getAttribute('href') && obj.getAttribute('href').indexOf('remove-from-list') !== -1;
+            if (!isRemoveButton && obj.classList.contains('button-added-list')) return;
             var xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState === 4 && this.status === 200) {
-                    obj.classList.add('button-added-list');
-                    var card = obj.closest('.card-hover');
-                    if (card) card.remove();
+                    try {
+                        var res = JSON.parse(this.responseText);
+                        if (res.deleted && res.id) {
+                            var pk = res.id;
+                            // Remove from localStorage if BillboardListManager is available
+                            if (window.BillboardListManager && window.BillboardListManager.removeIdFromStorage) {
+                                window.BillboardListManager.removeIdFromStorage(pk);
+                                // Update all buttons for this billboard
+                                if (window.BillboardListManager.updateButtonsForBillboard) {
+                                    window.BillboardListManager.updateButtonsForBillboard(pk);
+                                }
+                            }
+                            // Dispatch custom event for other scripts
+                            var event = new CustomEvent('billboardRemovedFromList', {
+                                detail: { id: pk }
+                            });
+                            document.dispatchEvent(event);
+                            // Remove the card from watch list page
+                            var card = obj.closest('.card-hover');
+                            if (card) card.remove();
+                        }
+                    } catch (e) {
+                        console.error('خطا در پردازش پاسخ:', e);
+                        // Fallback: just remove the card
+                        var card = obj.closest('.card-hover');
+                        if (card) card.remove();
+                    }
                 }
             };
             xhttp.open('GET', obj.getAttribute('href'));

@@ -281,8 +281,8 @@
                             <a href="{{ related.get_absolute_url }}" class="btn-hover flex-1 text-center bg-light hover:bg-gray-100 text-primary font-medium py-2 px-3 rounded-lg border border-primary transition duration-300 text-sm">
                                 مشاهده
                             </a>
-                            <a href="{% url 'add-to-list' related.pk %}" class="btn-hover flex-1 text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-3 rounded-lg transition duration-300 text-sm button-add-list" data-billboard-id="{{ related.pk }}">
-                                <span class="button-add-list-text">افزودن به لیست</span>
+                            <a href="{% url 'add-to-list' related.pk %}" class="btn-hover flex-1 text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-3 rounded-lg transition duration-300 text-sm button-add-list {% if related|on_list:request.user %}button-added-list{% endif %}" data-billboard-id="{{ related.pk }}">
+                                <span class="button-add-list-text">{% if related|on_list:request.user %}اضافه شده به لیست{% else %}افزودن به لیست{% endif %}</span>
                             </a>
                         </div>
                     </div>
