@@ -46,14 +46,29 @@
     function setButtonAdded(btn) {
         btn.classList.add('button-added-list');
         btn.classList.remove('button-add-list-loading');
+        btn.removeAttribute('aria-busy');
         btn.setAttribute('aria-disabled', 'true');
         btn.style.pointerEvents = 'none';
         btn.style.cursor = 'default';
         var el = getTextNode(btn);
+        var icon = btn.querySelector('i');
+        
         if (el === btn) {
-            el.textContent = 'اضافه شد';
+            // دکمه خودش متن را دارد
+            el.textContent = 'اضافه شده به لیست';
         } else {
-            el.textContent = 'اضافه شد';
+            // دکمه دارای span است
+            if (icon) {
+                // آیکون را به fa-check تغییر می‌دهیم
+                icon.className = 'fas fa-check';
+                el.textContent = 'اضافه شده به لیست';
+            } else {
+                // اگر آیکون وجود ندارد، باید اضافه کنیم
+                var newIcon = document.createElement('i');
+                newIcon.className = 'fas fa-check';
+                btn.insertBefore(newIcon, el);
+                el.textContent = 'اضافه شده به لیست';
+            }
         }
     }
 
@@ -63,15 +78,23 @@
         btn.style.pointerEvents = 'none';
         btn.style.cursor = 'wait';
         var el = getTextNode(btn);
+        var icon = btn.querySelector('i');
+        
         if (el === btn) {
+            // دکمه خودش متن را دارد
             el.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال افزودن...';
         } else {
-            var icon = btn.querySelector('i');
-            el.textContent = ' در حال افزودن...';
+            // دکمه دارای span است
             if (icon) {
-                icon.className = 'fas fa-spinner fa-spin ml-2';
+                // آیکون موجود است، فقط کلاس را تغییر می‌دهیم
+                icon.className = 'fas fa-spinner fa-spin';
+                el.textContent = 'در حال افزودن...';
             } else {
-                el.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> در حال افزودن...';
+                // آیکون وجود ندارد، باید در دکمه اضافه کنیم
+                var newIcon = document.createElement('i');
+                newIcon.className = 'fas fa-spinner fa-spin';
+                btn.insertBefore(newIcon, el);
+                el.textContent = 'در حال افزودن...';
             }
         }
     }
@@ -82,10 +105,24 @@
         btn.style.pointerEvents = '';
         btn.style.cursor = '';
         var el = getTextNode(btn);
+        var icon = btn.querySelector('i');
+        
         if (el === btn) {
+            // دکمه خودش متن را دارد
             el.textContent = label;
         } else {
-            el.textContent = label;
+            // دکمه دارای span است
+            if (icon) {
+                // آیکون را به حالت اولیه برمی‌گردانیم (fa-plus)
+                icon.className = 'fas fa-plus';
+                el.textContent = label;
+            } else {
+                // اگر آیکون وجود ندارد، باید اضافه کنیم
+                var newIcon = document.createElement('i');
+                newIcon.className = 'fas fa-plus';
+                btn.insertBefore(newIcon, el);
+                el.textContent = label;
+            }
         }
     }
 
@@ -110,8 +147,16 @@
         }
         setButtonLoading(btn);
         var xhr = new XMLHttpRequest();
+        var timeoutId = setTimeout(function() {
+            xhr.abort();
+            restoreButton(btn, 'افزودن به لیست');
+            alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
+        }, 30000); // 30 ثانیه timeout
+        
         xhr.onreadystatechange = function() {
             if (xhr.readyState !== 4) return;
+            clearTimeout(timeoutId);
+            
             if (xhr.status === 200) {
                 try {
                     var res = JSON.parse(xhr.responseText);
@@ -120,12 +165,21 @@
                         setButtonAdded(btn);
                         return;
                     }
-                } catch (e) {}
+                } catch (e) {
+                    console.error('خطا در پردازش پاسخ:', e);
+                }
                 restoreButton(btn, 'افزودن به لیست');
             } else {
                 restoreButton(btn, 'افزودن به لیست');
             }
         };
+        
+        xhr.onerror = function() {
+            clearTimeout(timeoutId);
+            restoreButton(btn, 'افزودن به لیست');
+            alert('خطا در ارتباط با سرور. لطفاً دوباره تلاش کنید.');
+        };
+        
         xhr.open('GET', url);
         xhr.send();
     }
