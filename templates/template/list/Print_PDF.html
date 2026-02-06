@@ -1,6 +1,7 @@
 {% load static %}
 {% load change_bool_value %}
 {% load jalali_date %}
+{% load number_filters %}
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -246,7 +247,7 @@
                 {% if pdf_form.price.value %}
                 <div class="property-row">
                     <span class="property-name">قیمت: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.price }}</span>
+                    <span class="property-value" contenteditable>{% if item.billboard.BillboardFinalPriceModel and item.billboard.BillboardFinalPriceModel.final_price %}{{ item.billboard.BillboardFinalPriceModel.final_price|intcomma }}{% else %}{{ item.billboard.price|intcomma }}{% endif %} تومان</span>
                 </div>
                 {% endif %}
             </div> </div>
