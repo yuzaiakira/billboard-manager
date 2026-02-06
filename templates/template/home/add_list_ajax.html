@@ -39,6 +39,18 @@
         }
     }
 
+    function removeIdFromStorage(pk) {
+        var ids = getStoredIds();
+        pk = parseInt(pk, 10);
+        if (pk) {
+            var index = ids.indexOf(pk);
+            if (index !== -1) {
+                ids.splice(index, 1);
+                setStoredIds(ids);
+            }
+        }
+    }
+
     function getTextNode(btn) {
         return btn.querySelector('.button-add-list-text') || btn;
     }
@@ -126,17 +138,122 @@
         }
     }
 
-    function applyStoredState() {
-        var ids = getStoredIds();
+    function setButtonRemoved(btn) {
+        btn.classList.remove('button-added-list');
+        btn.classList.remove('button-add-list-loading');
+        btn.removeAttribute('aria-disabled');
+        btn.removeAttribute('aria-busy');
+        btn.style.pointerEvents = '';
+        btn.style.cursor = '';
+        var el = getTextNode(btn);
+        var icon = btn.querySelector('i');
+        
+        if (el === btn) {
+            // دکمه خودش متن را دارد
+            el.textContent = 'افزودن به لیست';
+        } else {
+            // دکمه دارای span است
+            if (icon) {
+                // آیکون را به fa-plus تغییر می‌دهیم
+                icon.className = 'fas fa-plus';
+                el.textContent = 'افزودن به لیست';
+            } else {
+                // اگر آیکون وجود ندارد، باید اضافه کنیم
+                var newIcon = document.createElement('i');
+                newIcon.className = 'fas fa-plus';
+                btn.insertBefore(newIcon, el);
+                el.textContent = 'افزودن به لیست';
+            }
+        }
+    }
+
+    function updateButtonsForBillboard(pk) {
         var buttons = document.querySelectorAll('.button-add-list');
+        buttons.forEach(function(btn) {
+            var btnPk = btn.getAttribute('data-billboard-id');
+            if (!btnPk) {
+                var m = (btn.getAttribute('href') || '').match(/(?:add-to-list|remove-from-list)\/(\d+)/);
+                btnPk = m ? m[1] : null;
+            }
+            if (btnPk && parseInt(btnPk, 10) === parseInt(pk, 10)) {
+                // اگر دکمه مربوط به remove-from-list است، فقط کارت را حذف می‌کنیم
+                if (btn.getAttribute('href') && btn.getAttribute('href').indexOf('remove-from-list') !== -1) {
+                    var card = btn.closest('.card-hover');
+                    if (card) card.remove();
+                } else {
+                    // در غیر این صورت، دکمه را به حالت عادی برمی‌گردانیم
+                    setButtonRemoved(btn);
+                }
+            }
+        });
+    }
+
+    function applyStoredState() {
+        var storedIds = getStoredIds();
+        var actualIds = [];
+        var buttons = document.querySelectorAll('.button-add-list');
+        
+        // First pass: collect actual IDs from template (buttons that have button-added-list class)
         buttons.forEach(function(btn) {
             var pk = btn.getAttribute('data-billboard-id');
             if (!pk) {
                 var m = (btn.getAttribute('href') || '').match(/add-to-list\/(\d+)/);
                 pk = m ? m[1] : null;
             }
-            if (pk && ids.indexOf(parseInt(pk, 10)) !== -1) {
-                setButtonAdded(btn);
+            if (pk) {
+                pk = parseInt(pk, 10);
+                // If button already has button-added-list class (from template), it's actually in the list
+                if (btn.classList.contains('button-added-list')) {
+                    if (actualIds.indexOf(pk) === -1) {
+                        actualIds.push(pk);
+                    }
+                    // Make sure button is in added state
+                    setButtonAdded(btn);
+                } else {
+                    // If button doesn't have button-added-list class but is in localStorage, remove it
+                    if (storedIds.indexOf(pk) !== -1) {
+                        removeIdFromStorage(pk);
+                    }
+                    // Make sure button is in normal state
+                    setButtonRemoved(btn);
+                }
+            }
+        });
+        
+        // Second pass: sync localStorage with actual state
+        // Remove IDs from localStorage that are not in actual list
+        storedIds.forEach(function(id) {
+            if (actualIds.indexOf(id) === -1) {
+                removeIdFromStorage(id);
+            }
+        });
+        
+        // Add IDs to localStorage that are in actual list but not in storage
+        actualIds.forEach(function(id) {
+            if (storedIds.indexOf(id) === -1) {
+                addIdToStorage(id);
+            }
+        });
+        
+        // Third pass: apply stored state to all buttons (for buttons that might not have been in template)
+        var syncedIds = getStoredIds();
+        buttons.forEach(function(btn) {
+            var pk = btn.getAttribute('data-billboard-id');
+            if (!pk) {
+                var m = (btn.getAttribute('href') || '').match(/add-to-list\/(\d+)/);
+                pk = m ? m[1] : null;
+            }
+            if (pk) {
+                pk = parseInt(pk, 10);
+                // Only apply if it's an add-to-list button (not remove-from-list)
+                var isAddButton = btn.getAttribute('href') && btn.getAttribute('href').indexOf('add-to-list') !== -1;
+                if (isAddButton) {
+                    if (syncedIds.indexOf(pk) !== -1) {
+                        setButtonAdded(btn);
+                    } else {
+                        setButtonRemoved(btn);
+                    }
+                }
             }
         });
     }
@@ -203,6 +320,30 @@
             })(buttons[i]);
         }
     }
+
+    // Export functions to global scope for use in other scripts
+    window.BillboardListManager = {
+        removeIdFromStorage: removeIdFromStorage,
+        updateButtonsForBillboard: updateButtonsForBillboard,
+        setButtonRemoved: setButtonRemoved
+    };
+
+    // Listen for custom event when billboard is removed
+    document.addEventListener('billboardRemovedFromList', function(e) {
+        var pk = e.detail && e.detail.id;
+        if (pk) {
+            removeIdFromStorage(pk);
+            updateButtonsForBillboard(pk);
+        }
+    });
+
+    // Listen for storage events (when localStorage changes in other tabs)
+    window.addEventListener('storage', function(e) {
+        if (e.key === STORAGE_KEY) {
+            // localStorage changed in another tab, reapply state
+            applyStoredState();
+        }
+    });
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
