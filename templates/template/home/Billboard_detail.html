@@ -1,72 +1,115 @@
 {% extends 'template/home/base_body.html' %}
 {% load change_bool_value %}
 {% load jalali_date %}
+{% load check_in_list %}
+{% load number_filters %}
 {% load static %}
 {% block title %}{% if object.title %}{{ object.title }}{% else %}{{ object.name }}{% endif %}{% endblock %}
 {% block content %}
 
-      <!-- Billboard Details Section -->
-    <section class="py-16">
+    <!-- Page Header / Breadcrumb -->
+    <section class="bg-primary/10 border-b border-primary/20 py-6">
         <div class="container mx-auto px-4">
-            <div class="flex flex-col lg:flex-row gap-8">
+            <nav class="flex flex-wrap items-center gap-2 text-sm text-gray-600 mb-2" aria-label="breadcrumb">
+                <a href="{% url 'home' %}" class="hover:text-primary transition">خانه</a>
+                <span class="text-gray-400">/</span>
+                <a href="{% url 'billboard-list' %}" class="hover:text-primary transition">بیلبوردها</a>
+                {% if object.city %}
+                    <span class="text-gray-400">/</span>
+                    <a href="{{ object.city.state.get_absolute_url }}" class="hover:text-primary transition">{{ object.city.state.name }}</a>
+                    <span class="text-gray-400">/</span>
+                    <a href="{{ object.city.get_absolute_url }}" class="hover:text-primary transition">{{ object.city.name }}</a>
+                {% endif %}
+                <span class="text-gray-400">/</span>
+                <span class="text-dark font-medium">{{ object.name }}</span>
+            </nav>
+            <h1 class="text-2xl md:text-3xl font-bold text-dark">{{ object.name }}</h1>
+        </div>
+    </section>
+
+    <!-- Billboard Details Section -->
+    <section class="py-8 md:py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
                 <!-- Main Content -->
                 <div class="lg:w-2/3">
                     <!-- Billboard Image -->
-                    <div class="bg-gray-200 rounded-xl overflow-hidden mb-8 h-96">
-                        <img src="{{ object.billboard_pic_url }}" alt="بیلبورد" class="w-full h-full object-cover">
+                    <div class="bg-gray-100 rounded-2xl overflow-hidden mb-8 shadow-lg border border-gray-100">
+                        <img src="{{ object.billboard_pic_url }}" alt="{{ object.name }}" class="w-full h-auto min-h-[320px] max-h-[480px] object-cover">
                     </div>
 
-                    <!-- Billboard Title and Address -->
-                    <h1 class="text-3xl font-bold text-dark mb-2">{{ object.name }}</h1>
-                    <p class="text-gray-600 mb-6"><i class="fas fa-map-marker-alt text-primary ml-2"></i>{{ object.address }}</p>
-
-                    <!-- Billboard Description -->
-                    <div class="mb-12 description">
-                        <h2 class="text-2xl font-bold text-dark mb-4">توضیحات</h2>
-                        {{object.desc}}
+                    <!-- Title and Address -->
+                    <div class="mb-6">
+                        <p class="text-gray-600 flex items-center gap-2 flex-wrap">
+                            <i class="fas fa-map-marker-alt text-primary"></i>
+                            <span>{{ object.address|default:"آدرس ثبت نشده" }}</span>
+                        </p>
+                        {% if object.category %}
+                            <p class="text-gray-500 text-sm mt-2">
+                                <i class="fas fa-tag text-primary ml-1"></i>
+                                <a href="#" class="hover:text-primary">{{ object.category.name }}</a>
+                            </p>
+                        {% endif %}
                     </div>
 
-                    <!-- Three-column Section -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" style="direction: rtl;">
-                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                            <h3 class="font-bold text-dark mb-2">نوع پرداخت</h3>
-                            <p class="text-gray-600">ماهانه</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                            <h3 class="font-bold text-dark mb-2">نورپردازی</h3>
-                            <p class="text-green-600 font-medium"><i class="fas fa-lightbulb text-primary ml-2"></i> {{ object.has_power|boolean_value }}</p>
-                        </div>
-                        <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
-                            <h3 class="font-bold text-dark mb-2">کد بیلبورد</h3>
-                            <p class="text-gray-600">{{ object.pk }}</p>
+                    <!-- Description -->
+                    <div class="mb-10 description">
+                        <h2 class="text-xl font-bold text-dark mb-4 pb-2 border-b border-gray-200">توضیحات</h2>
+                        <div class="text-gray-700 leading-relaxed prose prose-lg max-w-none">
+                            {% if object.description %}
+                                {{ object.description|linebreaks }}
+                            {% else %}
+                                <p class="text-gray-500">توضیحاتی برای این بیلبورد ثبت نشده است.</p>
+                            {% endif %}
                         </div>
                     </div>
 
-                    <!-- Billboard Gallery -->
-                {% if object.BillboardImageModel %}
-                     <div class="mb-12">
-                        <h2 class="text-2xl font-bold text-dark mb-6">گالری</h2>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        {% for image in object.BillboardImageModel.all %}
+                    <!-- Info Cards (Three columns) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10" style="direction: rtl;">
+                        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">نوع پرداخت</h3>
+                            <p class="text-gray-800">ماهانه</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">نورپردازی</h3>
+                            <p class="{% if object.has_power %}text-green-600{% else %}text-gray-600{% endif %} font-medium">
+                                <i class="fas fa-lightbulb text-primary ml-2"></i> {{ object.has_power|boolean_value }}
+                            </p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">کد بیلبورد</h3>
+                            <p class="text-gray-800 font-mono">{{ object.pk }}</p>
+                        </div>
+                    </div>
 
-                            <div class="h-40 bg-gray-200 rounded-lg overflow-hidden">
-                                <img src="{ image.image.url }}" alt="{{ image.title|default:object.name }}" class="w-full h-full object-cover">
+                    <!-- Gallery -->
+                    {% with gallery_images=object.BillboardImageModel.all %}
+                    {% if gallery_images %}
+                    <div class="mb-10">
+                        <h2 class="text-xl font-bold text-dark mb-4 pb-2 border-b border-gray-200">گالری</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+                            {% for image in gallery_images %}
+                            <div class="rounded-xl overflow-hidden bg-gray-100 shadow border border-gray-100 aspect-[4/3]">
+                                <img src="{{ image.image.url }}" alt="{{ image.title|default:object.name }}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
                             </div>
-
-                        {% endfor %}
+                            {% endfor %}
                         </div>
                     </div>
-                {% endif %}
+                    {% endif %}
+                    {% endwith %}
 
-                    <!-- Google Maps Location -->
+                    <!-- Map -->
                     {% if object.map_iframe %}
-                    <div class="mb-12">
-                        <h2 class="text-2xl font-bold text-dark mb-6">موقعیت</h2>
-                        <div class="bg-gray-200 h-96 rounded-xl overflow-hidden">
-                           <iframe src="{{ object.map_iframe }}"
-                                   width="746" height="312" style="border:0;"
-                                   allowfullscreen="" loading="lazy"
-                                   referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <div class="mb-10">
+                        <h2 class="text-xl font-bold text-dark mb-4 pb-2 border-b border-gray-200">موقعیت روی نقشه</h2>
+                        <div class="rounded-2xl overflow-hidden shadow-lg border border-gray-100 bg-gray-100 h-[320px] md:h-[400px]">
+                            <iframe src="{{ object.map_iframe }}"
+                                    class="w-full h-full"
+                                    style="border:0;"
+                                    allowfullscreen
+                                    loading="lazy"
+                                    referrerpolicy="no-referrer-when-downgrade"
+                                    title="موقعیت بیلبورد"></iframe>
                         </div>
                     </div>
                     {% endif %}
@@ -74,62 +117,75 @@
 
                 <!-- Sidebar -->
                 <div class="lg:w-1/3">
-                    <div class="bg-white rounded-xl shadow-md p-6 sticky top-24">
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24 print:shadow-none print:border">
                         <div class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-bold text-dark mb-4">تاریخ نمایش</h3>
-                            <p class="text-gray-600">{{ object.reservation_date|jalali_slash }}</p>
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">تاریخ نمایش</h3>
+                            <p class="text-gray-800">
+                                {% if object.reservation_date %}
+                                    {{ object.reservation_date|jalali_slash }}
+                                {% else %}
+                                    تعیین نشده
+                                {% endif %}
+                            </p>
                         </div>
 
                         <div class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-bold text-dark mb-4">قیمت</h3>
-                            <p class="text-primary font-bold text-xl">{{ object.BillboardFinalPriceModel.final_price }} تومان</p>
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">قیمت</h3>
+                            <p class="text-primary font-bold text-2xl">
+                                {% if object.BillboardFinalPriceModel and object.BillboardFinalPriceModel.final_price %}
+                                    {{ object.BillboardFinalPriceModel.final_price|intcomma }}
+                                {% else %}
+                                    {{ object.price|intcomma }}
+                                {% endif %}
+                                <span class="text-base font-normal text-gray-600">تومان</span>
+                            </p>
                         </div>
 
                         <div class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-bold text-dark mb-4">ابعاد</h3>
-                            <div class="flex justify-between mb-2">
-                                <span class="text-gray-600">عرض:</span>
-                                <span class="font-medium">{{ object.billboard_width }} متر</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">ارتفاع:</span>
-                                <span class="font-medium">{{ object.billboard_length }} متر</span>
-                            </div>
-                        </div>
-
-                        <div class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-bold text-dark mb-4">موقعیت</h3>
-                            <p class="text-gray-600"><a href="{{ object.city.state.get_absolute_url }}">{{ object.city.state.name }}</a> / <a href="{{ object.city.get_absolute_url }}">{{ object.city.name }}</a></p>
-                        </div>
-
-                        <div class="mb-6 pb-6 border-b border-gray-200">
-                            <h3 class="font-bold text-dark mb-4">اشتراک‌گذاری</h3>
-                            <div class="flex space-x-reverse space-x-3">
-                                <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
-                                    <i class="fab fa-facebook-f"></i>
-                                </a>
-                                <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
-                                    <i class="fab fa-instagram"></i>
-                                </a>
-                                <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
-                                    <i class="fab fa-twitter"></i>
-                                </a>
-                                <a href="#" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300">
-                                    <i class="fab fa-linkedin-in"></i>
-                                </a>
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">ابعاد</h3>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-gray-700">
+                                    <span>عرض:</span>
+                                    <span class="font-medium">{{ object.billboard_width }} متر</span>
+                                </div>
+                                <div class="flex justify-between text-gray-700">
+                                    <span>ارتفاع:</span>
+                                    <span class="font-medium">{{ object.billboard_length }} متر</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="mb-6">
-                            <h3 class="font-bold text-dark mb-4">چاپ</h3>
-                            <div class="space-y-3">
-                                <button onclick="window.print()" class="btn-hover w-full bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300">
-                                    <i class="fas fa-print ml-2"></i> چاپ تکی
-                                </button>
-                                <a href="{% url 'add-to-list' object.pk %}" class="btn-hover w-full text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300 button-add-list" data-billboard-id="{{ object.pk }}">
-                                    <i class="fas fa-list ml-2"></i> <span class="button-add-list-text">افزودن به لیست</span>
-                                </a>
+                        {% if object.city %}
+                        <div class="mb-6 pb-6 border-b border-gray-200">
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">موقعیت</h3>
+                            <p class="text-gray-700">
+                                <a href="{{ object.city.state.get_absolute_url }}" class="hover:text-primary transition">{{ object.city.state.name }}</a>
+                                <span class="text-gray-400 mx-1">/</span>
+                                <a href="{{ object.city.get_absolute_url }}" class="hover:text-primary transition">{{ object.city.name }}</a>
+                            </p>
+                        </div>
+                        {% endif %}
+
+                        <div class="mb-6 pb-6 border-b border-gray-200">
+                            <h3 class="font-bold text-dark mb-2 text-sm text-gray-500">اشتراک‌گذاری</h3>
+                            <div class="flex gap-3 flex-wrap">
+                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white hover:bg-secondary transition duration-300" aria-label="فیسبوک"><i class="fab fa-facebook-f"></i></a>
+                                <a href="https://wa.me/?text={{ object.name }} {{ request.build_absolute_uri }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white hover:bg-green-600 transition duration-300" aria-label="واتساپ"><i class="fab fa-whatsapp"></i></a>
+                                <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ object.name }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-sky-500 flex items-center justify-center text-white hover:bg-sky-600 transition duration-300" aria-label="توییتر"><i class="fab fa-twitter"></i></a>
+                                <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-blue-700 flex items-center justify-center text-white hover:bg-blue-800 transition duration-300" aria-label="لینکدین"><i class="fab fa-linkedin-in"></i></a>
                             </div>
+                        </div>
+
+                        <div class="flex flex-row-reverse gap-2">
+                            <button type="button" onclick="window.print()" class="btn-hover flex-1 text-center bg-light hover:bg-gray-100 text-primary font-medium py-2 px-3 rounded-lg border border-primary transition duration-300 text-sm flex items-center justify-center gap-2 no-print">
+                                <i class="fas fa-print"></i> چاپ
+                            </button>
+                            <a href="{% url 'add-to-list' object.pk %}"
+                               class="btn-hover flex-1 text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-3 rounded-lg transition duration-300 text-sm button-add-list flex items-center justify-center gap-2 {% if object|on_list:request.user %}button-added-list{% endif %}"
+                               data-billboard-id="{{ object.pk }}">
+                                <i class="fas fa-list"></i>
+                                <span class="button-add-list-text">{% if object|on_list:request.user %}اضافه شده به لیست{% else %}افزودن به لیست{% endif %}</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -137,65 +193,68 @@
         </div>
     </section>
 
-
-        <!-- Related Billboards Section -->
-    <section class="py-16">
+    <!-- Related Billboards -->
+    {% with related_list=object.get_related %}
+    {% if related_list %}
+    <section class="py-12 bg-gray-50/50 border-t border-gray-100">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">بیلبوردهای مرتبط</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">جدیدترین بیلبوردهای ما را که برای اجاره فوری در دسترس هستند کشف کنید</p>
+            <div class="text-center mb-10">
+                <h2 class="text-2xl md:text-3xl font-bold text-dark mb-2">بیلبوردهای مرتبط</h2>
+                <p class="text-gray-600 max-w-xl mx-auto">بیلبوردهای مشابه از نظر موقعیت و ابعاد</p>
             </div>
-{% if object.get_related %}
-    {% for related in object.get_related%}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" style="direction: rtl;">
-                <!-- Billboard Card 1 -->
-                <div class="card-hover bg-white rounded-xl overflow-hidden shadow-md">
-                    <div class="h-48 bg-gray-200 relative">
-                        <img src="{{ related.billboard_pic_url }}" alt="{{ related.name }}" class="w-full h-full object-cover">
-                        <div class="absolute top-4 left-4 bg-primary text-white text-sm font-bold px-3 py-1 rounded-full">
-                            جدید
-                        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" style="direction: rtl;">
+                {% for related in related_list %}
+                <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100">
+                    <div class="h-48 bg-gray-100 relative">
+                        <a href="{{ related.get_absolute_url }}">
+                            <img src="{{ related.billboard_pic_url }}" alt="{{ related.name }}" class="w-full h-full object-cover">
+                        </a>
+                        <span class="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">مرتبط</span>
                     </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-dark mb-2">{{ related.name }}</h3>
-                        <p class="text-gray-600 mb-4"><i class="fas fa-map-marker-alt text-primary ml-2"></i>{{ related.address }}</p>
-                        <div class="flex flex-row-reverse justify-between mb-4">
+                    <div class="p-5">
+                        <h3 class="text-lg font-bold text-dark mb-2"><a href="{{ related.get_absolute_url }}" class="hover:text-primary transition">{{ related.name }}</a></h3>
+                        <p class="text-gray-600 text-sm mb-4"><i class="fas fa-map-marker-alt text-primary ml-1"></i>{{ related.address }}</p>
+                        <div class="flex flex-row-reverse justify-between mb-4 text-sm">
                             <div>
-                                <p class="text-gray-700 font-medium">نورپردازی</p>
-                                <div class="flex flex-row-reverse items-center">
-                                    <i class="fas fa-lightbulb text-primary ml-2"></i>
-                                    <span class="text-green-600 font-medium">{{ related.has_power|boolean_value }}</span>
-                                </div>
+                                <span class="text-gray-500">نورپردازی</span>
+                                <span class="text-green-600 font-medium">{{ related.has_power|boolean_value }}</span>
                             </div>
                             <div>
-                                <p class="text-gray-700 font-medium">تاریخ شروع</p>
-                                <p class="text-gray-600">{{ related.reservation_date|jalali_slash }}</p>
+                                <span class="text-gray-500">تاریخ شروع</span>
+                                <span class="text-gray-700">{% if related.reservation_date %}{{ related.reservation_date|jalali_slash }}{% else %}—{% endif %}</span>
                             </div>
                         </div>
-                        <div class="flex flex-row-reverse gap-3">
-                            <a href="{{ related.get_absolute_url }}" class="btn-hover flex-1 text-center bg-light hover:bg-gray-100 text-primary font-medium py-2 px-4 rounded-lg border border-primary transition duration-300">
-                                مشاهده بیلبورد
+                        <div class="flex flex-row-reverse gap-2">
+                            <a href="{{ related.get_absolute_url }}" class="btn-hover flex-1 text-center bg-light hover:bg-gray-100 text-primary font-medium py-2 px-3 rounded-lg border border-primary transition duration-300 text-sm">
+                                مشاهده
                             </a>
-                            <a href="{% url 'add-to-list' related.pk %}" class="btn-hover flex-1 text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-lg transition duration-300 button-add-list" data-billboard-id="{{ related.pk }}">
+                            <a href="{% url 'add-to-list' related.pk %}" class="btn-hover flex-1 text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-3 rounded-lg transition duration-300 text-sm button-add-list" data-billboard-id="{{ related.pk }}">
                                 <span class="button-add-list-text">افزودن به لیست</span>
                             </a>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-    {% endfor %}
-{% endif %}
-            <div class="text-center mt-12">
-                <a href="{%url 'billboard-list' %}" class="btn-hover bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-8 rounded-lg text-lg transition duration-300">
-                    مشاهده بیلبوردهای بیشتر
+            <div class="text-center mt-10">
+                <a href="{% url 'billboard-list' %}" class="btn-hover inline-flex items-center gap-2 bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white font-bold py-3 px-6 rounded-xl transition duration-300">
+                    مشاهده همه بیلبوردها
+                    <i class="fas fa-arrow-left"></i>
                 </a>
             </div>
         </div>
     </section>
+    {% endif %}
+    {% endwith %}
 
-
+    <style>
+        @media print {
+            .no-print, nav, .btn-hover, button, .sticky, section:last-of-type { display: none !important; }
+            body { padding: 0; }
+            .container { max-width: 100%; }
+        }
+    </style>
 {% endblock %}
-
 
 {% block script %}
 {% include 'template/home/add_list_ajax.html' %}
