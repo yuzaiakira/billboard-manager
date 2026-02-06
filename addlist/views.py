@@ -13,6 +13,23 @@ from billboard.utils import billboard_bool_value
 # Create your views here.
 
 
+def normalize_decimal(value):
+    """
+    Remove trailing zeros from decimal numbers.
+    e.g. 5.000 -> 5, 5.500 -> 5.5, 5.123 -> 5.123
+    """
+    if value is None:
+        return ''
+    try:
+        num = float(value)
+        # Convert to string and remove trailing zeros
+        if num == int(num):
+            return str(int(num))
+        return str(num).rstrip('0').rstrip('.')
+    except (ValueError, TypeError):
+        return value
+
+
 class AddToList(LoginRequiredMixin, View):
     http_method_names = ['get']
 
@@ -141,9 +158,9 @@ class ExportExcel(LoginRequiredMixin, View):
                 elif value_key == 'has_power':
                     row.append(billboard_bool_value(billboard.has_power))
                 elif value_key == 'billboard_length':
-                    row.append(billboard.billboard_length or '')
+                    row.append(normalize_decimal(billboard.billboard_length))
                 elif value_key == 'billboard_width':
-                    row.append(billboard.billboard_width or '')
+                    row.append(normalize_decimal(billboard.billboard_width))
                 elif value_key == 'reservation_date':
                     d = billboard.reservation_date
                     row.append(f"{d.year}/{d.month:02d}/{d.day:02d}" if d and hasattr(d, 'year') else (str(d) if d else ''))

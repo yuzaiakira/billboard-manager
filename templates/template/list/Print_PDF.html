@@ -231,11 +231,11 @@
                 {% if pdf_form.size.value %}
                 <div class="property-row">
                     <span class="property-name">طول: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.billboard_length }}</span>
+                    <span class="property-value" contenteditable>{{ item.billboard.billboard_length|normalize_decimal }}</span>
                 </div>
                 <div class="property-row">
                     <span class="property-name">عرض: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.billboard_width }}</span>
+                    <span class="property-value" contenteditable>{{ item.billboard.billboard_width|normalize_decimal }}</span>
                 </div>
                 {% endif %}
                 {% if pdf_form.reservation_date.value %}
