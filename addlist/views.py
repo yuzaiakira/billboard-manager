@@ -145,7 +145,8 @@ class ExportExcel(LoginRequiredMixin, View):
                 elif value_key == 'billboard_width':
                     row.append(billboard.billboard_width or '')
                 elif value_key == 'reservation_date':
-                    row.append(str(billboard.reservation_date))
+                    d = billboard.reservation_date
+                    row.append(f"{d.year}/{d.month:02d}/{d.day:02d}" if d and hasattr(d, 'year') else (str(d) if d else ''))
                 elif value_key == 'price':
                     row.append(billboard.price or '')
                 else:

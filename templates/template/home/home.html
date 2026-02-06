@@ -2,6 +2,7 @@
 {% load static %}
 {% load change_bool_value %}
 {% load check_in_list %}
+{% load jalali_date %}
 {% block content %}
 
     <!-- Hero Section -->
@@ -54,7 +55,7 @@
                             </div>
                             <div>
                                 <p class="text-gray-700 font-medium">تاریخ اکران</p>
-                                <p class="text-gray-600">{{ billboard.reservation_date }}</p>
+                                <p class="text-gray-600">{{ billboard.reservation_date|jalali_slash }}</p>
                             </div>
                         </div>
                         <div class="flex gap-3 flex-row-reverse">
