@@ -1,6 +1,6 @@
 {% load static %}
 <!-- Header Section -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <header class="bg-white shadow-sm sticky {% if request.user.is_authenticated and request.user.is_staff %}top-[32px]{% else %}top-0{% endif %} z-50">
         <div class="container mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between">
             <!-- Logo -->
             <div class="flex items-center mb-4 md:mb-0">
@@ -27,7 +27,6 @@
                         <a href="{% url 'register' %}" class="btn-hover inline-block border-2 border-primary text-primary font-medium hover:bg-primary hover:text-white py-2 px-4 rounded-lg transition duration-300">ثبت نام</a>
                     {% else %}
                         <a href="{% url 'logout' %}" class="nav-link text-dark font-medium hover:text-primary transition duration-300">خروج</a>
-                        <a href="{% url 'admin:index' %}" class="nav-link text-dark font-medium hover:text-primary transition duration-300">پنل مدیریت</a>  
                         <a href="{% url 'WatchList' %}" class="btn-hover inline-block border-2 border-primary text-primary font-medium hover:bg-primary hover:text-white py-2 px-4 rounded-lg transition duration-300">مشاهده لیست</a>
                     {% endif %}
                 </nav>
