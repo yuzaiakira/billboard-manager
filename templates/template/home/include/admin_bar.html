@@ -4,7 +4,10 @@
     <div class="container mx-auto w-full flex items-center justify-between">
         <div class="flex items-center gap-4">
             <a href="{% url 'admin:index' %}" class="text-white hover:text-primary transition duration-200">پنل مدیریت</a>
+            {% if object and object.pk %}
             <span class="text-white/40">|</span>
+            <a href="{% url 'admin:billboard_billboardmodel_change' object.pk %}" class="text-white hover:text-primary transition duration-200">ویرایش بیلبورد</a>
+            {% endif %}
         </div>
         <span class="text-white/70 text-xs">{{ request.user.get_full_name|default:request.user.username }}</span>
     </div>
