@@ -97,21 +97,31 @@
                         </div>
                     </div>
 
-                    <!-- Gallery -->
-                    {% with gallery_images=object.BillboardImageModel.all %}
-                    {% if gallery_images %}
-                    <div class="mb-10">
-                        <h2 class="text-xl font-bold text-dark mb-4 pb-2 border-b border-gray-200">گالری</h2>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
-                            {% for image in gallery_images %}
-                            <div class="rounded-xl overflow-hidden bg-gray-100 shadow border border-gray-100 aspect-[4/3]">
-                                <img src="{{ image.image.url }}" alt="{{ image.title|default:object.name }}" class="w-full h-full object-cover hover:scale-105 transition duration-300">
-                            </div>
+
+                    <!-- Gallery (main image + gallery images) -->
+                    <div class="mb-10" id="billboard-gallery">
+                        <h2 class="text-xl font-bold text-dark mb-4 pb-2 border-b border-gray-200">گالری عکس های بیلبورد</h2>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 gallery-grid">
+                            <button type="button" class="gallery-thumb rounded-xl overflow-hidden bg-gray-100 shadow border border-gray-100 aspect-[4/3] cursor-pointer p-0 block w-full text-right focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                <img src="{{ object.billboard_pic_url }}" alt="{{ object.name }}" class="w-full h-full object-cover hover:scale-105 transition duration-300 pointer-events-none">
+                            </button>
+                            {% for image in object.BillboardImageModel.all %}
+                            <button type="button" class="gallery-thumb rounded-xl overflow-hidden bg-gray-100 shadow border border-gray-100 aspect-[4/3] cursor-pointer p-0 block w-full text-right focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                                <img src="{{ image.image.url }}" alt="{{ image.title|default:object.name }}" class="w-full h-full object-cover hover:scale-105 transition duration-300 pointer-events-none">
+                            </button>
                             {% endfor %}
                         </div>
                     </div>
-                    {% endif %}
-                    {% endwith %}
+
+                    <!-- Lightbox -->
+                    <div id="gallery-lightbox" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 p-4" role="dialog" aria-modal="true" aria-label="نمایش تصویر">
+                        <button type="button" id="lightbox-close" class="absolute top-4 left-4 z-10 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition no-print" aria-label="بستن">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                        <img id="lightbox-img" src="" alt="" class="max-w-full max-h-[90vh] w-auto h-auto object-contain rounded-lg shadow-2xl">
+                        <button type="button" id="lightbox-backdrop" class="absolute inset-0 -z-10 cursor-default" aria-label="بستن"></button>
+                    </div>
+
 
                     <!-- Map -->
                     {% if object.map_iframe %}
@@ -280,4 +290,43 @@
 
 {% block script %}
 {% include 'template/home/add_list_ajax.html' %}
+<script>
+(function() {
+    var lightbox = document.getElementById('gallery-lightbox');
+    var lightboxImg = document.getElementById('lightbox-img');
+    var lightboxClose = document.getElementById('lightbox-close');
+    var lightboxBackdrop = document.getElementById('lightbox-backdrop');
+    var thumbs = document.querySelectorAll('.gallery-thumb');
+
+    function openLightbox(src, alt) {
+        if (!lightbox || !lightboxImg) return;
+        lightboxImg.src = src;
+        lightboxImg.alt = alt || '';
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        if (!lightbox) return;
+        lightbox.classList.add('hidden');
+        lightbox.classList.remove('flex');
+        document.body.style.overflow = '';
+    }
+
+    thumbs.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var img = this.querySelector('img');
+            if (img && img.src) openLightbox(img.src, img.alt);
+        });
+    });
+
+    if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+    if (lightboxBackdrop) lightboxBackdrop.addEventListener('click', closeLightbox);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && lightbox && !lightbox.classList.contains('hidden')) closeLightbox();
+    });
+})();
+</script>
 {% endblock %}
