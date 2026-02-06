@@ -171,11 +171,11 @@
                             <div class="space-y-2">
                                 <div class="flex justify-between text-gray-700">
                                     <span>عرض:</span>
-                                    <span class="font-medium">{{ object.billboard_width }} متر</span>
+                                    <span class="font-medium">{{ object.billboard_width|normalize_decimal }} متر</span>
                                 </div>
                                 <div class="flex justify-between text-gray-700">
                                     <span>ارتفاع:</span>
-                                    <span class="font-medium">{{ object.billboard_length }} متر</span>
+                                    <span class="font-medium">{{ object.billboard_length|normalize_decimal }} متر</span>
                                 </div>
                             </div>
                         </div>
