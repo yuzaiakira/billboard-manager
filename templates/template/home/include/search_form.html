@@ -1,6 +1,6 @@
 <!-- Search and Filter Section -->
 <section class="py-8 bg-light">
-    <form action="{% url 'search' %}>
+    <form action="{% url 'search' %}" method="get">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row-reverse gap-4">
                 <div class="flex-1">
@@ -12,7 +12,7 @@
                 <div class="w-full md:w-48">
                     {{ search_form.cities }}
                 </div>
-                <button class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-3 px-6 rounded-lg transition duration-300">
+                <button type="submit" class="btn-hover bg-primary hover:bg-secondary text-white font-medium py-3 px-6 rounded-lg transition duration-300">
                     <i class="fas fa-filter ml-2"></i> فیلتر
                 </button>
             </div>

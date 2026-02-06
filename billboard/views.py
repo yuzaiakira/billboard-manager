@@ -103,6 +103,11 @@ class BillboardStateList(BillboardCityList):
 
 class BillboardSearch(BillboardList):
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['search_form'] = SearchForm(self.request.GET)
+        return context
+
     def get_queryset(self):
         query = self.request.GET.get("q")
         cities = self.request.GET.get("cities")
