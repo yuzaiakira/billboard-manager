@@ -1,6 +1,7 @@
 {% extends 'template/home/base_body.html' %}
 {% load static %}
 {% load change_bool_value %}
+{% load jalali_date %}
 
 {% block title %}{{ title }}{% endblock %}
 
@@ -115,7 +116,7 @@
                                     </div>
                                     <div>
                                         <p class="text-gray-700 font-medium">تاریخ اکران</p>
-                                        <p class="text-gray-600">{{ item.billboard.reservation_date }}</p>
+                                        <p class="text-gray-600">{{ item.billboard.reservation_date|jalali_slash }}</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-3 flex-row-reverse">

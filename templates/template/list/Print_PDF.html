@@ -1,5 +1,6 @@
 {% load static %}
 {% load change_bool_value %}
+{% load jalali_date %}
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -239,7 +240,7 @@
                 {% if pdf_form.reservation_date.value %}
                 <div class="property-row">
                     <span class="property-name">تاریخ قابل اجاره: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.reservation_date }}</span>
+                    <span class="property-value" contenteditable>{{ item.billboard.reservation_date|jalali_slash }}</span>
                 </div>
                 {% endif %}
                 {% if pdf_form.price.value %}
