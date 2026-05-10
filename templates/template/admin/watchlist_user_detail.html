@@ -1,0 +1,56 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls %}
+
+{% block extrahead %}{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} watchlist-user-detail{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; <a href="{% url 'admin:addlist_listsmodel_watchlist_users' %}">کاربران دارای لیست بیلبورد</a>
+&rsaquo; لیست {{ watched_user.username }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>لیست بیلبورد کاربر {{ watched_user.username }}</h1>
+  {% if watched_user.display_name %}
+  <p class="help">نام نمایشی: <strong>{{ watched_user.display_name }}</strong></p>
+  {% endif %}
+  <div class="results" style="direction: rtl;">
+    <table id="result_list">
+      <thead>
+        <tr>
+          <th scope="col">بیلبورد</th>
+          <th scope="col">شهر</th>
+          <th scope="col">افزوده‌شده به لیست</th>
+          <th scope="col">عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in items %}
+        <tr class="{% cycle 'row1' 'row2' %}">
+          <th scope="row">{{ row.billboard.name }}</th>
+          <td>{% if row.billboard.city %}{{ row.billboard.city }}{% else %}—{% endif %}</td>
+          <td>{{ row.created_at }}</td>
+          <td><a href="{% url 'admin:billboard_billboardmodel_change' row.billboard.pk %}">بازکردن در ادمین بیلبورد</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">برای این کاربر ردیفی در لیست ثبت نشده است.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top: 1em;">
+    <a href="{% url 'admin:addlist_listsmodel_watchlist_users' %}">« بازگشت به فهرست کاربران</a>
+  </p>
+</div>
+{% endblock %}

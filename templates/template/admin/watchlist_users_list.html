@@ -1,0 +1,55 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls %}
+
+{% block extrahead %}{{ block.super }}
+<script src="{% url 'admin:jsi18n' %}"></script>
+{% endblock %}
+
+{% block coltype %}colM{% endblock %}
+
+{% block bodyclass %}{{ block.super }} app-{{ opts.app_label }} model-{{ opts.model_name }} watchlist-users-list{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
+&rsaquo; <a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>
+&rsaquo; کاربران دارای لیست بیلبورد
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  <h1>کاربران دارای لیست بیلبورد</h1>
+  <p class="help">فقط کاربرانی که حداقل یک بیلبورد در لیست ذخیره کرده‌اند نمایش داده می‌شوند.</p>
+  <div class="results" style="direction: rtl;">
+    <table id="result_list">
+      <thead>
+        <tr>
+          <th scope="col">نام کاربری</th>
+          <th scope="col">نام نمایشی</th>
+          <th scope="col">تعداد بیلبورد در لیست</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr class="{% cycle 'row1' 'row2' %}">
+          <th scope="row">{{ u.username }}</th>
+          <td>{{ u.display_name|default:"—" }}</td>
+          <td>{{ u.watchlist_count }}</td>
+          <td>
+            <a href="{% url 'admin:addlist_listsmodel_watchlist_user_detail' u.pk %}">مشاهدهٔ لیست بیلبوردها</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">کاربری با لیست بیلبورد یافت نشد.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="paginator" style="margin-top: 1em;">
+    <a href="{% url opts|admin_urlname:'changelist' %}" class="button">بازگشت به لیست ردیف‌های لیست</a>
+  </p>
+</div>
+{% endblock %}

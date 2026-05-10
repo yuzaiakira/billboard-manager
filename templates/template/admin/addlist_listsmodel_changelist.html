@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block object-tools-items %}
+  {% if show_watchlist_users_link %}
+  <li>
+    <a href="{% url 'admin:addlist_listsmodel_watchlist_users' %}" class="addlink">کاربران دارای لیست بیلبورد</a>
+  </li>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}
