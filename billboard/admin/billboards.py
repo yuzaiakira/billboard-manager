@@ -3,6 +3,7 @@ from functools import update_wrapper
 from openpyxl import Workbook
 
 from django.contrib import admin
+from django.contrib.admin import RelatedOnlyFieldListFilter
 from django.http import HttpResponse
 from django.shortcuts import redirect
 
@@ -33,7 +34,8 @@ class BillboardAdmin(admin.ModelAdmin):
     change_list_template = 'template/admin/admin-change-list.html'
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price')
     list_filter = (
-        'owner_company',
+        ('owner_company', RelatedOnlyFieldListFilter),
+        ('category', RelatedOnlyFieldListFilter),
         'city',
         'reservation_date',
         'has_power',
