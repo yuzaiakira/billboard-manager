@@ -33,7 +33,7 @@ class BillboardAdmin(admin.ModelAdmin):
     list_filter = ('reseller','owner_company', 'city', 'reservation_date', 'billboard_length',
                    'billboard_width', 'has_power')
     search_fields = ('name', 'address', 'city__name')
-    actions = ['make_export', 'assign_to_company']
+    actions = ['make_export', 'assign_to_company', 'assign_to_category']
     prepopulated_fields = {'slug': ('title',), }
     inlines = (BillboardImageInline, )
     raw_id_fields = ('category', 'reseller', 'owner_company')
@@ -152,7 +152,16 @@ class BillboardAdmin(admin.ModelAdmin):
         custom_urls = [
             path("import/", wrap(views.ImportBillboard.as_view()), name='%s_%s_import' % info),
             path("update/", wrap(views.UpdateBillboard.as_view()), name='%s_%s_update' % info),
-            path("assign-to-company/", self.admin_site.admin_view(views.assign_to_company_view), name='assign_to_company'),
+            path(
+                "assign-to-company/",
+                self.admin_site.admin_view(views.assign_to_company_view),
+                name='%s_%s_assign_to_company' % info,
+            ),
+            path(
+                "assign-to-category/",
+                self.admin_site.admin_view(views.assign_to_category_view),
+                name='%s_%s_assign_to_category' % info,
+            ),
         ]
 
         return custom_urls + super().get_urls()
@@ -184,6 +193,12 @@ class BillboardAdmin(admin.ModelAdmin):
         return redirect(f'assign-to-company/?ids={",".join(str(pk) for pk in selected)}')
 
     assign_to_company.short_description = "تعیین شرکت صاحب امتیاز برای بیلبوردهای انتخاب شده"
+
+    def assign_to_category(self, request, queryset):
+        selected = queryset.values_list('pk', flat=True)
+        return redirect(f'assign-to-category/?ids={",".join(str(pk) for pk in selected)}')
+
+    assign_to_category.short_description = "انتقال بیلبوردهای انتخاب شده به دسته‌بندی"
 
 
 @admin.register(models.StateModel)

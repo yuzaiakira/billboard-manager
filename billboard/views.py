@@ -1,6 +1,6 @@
 from urllib.parse import unquote
 
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.http import Http404
 
 from django.views import View
@@ -14,7 +14,7 @@ from django.shortcuts import render, redirect
 from django.utils.encoding import uri_to_iri
 
 from django.db.models import Q
-from billboard.models import BillboardModel, CompanyModel
+from billboard.models import BillboardModel, BillboardCategory, CompanyModel
 from billboard.forms import ImportBillboardForm, UpdateBillboardForm, SearchForm
 from reservation.models import RentalListModel
 
@@ -147,21 +147,98 @@ class ImportBillboard(PermissionRequiredMixin, FormView):
         return super().form_valid(form)
 
 
+def _parse_billboard_id_list(ids_param):
+    if not ids_param:
+        return []
+    out = []
+    for part in ids_param.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            out.append(int(part))
+        except ValueError:
+            continue
+    return out
+
+
+def _billboard_admin_assign_context(request):
+    return {
+        **admin.site.each_context(request),
+        "opts": BillboardModel._meta,
+    }
+
+
 def assign_to_company_view(request):
+    changelist_url = reverse("admin:billboard_billboardmodel_changelist")
     if request.method == "POST":
-        company_id = request.POST.get("company_id")
         ids = request.POST.get("ids", "")
-        id_list = ids.split(",")
-        BillboardModel.objects.filter(id__in=id_list).update(owner_company_id=company_id)
+        id_list = _parse_billboard_id_list(ids)
+        if not id_list:
+            messages.error(request, "هیچ بیلبوردی برای به‌روزرسانی انتخاب نشده است.")
+            return redirect(changelist_url)
+        company_id = request.POST.get("company_id")
+        if company_id in (None, ""):
+            owner_company_id = None
+        else:
+            try:
+                owner_company_id = int(company_id)
+            except ValueError:
+                messages.error(request, "شرکت انتخاب‌شده نامعتبر است.")
+                return redirect(changelist_url)
+        BillboardModel.objects.filter(id__in=id_list).update(owner_company_id=owner_company_id)
         messages.success(request, "شرکت صاحب امتیاز با موفقیت اعمال شد.")
-        return redirect("/admin/billboard/billboardmodel/")
+        return redirect(changelist_url)
 
     ids = request.GET.get("ids", "")
-    companies = CompanyModel.objects.all()  # فرض بر اینکه مدل شرکت اینه
-    return render(request, "template/admin/assign_to_company.html", {
-        "ids": ids,
-        "companies": companies,
-    })
+    companies = CompanyModel.objects.all().order_by("id")
+    id_list = _parse_billboard_id_list(ids)
+    return render(
+        request,
+        "template/admin/assign_to_company.html",
+        {
+            "ids": ids,
+            "company_count": len(id_list),
+            "companies": companies,
+            **_billboard_admin_assign_context(request),
+        },
+    )
+
+
+def assign_to_category_view(request):
+    changelist_url = reverse("admin:billboard_billboardmodel_changelist")
+    if request.method == "POST":
+        ids = request.POST.get("ids", "")
+        id_list = _parse_billboard_id_list(ids)
+        if not id_list:
+            messages.error(request, "هیچ بیلبوردی برای به‌روزرسانی انتخاب نشده است.")
+            return redirect(changelist_url)
+        category_id = request.POST.get("category_id")
+        if category_id in (None, ""):
+            category_fk = None
+        else:
+            try:
+                category_fk = int(category_id)
+            except ValueError:
+                messages.error(request, "دسته‌بندی انتخاب‌شده نامعتبر است.")
+                return redirect(changelist_url)
+        BillboardModel.objects.filter(id__in=id_list).update(category_id=category_fk)
+        messages.success(request, "دسته‌بندی بیلبوردها با موفقیت اعمال شد.")
+        return redirect(changelist_url)
+
+    ids = request.GET.get("ids", "")
+    categories = BillboardCategory.objects.all().order_by("name")
+    id_list = _parse_billboard_id_list(ids)
+    return render(
+        request,
+        "template/admin/assign_to_category.html",
+        {
+            "ids": ids,
+            "category_count": len(id_list),
+            "categories": categories,
+            **_billboard_admin_assign_context(request),
+        },
+    )
 
 
 class UpdateBillboard(ImportBillboard):
