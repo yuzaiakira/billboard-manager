@@ -1,4 +1,52 @@
 {% extends "admin/change_list.html" %}
+{% load static %}
+
+{# کشویی کردن ستون فیلترها (h3 + ul در Django 3.2) تا لیست کشوی کمتر شلوغ شود #}
+{% block extrastyle %}
+{{ block.super }}
+<style>
+  #changelist-filter h3.bb-filter-accordion-header {
+    cursor: pointer;
+    position: relative;
+    padding-inline-end: 1.35em;
+    user-select: none;
+    margin-top: 0.35em;
+  }
+  #changelist-filter h3.bb-filter-accordion-header:hover,
+  #changelist-filter h3.bb-filter-accordion-header:focus {
+    outline: 0;
+    text-decoration: underline;
+  }
+  #changelist-filter h3.bb-filter-accordion-header:focus-visible {
+    outline: 2px solid var(--accent, #417690);
+    outline-offset: 2px;
+  }
+  /* فلش فشرده‌شده / باز؛ با logical properties برای RTL درست عمل می‌کند */
+  #changelist-filter h3.bb-filter-accordion-header::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: 0.2em;
+    top: 50%;
+    width: 0.4em;
+    height: 0.4em;
+    margin-top: -0.2em;
+    border: solid currentColor;
+    border-width: 0 2px 2px 0;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+    opacity: 0.85;
+  }
+  #changelist-filter h3.bb-filter-accordion-header[aria-expanded="true"]::after {
+    margin-top: 0;
+    transform: rotate(45deg);
+  }
+</style>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script defer src="{% static 'admin/js/changelist-filter-accordion.js' %}"></script>
+{% endblock %}
 
 {% block object-tools-items %}
   {% if perms.billboard.can_import_billboard %}
