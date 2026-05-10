@@ -11,5 +11,9 @@ class ListsModel(models.Model):
                                   verbose_name="بیلبورد", related_name="ListModel")
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = "آیتم لیست کاربر"
+        verbose_name_plural = "لیست کاربران"
+
     def __str__(self):
         return f"{self.user} -> {self.billboard}"
