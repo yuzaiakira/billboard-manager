@@ -14,7 +14,11 @@ from billboard.models import (
     BillboardModel,
     CityModel,
 )
-from billboard.widgets import MediaLibraryWidget
+from billboard.widgets import (
+    IntegerStepNumberWidget,
+    MediaLibraryWidget,
+    ThousandSeparatedNumberWidget,
+)
 
 
 class LibraryImageFormMixin:
@@ -63,6 +67,9 @@ class BillboardAdminForm(LibraryImageFormMixin, forms.ModelForm):
         fields = '__all__'
         widgets = {
             'billboard_pic': MediaLibraryWidget,
+            'price': ThousandSeparatedNumberWidget,
+            'billboard_length': IntegerStepNumberWidget,
+            'billboard_width': IntegerStepNumberWidget,
         }
 
 

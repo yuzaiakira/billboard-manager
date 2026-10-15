@@ -1,6 +1,75 @@
-from django.forms.widgets import ClearableFileInput, FileInput
+from django.forms.widgets import ClearableFileInput, FileInput, NumberInput, TextInput
 from django.utils.html import format_html, conditional_escape
 from django.utils.safestring import mark_safe
+
+
+class IntegerStepNumberWidget(NumberInput):
+    """Number input whose spinner/arrows change the value by 1, not by decimals."""
+
+    class Media:
+        js = ('admin/js/integer-step-number.js',)
+
+    def __init__(self, attrs=None):
+        default_attrs = {
+            'class': 'integer-step-number',
+            # Allow any typed decimal; JS forces arrow/spinner step to 1.
+            'step': 'any',
+        }
+        if attrs:
+            classes = '{} {}'.format(
+                default_attrs.get('class', ''),
+                attrs.get('class', ''),
+            ).strip()
+            default_attrs.update(attrs)
+            if classes:
+                default_attrs['class'] = classes
+            default_attrs['step'] = 'any'
+        super().__init__(attrs=default_attrs)
+
+
+class ThousandSeparatedNumberWidget(TextInput):
+    """Text input that shows integers with thousand separators while typing."""
+
+    class Media:
+        js = ('admin/js/thousand-separator.js',)
+
+    def __init__(self, attrs=None):
+        default_attrs = {
+            'class': 'vBigIntegerField thousand-separator-input',
+            'inputmode': 'numeric',
+            'autocomplete': 'off',
+        }
+        if attrs:
+            classes = '{} {}'.format(
+                default_attrs.get('class', ''),
+                attrs.get('class', ''),
+            ).strip()
+            default_attrs.update(attrs)
+            if classes:
+                default_attrs['class'] = classes
+        super().__init__(attrs=default_attrs)
+
+    def format_value(self, value):
+        if value is None or value == '':
+            return ''
+        try:
+            return '{:,}'.format(int(value))
+        except (TypeError, ValueError):
+            return value
+
+    def value_from_datadict(self, data, files, name):
+        value = data.get(name)
+        if value is None:
+            return None
+        cleaned = (
+            str(value)
+            .replace(',', '')
+            .replace('\u066c', '')  # Arabic thousands separator
+            .replace('\u2009', '')  # thin space
+            .replace(' ', '')
+            .strip()
+        )
+        return cleaned or None
 
 
 class MediaLibraryWidget(ClearableFileInput):
