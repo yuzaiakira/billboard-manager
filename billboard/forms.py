@@ -4,9 +4,77 @@ from datetime import datetime
 
 from django import forms
 from django.conf import settings
+from django.core.exceptions import ValidationError
 import jdatetime
 
-from billboard.models import BillboardModel, CityModel, BillboardFinalPriceModel
+from billboard.media_library import resolve_library_path
+from billboard.models import (
+    BillboardFinalPriceModel,
+    BillboardImageModel,
+    BillboardModel,
+    CityModel,
+)
+from billboard.widgets import MediaLibraryWidget
+
+
+class LibraryImageFormMixin:
+    """Apply a media-library path to an ImageField when posted."""
+
+    library_image_fields = ()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Allow library-only selection on required image fields (e.g. new inlines).
+        for field_name in self.library_image_fields:
+            if field_name in self.fields and self._library_path_for(field_name):
+                self.fields[field_name].required = False
+
+    def _library_path_for(self, field_name):
+        if not hasattr(self, 'data') or self.data is None:
+            return ''
+        return self.data.get('{}_library_path'.format(self.add_prefix(field_name)), '').strip()
+
+    def _apply_library_selection(self, field_name):
+        library_path = self._library_path_for(field_name)
+        if not library_path:
+            return
+        resolved = resolve_library_path(library_path)
+        if not resolved:
+            raise ValidationError({'{}'.format(field_name): 'فایل انتخاب‌شده در کتابخانه یافت نشد.'})
+        # Prefer an explicit new upload over a library pick.
+        if self.files.get(self.add_prefix(field_name)):
+            return
+        self.instance.assign_existing_image(field_name, resolved)
+        self.cleaned_data[field_name] = resolved
+
+    def clean(self):
+        cleaned = super().clean()
+        for field_name in self.library_image_fields:
+            if field_name in self.fields:
+                self._apply_library_selection(field_name)
+        return cleaned
+
+
+class BillboardAdminForm(LibraryImageFormMixin, forms.ModelForm):
+    library_image_fields = ('billboard_pic',)
+
+    class Meta:
+        model = BillboardModel
+        fields = '__all__'
+        widgets = {
+            'billboard_pic': MediaLibraryWidget,
+        }
+
+
+class BillboardImageInlineForm(LibraryImageFormMixin, forms.ModelForm):
+    library_image_fields = ('image',)
+
+    class Meta:
+        model = BillboardImageModel
+        fields = '__all__'
+        widgets = {
+            'image': MediaLibraryWidget,
+        }
 
 class ImportBillboardForm(forms.Form):
     file = forms.FileField(label='فایل')

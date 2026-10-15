@@ -6,12 +6,16 @@ from django.contrib import admin
 from django.contrib.admin import RelatedOnlyFieldListFilter
 from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse
 
 from account.models import UserModel
 from billboard import models, views
 from billboard.admin.fieldsets import ADMIN_USER_BILLBOARD_FIELDSETS, DEFAULT_BILLBOARD_FIELDSETS
 from billboard.admin.filters import BillboardResellerListFilter
 from billboard.admin.inlines import BillboardFinalPriceInline, BillboardImageInline
+from billboard.admin.media_views import media_library_json
+from billboard.forms import BillboardAdminForm
+from billboard.widgets import MediaLibraryWidget
 from siteoption.constants import BILLBOARD_COMMISSION
 from siteoption.utils.functions import get_option
 
@@ -32,6 +36,7 @@ def export_billboards_to_xlsx_response(queryset) -> HttpResponse:
 @admin.register(models.BillboardModel)
 class BillboardAdmin(admin.ModelAdmin):
     change_list_template = 'template/admin/admin-change-list.html'
+    form = BillboardAdminForm
     list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price')
     list_filter = (
         ('owner_company', RelatedOnlyFieldListFilter),
@@ -47,6 +52,20 @@ class BillboardAdmin(admin.ModelAdmin):
     inlines = (BillboardImageInline,)
     raw_id_fields = ('category', 'reseller', 'owner_company')
     fieldsets = DEFAULT_BILLBOARD_FIELDSETS
+
+    def get_form(self, request, obj=None, **kwargs):
+        form_class = super().get_form(request, obj, **kwargs)
+        media_url = reverse('admin:billboard_billboardmodel_media_library')
+
+        class FormWithMediaUrl(form_class):
+            def __init__(self, *args, **form_kwargs):
+                super().__init__(*args, **form_kwargs)
+                if 'billboard_pic' in self.fields:
+                    self.fields['billboard_pic'].widget = MediaLibraryWidget(attrs={
+                        'data-media-url': media_url,
+                    })
+
+        return FormWithMediaUrl
 
     def get_commission(self):
         if not hasattr(self, '_commission'):
@@ -122,6 +141,11 @@ class BillboardAdmin(admin.ModelAdmin):
         custom_urls = [
             path('import/', wrap(views.ImportBillboard.as_view()), name='%s_%s_import' % info),
             path('update/', wrap(views.UpdateBillboard.as_view()), name='%s_%s_update' % info),
+            path(
+                'media-library/',
+                wrap(media_library_json),
+                name='%s_%s_media_library' % info,
+            ),
             path(
                 'assign-to-company/',
                 self.admin_site.admin_view(views.assign_to_company_view),

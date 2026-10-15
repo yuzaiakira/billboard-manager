@@ -180,3 +180,4 @@ upload/*
 # i comming soon add MIT tempalte
 static/
 !templates/static/
+.cursor/
