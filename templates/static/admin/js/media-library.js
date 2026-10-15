@@ -201,12 +201,77 @@
     });
   }
 
+  function getPreview(widget) {
+    return widget.querySelector('.media-library-preview');
+  }
+
+  function getPreviewImg(widget) {
+    return widget.querySelector('.media-library-preview-img');
+  }
+
+  function setClearChecked(widget, checked) {
+    var clearInput = widget.querySelector('.media-library-clear-input');
+    if (clearInput) {
+      clearInput.checked = !!checked;
+    }
+  }
+
+  function setClearEnabled(widget, enabled) {
+    var clearBtn = widget.querySelector('.media-library-clear-btn');
+    if (clearBtn) {
+      clearBtn.disabled = !enabled;
+    }
+  }
+
+  function showPreview(widget, url, note) {
+    var preview = getPreview(widget);
+    var img = getPreviewImg(widget);
+    var chosen = widget.querySelector('.media-library-chosen');
+    if (preview && img && url) {
+      img.src = url;
+      img.alt = note || '';
+      preview.hidden = false;
+    }
+    if (chosen) {
+      if (note) {
+        chosen.hidden = false;
+        chosen.textContent = note;
+      } else {
+        chosen.hidden = true;
+        chosen.textContent = '';
+      }
+    }
+    setClearEnabled(widget, true);
+    setClearChecked(widget, false);
+  }
+
+  function hidePreview(widget, note) {
+    var preview = getPreview(widget);
+    var img = getPreviewImg(widget);
+    var chosen = widget.querySelector('.media-library-chosen');
+    if (preview) {
+      preview.hidden = true;
+    }
+    if (img) {
+      img.removeAttribute('src');
+      img.alt = '';
+    }
+    if (chosen) {
+      if (note) {
+        chosen.hidden = false;
+        chosen.textContent = note;
+      } else {
+        chosen.hidden = true;
+        chosen.textContent = '';
+      }
+    }
+  }
+
   function selectItem(item) {
     if (!activeWidget) {
       return;
     }
     var pathInput = activeWidget.querySelector('.media-library-path-input');
-    var chosen = activeWidget.querySelector('.media-library-chosen');
     var fileInput = activeWidget.querySelector('input[type="file"]');
 
     if (pathInput) {
@@ -219,11 +284,38 @@
         /* ignore */
       }
     }
-    if (chosen) {
-      chosen.hidden = false;
-      chosen.textContent = 'انتخاب شده: ' + (item.name || item.path);
-    }
+    showPreview(activeWidget, item.url, 'انتخاب شده: ' + (item.name || item.path));
     closeModal();
+  }
+
+  function clearImage(widget) {
+    var pathInput = widget.querySelector('.media-library-path-input');
+    var fileInput = widget.querySelector('input[type="file"]');
+    if (pathInput) {
+      pathInput.value = '';
+    }
+    if (fileInput) {
+      try {
+        fileInput.value = '';
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    setClearChecked(widget, true);
+    setClearEnabled(widget, false);
+    hidePreview(widget, 'تصویر پس از ذخیره حذف می‌شود');
+  }
+
+  function updateUploadChosen(widget, fileInput) {
+    var pathInput = widget.querySelector('.media-library-path-input');
+    if (pathInput) {
+      pathInput.value = '';
+    }
+    if (fileInput.files && fileInput.files.length) {
+      var file = fileInput.files[0];
+      var objectUrl = URL.createObjectURL(file);
+      showPreview(widget, objectUrl, 'آماده آپلود: ' + file.name);
+    }
   }
 
   function bindWidgets(root) {
@@ -232,26 +324,31 @@
         return;
       }
       widget.setAttribute('data-media-bound', '1');
-      var btn = widget.querySelector('.media-library-open-btn');
-      if (btn) {
-        btn.addEventListener('click', function () {
+
+      var openBtn = widget.querySelector('.media-library-open-btn');
+      if (openBtn) {
+        openBtn.addEventListener('click', function () {
           openModal(widget);
         });
       }
+
       var fileInput = widget.querySelector('input[type="file"]');
+      var uploadBtn = widget.querySelector('.media-library-upload-btn');
+      if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener('click', function () {
+          fileInput.click();
+        });
+      }
       if (fileInput) {
         fileInput.addEventListener('change', function () {
-          if (fileInput.files && fileInput.files.length) {
-            var pathInput = widget.querySelector('.media-library-path-input');
-            var chosen = widget.querySelector('.media-library-chosen');
-            if (pathInput) {
-              pathInput.value = '';
-            }
-            if (chosen) {
-              chosen.hidden = true;
-              chosen.textContent = '';
-            }
-          }
+          updateUploadChosen(widget, fileInput);
+        });
+      }
+
+      var clearBtn = widget.querySelector('.media-library-clear-btn');
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () {
+          clearImage(widget);
         });
       }
     });
