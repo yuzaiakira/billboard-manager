@@ -37,11 +37,12 @@ def export_billboards_to_xlsx_response(queryset) -> HttpResponse:
 class BillboardAdmin(admin.ModelAdmin):
     change_list_template = 'template/admin/admin-change-list.html'
     form = BillboardAdminForm
-    list_display = ('name', 'reseller', 'city', 'reservation_date', 'get_final_price')
+    list_display = ('name', 'reseller', 'city', 'billboard_status', 'reservation_date', 'get_final_price')
     list_filter = (
         ('owner_company', RelatedOnlyFieldListFilter),
         ('category', RelatedOnlyFieldListFilter),
         'city',
+        'billboard_status',
         'reservation_date',
         'has_power',
         BillboardResellerListFilter,

@@ -27,6 +27,22 @@
         </div>
     </section>
 
+    {% if is_unavailable_for_display %}
+    <section class="py-4 border-b border-amber-200 bg-amber-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-start gap-3 text-amber-900" role="alert">
+                <span class="mt-0.5 w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
+                    <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
+                </span>
+                <div>
+                    <p class="font-bold text-lg">این بیلبورد غیرقابل اکران است</p>
+                    <p class="text-sm text-amber-800 mt-1">در حال حاضر امکان اکران یا رزرو این بیلبورد وجود ندارد.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Billboard Details Section -->
     <section class="py-8 md:py-12">
         <div class="container mx-auto px-4">
@@ -230,6 +246,7 @@
                                         چاپ صفحه
                                     </a>
                                 </div>
+                                {% if not is_unavailable_for_display %}
                                 <div>
                                     <p class="text-sm font-medium text-gray-700 mb-1">چاپ دسته‌ای</p>
                                     <p class="text-xs text-gray-500 mb-2">با افزودن به لیست، از همهٔ بیلبوردهای انتخاب‌شده چاپ بگیرید.</p>
@@ -238,6 +255,7 @@
                                         <span class="button-add-list-text">{% if object|on_list:request.user %}اضافه شده به لیست{% else %}افزودن به لیست{% endif %}</span>
                                     </a>
                                 </div>
+                                {% endif %}
                             </div>
                         </div>
                     </aside>
@@ -262,7 +280,11 @@
                         <a href="{{ related.get_absolute_url }}">
                             <img src="{{ related.billboard_pic_url }}" alt="{{ related.name }}" class="w-full h-full object-cover">
                         </a>
+                        {% if related.is_unavailable_for_display %}
+                        <span class="absolute top-3 right-3 bg-amber-500 text-white text-xs font-bold px-2 py-1 rounded-lg">غیرقابل اکران</span>
+                        {% else %}
                         <span class="absolute top-3 right-3 bg-primary text-white text-xs font-bold px-2 py-1 rounded-full">مرتبط</span>
+                        {% endif %}
                     </div>
                     <div class="p-5">
                         <h3 class="text-lg font-bold text-dark mb-2"><a href="{{ related.get_absolute_url }}" class="hover:text-primary transition">{{ related.name }}</a></h3>
@@ -281,9 +303,11 @@
                             <a href="{{ related.get_absolute_url }}" class="btn-hover flex-1 text-center bg-light hover:bg-gray-100 text-primary font-medium py-2 px-3 rounded-lg border border-primary transition duration-300 text-sm">
                                 مشاهده
                             </a>
+                            {% if not related.is_unavailable_for_display %}
                             <a href="{% url 'add-to-list' related.pk %}" class="btn-hover flex-1 text-center bg-primary hover:bg-secondary text-white font-medium py-2 px-3 rounded-lg transition duration-300 text-sm button-add-list {% if related|on_list:request.user %}button-added-list{% endif %}" data-billboard-id="{{ related.pk }}">
                                 <span class="button-add-list-text">{% if related|on_list:request.user %}اضافه شده به لیست{% else %}افزودن به لیست{% endif %}</span>
                             </a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

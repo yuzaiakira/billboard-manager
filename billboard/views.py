@@ -48,13 +48,16 @@ class BillboardDetail(DetailView):
 
         if not objects.exists():
             raise Http404("No BillboardModel matches the given query.")
-        
-        # If you want to return the first object or handle multiple objects differently
-        return objects.first()  # or handle as needed
+
+        obj = objects.first()
+        if not obj.is_publicly_listed:
+            raise Http404("No BillboardModel matches the given query.")
+        return obj
 
     def get_context_data(self, *args, **kwargs):
         context = super(BillboardDetail, self).get_context_data(*args, **kwargs)
         context['rental_list'] = RentalListModel.get_rental_list(billboard_id=self.object.id)
+        context['is_unavailable_for_display'] = self.object.is_unavailable_for_display
         return context
 
 
@@ -66,8 +69,7 @@ class BillboardList(ListView):
     slug_url_kwarg = 'slug'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.order_by('-id')
+        return self.model.objects.publicly_listed().order_by('-id')
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -80,10 +82,6 @@ class BillboardCityList(BillboardList):
         self.kwargs['slug'] = unquote(self.kwargs['slug'])
         return super().get(request, *args, **kwargs)
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.filter(slug=self.kwargs['slug']).order_by('-id')
-
     def get_object(self):
         queryset = self.get_queryset()
         obj = queryset.first()
@@ -93,12 +91,20 @@ class BillboardCityList(BillboardList):
             raise Http404("No billboard found")
 
     def get_queryset(self):
-        return self.model.objects.filter(city__slug=self.kwargs['slug']).order_by('-id')
+        return (
+            self.model.objects.publicly_listed()
+            .filter(city__slug=self.kwargs['slug'])
+            .order_by('-id')
+        )
 
 
 class BillboardStateList(BillboardCityList):
     def get_queryset(self):
-        return self.model.objects.filter(city__state__slug=self.kwargs['slug']).order_by('-id')
+        return (
+            self.model.objects.publicly_listed()
+            .filter(city__state__slug=self.kwargs['slug'])
+            .order_by('-id')
+        )
 
 
 class BillboardSearch(BillboardList):
@@ -112,10 +118,12 @@ class BillboardSearch(BillboardList):
         query = self.request.GET.get("q")
         cities = self.request.GET.get("cities")
         if query is not None:
-            object_list = (self.model.objects.filter(
-                Q(name__icontains=query) | Q(city__name__icontains=query) |
-                Q(city__state__name__icontains=query) | Q(address__icontains=query)
-            ))
+            object_list = (
+                self.model.objects.publicly_listed().filter(
+                    Q(name__icontains=query) | Q(city__name__icontains=query) |
+                    Q(city__state__name__icontains=query) | Q(address__icontains=query)
+                )
+            )
 
             if cities != SearchForm.ALL_CITY:
                 object_list = object_list.filter(city__id=cities)

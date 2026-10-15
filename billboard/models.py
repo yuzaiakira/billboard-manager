@@ -83,20 +83,32 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
     billboard_pic = models.ImageField(upload_to=billboard_path, verbose_name="تصویر اصلی بیلبورد",
                                       blank=True, null=True)
 
-    BILLBOARD_PUBLIC = 0
-    BILLBOARD_DRAFT = 1
-    BILLBOARD_ARCHIVE = 2
-    BILLBOARD_NO_SELL = 3
+    class BillboardStatus(models.IntegerChoices):
+        PUBLIC = 0, 'نمایش در سایت'
+        DRAFT = 1, 'پیش نویس'
+        ARCHIVE = 2, 'آرشیو'
+        UNAVAILABLE = 3, 'غیر قابل اکران'
 
-    billboard_group_status = (
-        (BILLBOARD_PUBLIC, 'نمایش در سایت'),
-        (BILLBOARD_DRAFT, 'پیش نویس'),
-        (BILLBOARD_ARCHIVE, 'آرشیو'),
-        (BILLBOARD_NO_SELL, 'غیر قابل فروش'),
+    # Backward-compatible aliases
+    BILLBOARD_PUBLIC = BillboardStatus.PUBLIC
+    BILLBOARD_DRAFT = BillboardStatus.DRAFT
+    BILLBOARD_ARCHIVE = BillboardStatus.ARCHIVE
+    BILLBOARD_NO_SELL = BillboardStatus.UNAVAILABLE
+    billboard_group_status = BillboardStatus.choices
+
+    STATUSES_HIDDEN_FROM_PUBLIC = frozenset({
+        BillboardStatus.DRAFT,
+        BillboardStatus.ARCHIVE,
+    })
+    STATUSES_LISTED_BUT_UNAVAILABLE = frozenset({
+        BillboardStatus.UNAVAILABLE,
+    })
+
+    billboard_status = models.PositiveSmallIntegerField(
+        choices=BillboardStatus.choices,
+        verbose_name="وضعیت بیلبورد",
+        default=BillboardStatus.PUBLIC,
     )
-
-    billboard_status = models.PositiveSmallIntegerField(choices=billboard_group_status,
-                                                        verbose_name="وضعیت بیلبورد", default=0)
     
     owner_company = models.ForeignKey(
         CompanyModel,
@@ -111,7 +123,7 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
     objects = BillboardManager()
 
     # The fields that show in short property
-    fields_property = ['name', 'address', 'has_power', 'reservation_date']
+    fields_property = ['name', 'address', 'has_power', 'reservation_date', 'billboard_status']
 
     class Meta:
         verbose_name_plural = "بیلبورد ها"
@@ -151,15 +163,31 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
         if only is None:
             only = cls.fields_property
 
-        return cls.objects.order_by('-id').only(*only)[:number]
+        return cls.objects.publicly_listed().order_by('-id').only(*only)[:number]
+
+    @property
+    def is_publicly_listed(self) -> bool:
+        return self.billboard_status not in self.STATUSES_HIDDEN_FROM_PUBLIC
+
+    @property
+    def is_unavailable_for_display(self) -> bool:
+        return self.billboard_status in self.STATUSES_LISTED_BUT_UNAVAILABLE
 
     @property
     def get_related(self):
         """Return related object with count of 3"""
 
-        return BillboardModel.objects.filter(~Q(id=self.id), city=self.city, billboard_length=self.billboard_length,
-                                             billboard_width=self.billboard_width,
-                                             has_power=self.has_power)[:3].only(*self.fields_property)
+        return (
+            BillboardModel.objects.publicly_listed()
+            .filter(
+                ~Q(id=self.id),
+                city=self.city,
+                billboard_length=self.billboard_length,
+                billboard_width=self.billboard_width,
+                has_power=self.has_power,
+            )[:3]
+            .only(*self.fields_property)
+        )
 
     @property
     def billboard_pic_url(self):
