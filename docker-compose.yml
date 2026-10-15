@@ -1,0 +1,45 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: billboard-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-billboard}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+  web:
+    build: .
+    container_name: billboard-web
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      # Override so Django talks to the compose MySQL as root
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-True}
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    volumes:
+      - .:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  mysql_data:

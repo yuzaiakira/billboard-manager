@@ -1,0 +1,15 @@
+.git
+.idea
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.env
+.venv
+venv/
+*.log
+staticfiles/
+tmp/
+*.md
+.DS_Store
