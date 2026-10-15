@@ -122,10 +122,9 @@ class BillboardModel(SEOBaseModel, ImageCompressMixin):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.billboard_pic:
-            new_image = self.compress(self.billboard_pic)
-            self.billboard_pic = new_image
-        
+        if self._image_field_changed('billboard_pic'):
+            self.billboard_pic = self.compress(self.billboard_pic)
+
         super().save(*args, **kwargs)
 
     @classmethod
@@ -238,6 +237,6 @@ class BillboardImageModel(models.Model, ImageCompressMixin):
         return self.title
 
     def save(self, *args, **kwargs):
-        new_image = self.compress(self.image)
-        self.image = new_image
+        if self._image_field_changed('image'):
+            self.image = self.compress(self.image)
         super().save(*args, **kwargs)

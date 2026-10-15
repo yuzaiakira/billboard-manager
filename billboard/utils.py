@@ -9,6 +9,9 @@ def billboard_path(instance, filename):
     date_today = now().date()
     date_path = date_today.strftime('billboard/%Y/%m/%d')
 
+    # Only keep the file name so existing storage paths are not nested again
+    filename = os.path.basename(filename)
+
     # Prepare the full file path
     full_path = os.path.join(date_path, filename)
 
