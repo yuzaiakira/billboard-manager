@@ -3,16 +3,70 @@
 }
 
 .media-library-controls {
-  margin-top: 8px;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  min-height: 56px;
+  box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+
+}
+
+/* Vertically center the admin label with the picker button row */
+.aligned .form-row:has(.media-library-widget) > div > label,
+.aligned .form-row.field-billboard_pic > div > label {
+  min-height: 56px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.form-row .media-library-widget > .media-library-controls {
+  max-width: 100%;
+}
+
+.media-library-open-btn.button,
+button.media-library-open-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px 16px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  color: #fff !important;
+  background: #417690 !important;
+  border: 1px solid #205067 !important;
+  border-radius: 4px !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  text-transform: none !important;
+}
+
+.media-library-open-btn.button:hover,
+.media-library-open-btn.button:focus,
+button.media-library-open-btn:hover,
+button.media-library-open-btn:focus {
+  background: #205067 !important;
+  border-color: #103040 !important;
+  color: #fff !important;
+}
+
+.media-library-open-btn.button:active,
+button.media-library-open-btn:active {
+  background: #163a4a !important;
 }
 
 .media-library-chosen {
-  color: #417690;
+  color: #205067;
   font-size: 13px;
+  font-weight: 600;
 }
 
 .media-library-modal {

@@ -110,13 +110,25 @@
     }
   }
 
+  function showError(message) {
+    setLoading(false);
+    var err = modal.querySelector('.media-library-error');
+    err.hidden = false;
+    err.textContent = message || 'خطای ناشناخته';
+  }
+
   function loadItems() {
     if (!activeWidget) {
       return;
     }
     var controls = activeWidget.querySelector('.media-library-controls');
-    var mediaUrl = controls && controls.getAttribute('data-media-url');
+    var mediaUrl = (controls && controls.getAttribute('data-media-url')) || '';
     if (!mediaUrl) {
+      var fileInput = activeWidget.querySelector('input[type="file"]');
+      mediaUrl = (fileInput && fileInput.getAttribute('data-media-url')) || '';
+    }
+    if (!mediaUrl) {
+      showError('آدرس کتابخانه رسانه تنظیم نشده است.');
       return;
     }
 
@@ -145,10 +157,7 @@
           'صفحه ' + currentPage + (data.total != null ? ' از ' + Math.max(1, Math.ceil(data.total / PAGE_SIZE)) : '');
       })
       .catch(function (error) {
-        setLoading(false);
-        var err = modal.querySelector('.media-library-error');
-        err.hidden = false;
-        err.textContent = error.message || 'خطای ناشناخته';
+        showError(error.message || 'خطای ناشناخته');
       });
   }
 
