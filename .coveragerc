@@ -1,0 +1,33 @@
+[run]
+branch = True
+source =
+    account
+    addlist
+    billboard
+    reservation
+    seo
+    siteoption
+    core
+omit =
+    */migrations/*
+    */apps.py
+    */__init__.py
+    manage.py
+    passenger_wsgi.py
+    core/asgi.py
+    core/wsgi.py
+    core/settings.py
+    */tests.py
+    tests/*
+    reservation/views.py
+    seo/views.py
+    siteoption/views.py
+
+[report]
+fail_under = 90
+show_missing = True
+skip_covered = False
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError

@@ -2,8 +2,6 @@ from django.utils.text import slugify
 
 from django.db import models
 
-# Create your models here.
-
 
 class SEOBaseModel(models.Model):
     # SEO fields
@@ -12,14 +10,25 @@ class SEOBaseModel(models.Model):
     desc = models.TextField(max_length=160, verbose_name='توضیحات صفحه', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        if not self.id:  # If instance is new, id is not set yet.
-            super(SEOBaseModel, self).save(*args, **kwargs)  # Save to set an ID.
-        if not self.slug:
-            self.slug = str(self.id)  # Now we can use the ID to set slug.
-            super(SEOBaseModel, self).save(*args, **kwargs)  # Save again with slug.
-        else:   # Slug exists, just save.
+        # QuerySet.create() passes force_insert=True; we may save twice (id then slug),
+        # so never keep force_insert across both writes.
+        kwargs.pop('force_insert', None)
+
+        if not self.pk:
+            if not self.slug:
+                super().save(*args, **kwargs)
+                self.slug = str(self.pk)
+                super().save(*args, **kwargs)
+                return
             self.slug = slugify(self.slug, allow_unicode=True)
-            super(SEOBaseModel, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
+            return
+
+        if not self.slug:
+            self.slug = str(self.pk)
+        else:
+            self.slug = slugify(self.slug, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     class Meta:
         abstract = True

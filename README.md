@@ -59,3 +59,23 @@ docker compose exec web python manage.py repair_nested_billboard_paths
 ```
 
 On production (cPanel), run the same `manage.py` commands after uploading the new code. Do not flush the database or wipe `upload/` media.
+
+## Tests
+
+Tests live under `tests/` and use SQLite via `core.test_settings` (no MySQL required).
+
+```bash
+pip install -r requirements-dev.txt
+DJANGO_SETTINGS_MODULE=core.test_settings coverage run manage.py test tests -v 2
+coverage report -m
+```
+
+With Docker (bypasses the MySQL entrypoint):
+
+```bash
+docker compose run --rm --no-deps --entrypoint bash \
+  -e DJANGO_SETTINGS_MODULE=core.test_settings web \
+  -c "pip install -q coverage && coverage run manage.py test tests -v 2 && coverage report -m"
+```
+
+Coverage fails under 90% for application packages (see `.coveragerc`).
