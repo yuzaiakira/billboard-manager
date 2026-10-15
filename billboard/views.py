@@ -20,20 +20,17 @@ from reservation.models import RentalListModel
 
     
 class Home(View):
-    queryset = BillboardModel.get_recent(9)
+    recent_count = 9
 
     def get(self, request):
-
         context = self.get_context_data()
-
         return render(request, 'template/home/home.html', context)
 
     def get_context_data(self, *args, **kwargs):
-        context = {
-            'queryset': self.queryset,
-            'search_form': SearchForm()
+        return {
+            'queryset': BillboardModel.get_recent(self.recent_count),
+            'search_form': SearchForm(),
         }
-        return context
 
 
 class BillboardDetail(DetailView):

@@ -14,6 +14,5 @@ class BillboardManager(models.Manager):
         """Billboards visible in public lists (excludes draft/archive)."""
         from billboard.models import BillboardModel
 
-        return self.get_queryset().exclude(
-            billboard_status__in=BillboardModel.STATUSES_HIDDEN_FROM_PUBLIC
-        )
+        hidden = [int(s) for s in BillboardModel.STATUSES_HIDDEN_FROM_PUBLIC]
+        return self.get_queryset().exclude(billboard_status__in=hidden)
