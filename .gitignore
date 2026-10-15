@@ -180,4 +180,8 @@ upload/*
 # i comming soon add MIT tempalte
 static/
 !templates/static/
-.cursor/
+# Ignore .cursor contents, but allow selected rules (parent dirs must be un-ignored first)
+.cursor/*
+!.cursor/rules/
+.cursor/rules/*
+!.cursor/rules/maintain-test-coverage.mdc

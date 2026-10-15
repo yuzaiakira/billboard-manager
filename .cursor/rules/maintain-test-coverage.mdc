@@ -1,0 +1,39 @@
+---
+description: After any code change, add/update tests and keep coverage high
+alwaysApply: true
+---
+
+# Maintain Test Coverage
+
+After finishing any feature, bugfix, or refactor that changes application behavior, **add or update tests in the same change**. Do not leave coverage gaps for new or modified code.
+
+## Where tests live
+
+- Put tests under `tests/` organized by app (e.g. `tests/billboard/`, `tests/account/`).
+- Reuse helpers from `tests/helpers/` (factories, media fixtures).
+- Do not add new tests to empty app-level `*/tests.py` stubs.
+
+## What to cover
+
+- New/changed public functions, models, forms, views, admin logic, management commands, and templatetags.
+- Edge cases and failure paths (validation errors, 404/403, empty input, permissions).
+- Prefer `django.test.TestCase` / `SimpleTestCase` / `Client` (same style as existing suite).
+
+## Done checklist
+
+Before considering the task complete:
+
+1. Add or update tests for the changed behavior.
+2. Run: `DJANGO_SETTINGS_MODULE=core.test_settings coverage run manage.py test tests -v 2 && coverage report -m`
+3. Keep overall coverage at or above the `.coveragerc` `fail_under` threshold (90%).
+4. Fix failing or missing coverage before finishing — do not ship untested behavior.
+
+## Examples
+
+```text
+❌ BAD: Implement media library path resolve, no tests
+✅ GOOD: Implement resolve + tests for traversal, missing file, happy path
+
+❌ BAD: Change publicly_listed() filter, skip tests
+✅ GOOD: Update manager tests for DRAFT/ARCHIVE/UNAVAILABLE
+```
