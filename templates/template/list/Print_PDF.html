@@ -92,35 +92,12 @@
             background-color: #5927e3b5;
         }
 
-        /* Brand header/footer images (screen preview) */
+        /* Brand header/footer: hidden on screen, visible only when printing */
         .pdf-brand-header,
-        .pdf-brand-footer {
-            width: 100%;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-        .pdf-brand-header {
-            margin-bottom: 16px;
-        }
-        .pdf-brand-footer {
-            margin-top: 16px;
-        }
-        .pdf-brand-header img,
-        .pdf-brand-footer img,
+        .pdf-brand-footer,
         .header-img,
         .footer-img {
-            display: block;
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            margin: 0;
-        }
-        .list-print.has-brand .container {
-            margin-top: 8px;
-            margin-bottom: 8px;
+            display: none;
         }
 
         /* print styles */
@@ -134,11 +111,14 @@
 
             .pdf-brand-header,
             .pdf-brand-footer {
+                display: block;
                 position: fixed;
                 left: 0;
                 right: 0;
                 width: 100%;
                 margin: 0;
+                padding: 0;
+                text-align: center;
                 z-index: 10;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
