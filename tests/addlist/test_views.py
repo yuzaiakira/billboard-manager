@@ -5,8 +5,6 @@ from django.urls import reverse
 from addlist.models import ListsModel
 from addlist.templatetags.check_in_list import on_list
 from addlist.views import WatchList, normalize_decimal
-from siteoption.constants import SITE_NAME
-from siteoption.utils.functions import set_option
 from tests.helpers import make_admin, make_billboard, make_user
 
 
@@ -66,7 +64,6 @@ class AddListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_pdf_brand_header_footer_when_enabled(self):
-        set_option(SITE_NAME, 'Anten Brand')
         ListsModel.objects.create(user=self.user, billboard=self.bb)
         response = self.client.get(
             reverse('get-pdf'),
@@ -76,7 +73,8 @@ class AddListViewTests(TestCase):
         content = response.content.decode()
         self.assertIn('class="pdf-brand-header header"', content)
         self.assertIn('class="pdf-brand-footer footer"', content)
-        self.assertIn('Anten Brand', content)
+        self.assertIn('template/images/print/header.png', content)
+        self.assertIn('template/images/print/footer.png', content)
         self.assertIn('list-print has-brand', content)
 
     def test_pdf_brand_header_footer_absent_when_disabled(self):
@@ -89,6 +87,8 @@ class AddListViewTests(TestCase):
         content = response.content.decode()
         self.assertNotIn('class="pdf-brand-header header"', content)
         self.assertNotIn('class="pdf-brand-footer footer"', content)
+        self.assertNotIn('template/images/print/header.png', content)
+        self.assertNotIn('template/images/print/footer.png', content)
         self.assertNotIn('list-print has-brand', content)
 
     def test_watchlist_context_not_shared_across_users(self):

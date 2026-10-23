@@ -92,50 +92,35 @@
             background-color: #5927e3b5;
         }
 
-        /* Brand header/footer (screen + print) */
+        /* Brand header/footer images (screen preview) */
         .pdf-brand-header,
         .pdf-brand-footer {
-            display: flex;
-            align-items: center;
-            justify-content: center;
             width: 100%;
-            background-color: #ff8000;
-            color: #ffffff;
-            font-family: 'Vazirmatn FD', 'Vazirmatn', sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
         .pdf-brand-header {
-            min-height: 72px;
-            padding: 16px 24px;
-            margin-bottom: 24px;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .pdf-brand-header .pdf-brand-name {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0;
-        }
-        .pdf-brand-header .pdf-brand-label {
-            font-size: 14px;
-            font-weight: 400;
-            opacity: 0.95;
-            margin: 0;
+            margin-bottom: 16px;
         }
         .pdf-brand-footer {
-            min-height: 56px;
-            padding: 12px 24px;
-            margin-top: 24px;
+            margin-top: 16px;
         }
-        .pdf-brand-footer .pdf-brand-name {
-            font-size: 16px;
-            font-weight: 600;
+        .pdf-brand-header img,
+        .pdf-brand-footer img,
+        .header-img,
+        .footer-img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            height: auto;
             margin: 0;
         }
         .list-print.has-brand .container {
-            margin-top: 16px;
-            margin-bottom: 16px;
+            margin-top: 8px;
+            margin-bottom: 8px;
         }
 
         /* print styles */
@@ -167,14 +152,27 @@
                 bottom: 0;
             }
 
+            .pdf-brand-header img,
+            .pdf-brand-footer img,
+            .header-img,
+            .footer-img {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+                height: auto !important;
+                max-height: none !important;
+                margin: 0 !important;
+            }
+
             .list-print{
                 display: block;
             }
             .list-print.has-brand .container {
-                margin-top: 100px;
-                margin-bottom: 80px;
+                margin-top: 140px;
+                margin-bottom: 120px;
             }
-            img {
+            .property .image img,
+            .image a img {
                 margin-top: 2rem;
                 max-width: 100%;
                 max-height: 28vh;
@@ -223,8 +221,7 @@
     <div class="container">
         {% if pdf_form.brand.value %}
         <div class="pdf-brand-header header">
-            <p class="pdf-brand-name">{{ site_name|default:"siteName" }}</p>
-            <p class="pdf-brand-label">فهرست بیلبورد</p>
+            <img src="{% static 'template/images/print/header.png' %}" class="header-img" alt="{{ site_name|default:'header' }}">
         </div>
         {% endif %}
         <div class="property">
@@ -298,7 +295,7 @@
         </div>
         {% if pdf_form.brand.value %}
         <div class="pdf-brand-footer footer">
-            <p class="pdf-brand-name">{{ site_name|default:"siteName" }}</p>
+            <img src="{% static 'template/images/print/footer.png' %}" class="footer-img" alt="{{ site_name|default:'footer' }}">
         </div>
         {% endif %}
     </div>
