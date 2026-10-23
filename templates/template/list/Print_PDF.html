@@ -100,13 +100,20 @@
             display: none;
         }
 
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
         /* print styles */
         @media print {
             body, html {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                height: 100%;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 210mm;
+                min-height: 297mm;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
             }
 
             .pdf-brand-header,
@@ -115,7 +122,7 @@
                 position: fixed;
                 left: 0;
                 right: 0;
-                width: 100%;
+                width: 210mm;
                 margin: 0;
                 padding: 0;
                 text-align: center;
@@ -137,8 +144,8 @@
             .header-img,
             .footer-img {
                 display: block;
-                width: 100%;
-                max-width: 100%;
+                width: 210mm;
+                max-width: 210mm;
                 height: auto !important;
                 max-height: none !important;
                 margin: 0 !important;
@@ -146,37 +153,43 @@
 
             .list-print{
                 display: block;
+                width: 210mm;
+                margin: 0;
+                padding: 0;
             }
             .list-print.has-brand .container {
-                margin-top: 140px;
-                margin-bottom: 120px;
+                margin-top: 45mm;
+                margin-bottom: 40mm;
             }
             .property .image img,
             .image a img {
-                margin-top: 2rem;
+                margin-top: 1rem;
                 max-width: 100%;
-                max-height: 28vh;
+                max-height: 120mm;
                 height: auto !important;
             }
             .container{
                 position: relative;
-                max-width: 100%;
-                max-height: 100%;
-                padding: 0;
+                width: 210mm;
+                max-width: 210mm;
+                margin: 0;
+                padding: 0 10mm;
+                box-sizing: border-box;
             }
             #btn-section{
-                display: none;
+                display: none !important;
             }
 
             .pagebreak {
                 page-break-before: always;
+                break-before: page;
                 clear: both;
             }
 
             .image img {
                 max-width: 100%;
                 height: auto;
-                max-height: 500px;
+                max-height: 120mm;
                 object-fit: contain;
             }
 
@@ -185,9 +198,8 @@
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
-                width: 80%;
-                height: 80%;
-                margin: 50px auto;
+                width: 100%;
+                margin: 0 auto;
                 text-align: center;
             }
         }
