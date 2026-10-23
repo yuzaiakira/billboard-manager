@@ -85,15 +85,22 @@
             transition: all 0.3s ease-out;
             cursor: pointer;
         }
-        .container#btn_section{
-            margin: 50px;
-        }
-        .container .row .button {
-            margin: 10px;
-        }
-
         #btn-section{
             display: block;
+            margin: 50px auto;
+            max-width: 960px;
+        }
+        #btn-section .btn-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+        #btn-section .button {
+            margin: 0;
+            flex: 0 0 auto;
         }
         .button:hover{
             background-color: #dc3545b5;
@@ -361,7 +368,7 @@
 </div>
 
 <div class="container" id="btn-section">
-    <div class="row">
+    <div class="btn-actions">
         <button type="button" class="button button--effect download-pdf" id="download-pdf">
             دانلود PDF
         </button>

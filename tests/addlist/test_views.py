@@ -62,6 +62,11 @@ class AddListViewTests(TestCase):
         ListsModel.objects.create(user=self.user, billboard=self.bb)
         response = self.client.get(reverse('get-pdf'), {'billboard_pic': 'on', 'city': 'on'})
         self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn('id="btn-section"', content)
+        self.assertIn('class="btn-actions"', content)
+        self.assertIn('id="download-pdf"', content)
+        self.assertIn('id="get-pdf"', content)
 
     def test_pdf_brand_header_footer_when_enabled(self):
         ListsModel.objects.create(user=self.user, billboard=self.bb)
