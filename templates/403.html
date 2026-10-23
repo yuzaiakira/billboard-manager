@@ -1,0 +1,12 @@
+{% extends "errors/base.html" %}
+
+{% block title %}دسترسی غیرمجاز{% endblock %}
+{% block error_code %}403{% endblock %}
+{% block error_title %}دسترسی مجاز نیست{% endblock %}
+{% block error_message %}
+شما اجازه مشاهده این صفحه را ندارید. اگر فکر می‌کنید این اشتباه است، وارد حساب کاربری شوید یا با پشتیبانی تماس بگیرید.
+{% endblock %}
+{% block error_actions %}
+<a class="error-btn error-btn--primary" href="{% url 'home' %}">بازگشت به خانه</a>
+<a class="error-btn error-btn--ghost" href="{% url 'login' %}">ورود به حساب</a>
+{% endblock %}

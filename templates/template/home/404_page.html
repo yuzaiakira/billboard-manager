@@ -1,3 +1,13 @@
-<div class="not-found-section">
-    <p class="not-found-section__text">متاسفانه چیزی یافت نشد.</p>
+<div class="w-full max-w-lg mx-auto text-center py-16 px-4">
+    <div class="mx-auto mb-6 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+        <i class="fas fa-search text-primary text-2xl" aria-hidden="true"></i>
+    </div>
+    <p class="text-2xl font-bold text-dark mb-3">چیزی یافت نشد</p>
+    <p class="text-gray-600 mb-8 leading-relaxed">
+        متأسفانه با فیلترهای فعلی بیلبوردی پیدا نشد. فیلترها را تغییر دهید یا همه بیلبوردها را ببینید.
+    </p>
+    <a href="{% url 'billboard-list' %}"
+       class="btn-hover inline-block bg-primary hover:bg-secondary text-white font-medium py-2.5 px-6 rounded-lg transition duration-300">
+        مشاهده همه بیلبوردها
+    </a>
 </div>

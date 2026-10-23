@@ -1,0 +1,11 @@
+{% extends "errors/base.html" %}
+
+{% block title %}خطای سرور{% endblock %}
+{% block error_code %}500{% endblock %}
+{% block error_title %}مشکلی پیش آمده است{% endblock %}
+{% block error_message %}
+در پردازش درخواست خطایی رخ داد. چند لحظه دیگر دوباره تلاش کنید. اگر مشکل ادامه داشت با پشتیبانی تماس بگیرید.
+{% endblock %}
+{% block error_actions %}
+<a class="error-btn error-btn--primary" href="{% url 'home' %}">بازگشت به خانه</a>
+{% endblock %}
