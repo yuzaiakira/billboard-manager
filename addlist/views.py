@@ -1,7 +1,13 @@
-from django.http import JsonResponse, HttpResponse
+import json
+import logging
+
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 
 from openpyxl import Workbook
 from openpyxl.styles import Font, PatternFill, Border, Side, Alignment
@@ -9,8 +15,17 @@ from openpyxl.utils import get_column_letter
 
 from .models import ListsModel
 from .forms import PdfExportFieldForm, ExcelExportFieldForm
+from .pdf import PdfImageOptimizer, WatchlistPdfGenerator
 from billboard.utils import billboard_bool_value
-# Create your views here.
+
+logger = logging.getLogger(__name__)
+
+WATCHLIST_SELECT_RELATED = (
+    'billboard',
+    'billboard__city',
+    'billboard__city__state',
+    'billboard__BillboardFinalPriceModel',
+)
 
 
 def normalize_decimal(value):
@@ -70,7 +85,9 @@ class WatchList(LoginRequiredMixin, View):
     context['excel_form'] = ExcelExportFieldForm()
 
     def get(self, request):
-        self.context['object_list'] = self.model.objects.filter(user=request.user)
+        self.context['object_list'] = self.model.objects.filter(user=request.user).select_related(
+            *WATCHLIST_SELECT_RELATED
+        )
         self.context['title'] = "لیست بیلبورد های انتخاب شده"
         # TODO: add only
         return render(request, self.template, self.context)
@@ -87,17 +104,112 @@ class RemoveList(LoginRequiredMixin, View):
         return redirect('WatchList')
 
 
-class PrintPDF(WatchList):
+def _watchlist_qs(user):
+    return ListsModel.objects.filter(user=user).select_related(*WATCHLIST_SELECT_RELATED)
+
+
+def _pdf_field_flags_from_form(form):
+    """Return boolean field flags; fall back to form initials when unbound/invalid."""
+    if form.is_valid():
+        return {name: bool(form.cleaned_data.get(name)) for name in form.fields}
+    return {name: bool(field.initial) for name, field in form.fields.items()}
+
+
+@method_decorator(ensure_csrf_cookie, name='dispatch')
+class PrintPDF(LoginRequiredMixin, View):
+    """HTML print preview with optimized images (editable before browser print)."""
+
+    http_method_names = ['get']
     template = 'template/list/Print_PDF.html'
+    model = ListsModel
 
     def get(self, request, *args, **kwargs):
-        if request.method == 'GET':
-            self.context['pdf_form'] = PdfExportFieldForm(request.GET)
-            if self.context['pdf_form'].is_valid():
-                print(self.context['pdf_form'].cleaned_data['billboard_pic'])
-                print(self.context['pdf_form'].cleaned_data)
+        pdf_form = PdfExportFieldForm(request.GET)
+        field_flags = _pdf_field_flags_from_form(pdf_form)
+        object_list = list(_watchlist_qs(request.user))
 
-        return super().get(request, *args, **kwargs)
+        optimizer = PdfImageOptimizer()
+        for item in object_list:
+            _path, url = optimizer.optimize_billboard_image(item.billboard)
+            item.print_pic_url = url or item.billboard.billboard_pic_url
+
+        brand_header_url = brand_footer_url = None
+        if field_flags.get('brand'):
+            _hp, brand_header_url, _fp, brand_footer_url = optimizer.optimize_brand_assets()
+
+        context = {
+            'object_list': object_list,
+            'pdf_form': pdf_form,
+            'title': 'لیست بیلبورد های انتخاب شده',
+            'field_flags': field_flags,
+            'brand_header_url': brand_header_url,
+            'brand_footer_url': brand_footer_url,
+            'download_pdf_url': reverse('download-pdf'),
+        }
+        return render(request, self.template, context)
+
+
+class DownloadPDF(LoginRequiredMixin, View):
+    """Server-side PDF download (compressed images). Accepts GET flags or POST with overrides."""
+
+    http_method_names = ['get', 'post']
+    model = ListsModel
+
+    def get(self, request, *args, **kwargs):
+        form = PdfExportFieldForm(request.GET)
+        field_flags = _pdf_field_flags_from_form(form)
+        return self._build_response(request, field_flags, overrides={})
+
+    def post(self, request, *args, **kwargs):
+        overrides = {}
+        field_flags = None
+
+        content_type = (request.content_type or '').split(';')[0].strip().lower()
+        if content_type == 'application/json':
+            try:
+                payload = json.loads(request.body.decode('utf-8') or '{}')
+            except (TypeError, ValueError, UnicodeDecodeError):
+                return HttpResponseBadRequest('Invalid JSON')
+            raw_fields = payload.get('fields') or {}
+            field_flags = {name: bool(raw_fields.get(name, field.initial))
+                           for name, field in PdfExportFieldForm.base_fields.items()}
+            raw_overrides = payload.get('overrides') or {}
+            if isinstance(raw_overrides, dict):
+                overrides = {
+                    str(k): {sk: str(sv) for sk, sv in (v or {}).items()}
+                    for k, v in raw_overrides.items()
+                    if isinstance(v, dict)
+                }
+        else:
+            form = PdfExportFieldForm(request.POST)
+            field_flags = _pdf_field_flags_from_form(form)
+            overrides_raw = request.POST.get('overrides')
+            if overrides_raw:
+                try:
+                    parsed = json.loads(overrides_raw)
+                    if isinstance(parsed, dict):
+                        overrides = {
+                            str(k): {sk: str(sv) for sk, sv in (v or {}).items()}
+                            for k, v in parsed.items()
+                            if isinstance(v, dict)
+                        }
+                except (TypeError, ValueError):
+                    return HttpResponseBadRequest('Invalid overrides JSON')
+
+        return self._build_response(request, field_flags, overrides=overrides)
+
+    def _build_response(self, request, field_flags, overrides):
+        items = list(_watchlist_qs(request.user))
+        result = WatchlistPdfGenerator().execute(items, field_flags=field_flags, overrides=overrides)
+        if not result.get('success'):
+            logger.warning('PDF download failed: %s', result.get('message'))
+            return HttpResponseBadRequest(result.get('message') or 'PDF generation failed')
+
+        pdf_bytes = result['pdf_bytes']
+        response = HttpResponse(pdf_bytes, content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="billboard-list.pdf"'
+        response['Content-Length'] = str(len(pdf_bytes))
+        return response
 
 
 class ExportExcel(LoginRequiredMixin, View):

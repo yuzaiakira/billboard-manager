@@ -73,9 +73,12 @@ class AddListViewTests(TestCase):
         content = response.content.decode()
         self.assertIn('class="pdf-brand-header header"', content)
         self.assertIn('class="pdf-brand-footer footer"', content)
-        self.assertIn('template/images/print/header.png', content)
-        self.assertIn('template/images/print/footer.png', content)
         self.assertIn('list-print has-brand', content)
+        # Brand chrome must appear once (not per billboard)
+        self.assertEqual(content.count('class="pdf-brand-header header"'), 1)
+        self.assertEqual(content.count('class="pdf-brand-footer footer"'), 1)
+        self.assertIn('id="download-pdf"', content)
+        self.assertIn(reverse('download-pdf'), content)
 
     def test_pdf_brand_header_footer_absent_when_disabled(self):
         ListsModel.objects.create(user=self.user, billboard=self.bb)
@@ -87,9 +90,19 @@ class AddListViewTests(TestCase):
         content = response.content.decode()
         self.assertNotIn('class="pdf-brand-header header"', content)
         self.assertNotIn('class="pdf-brand-footer footer"', content)
-        self.assertNotIn('template/images/print/header.png', content)
-        self.assertNotIn('template/images/print/footer.png', content)
         self.assertNotIn('list-print has-brand', content)
+
+    def test_pdf_preview_uses_print_pic_url(self):
+        from tests.helpers import make_uploaded_image
+        self.bb.billboard_pic = make_uploaded_image('preview.jpg', size=(640, 480))
+        self.bb.save()
+        ListsModel.objects.create(user=self.user, billboard=self.bb)
+        response = self.client.get(reverse('get-pdf'), {'billboard_pic': 'on'})
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        item = response.context['object_list'][0]
+        self.assertTrue(getattr(item, 'print_pic_url', None))
+        self.assertIn(item.print_pic_url, content)
 
     def test_watchlist_context_not_shared_across_users(self):
         other = make_user(username='other_lister', password='pass12345')

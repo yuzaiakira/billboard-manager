@@ -67,6 +67,7 @@
             outline: 0px;
             -webkit-transition: all 0.3s ease-out;
             transition: all 0.3s ease-out;
+            cursor: pointer;
         }
         .container#btn_section{
             margin: 50px;
@@ -81,6 +82,10 @@
         .button:hover{
             background-color: #dc3545b5;
         }
+        .button:disabled{
+            opacity: 0.7;
+            cursor: wait;
+        }
         .exit{
             color: #ffffff;
             -webkit-box-shadow: 0px 10px 24px 0px rgba(89, 39, 227, 0.8);
@@ -90,6 +95,14 @@
         .exit:hover{
             color: #fff;
             background-color: #5927e3b5;
+        }
+        .download-pdf{
+            background-color: #0d6efd;
+            -webkit-box-shadow: 0px 4px 24px 0px rgba(13, 110, 253, 0.45);
+            box-shadow: 0px 4px 24px 0px rgba(13, 110, 253, 0.45);
+        }
+        .download-pdf:hover{
+            background-color: #0d6efdb5;
         }
 
         /* Brand header/footer: hidden on screen, visible only when printing */
@@ -157,7 +170,7 @@
                 margin: 0;
                 padding: 0;
             }
-            .list-print.has-brand .container {
+            .list-print.has-brand .container.pdf-page {
                 margin-top: 45mm;
                 margin-bottom: 40mm;
             }
@@ -168,7 +181,7 @@
                 max-height: 120mm;
                 height: auto !important;
             }
-            .container{
+            .container.pdf-page{
                 position: relative;
                 width: 210mm;
                 max-width: 210mm;
@@ -208,111 +221,202 @@
 
 </head>
 <body>
-<div class="list-print{% if pdf_form.brand.value %} has-brand{% endif %}">
+{% if field_flags.brand %}
+<div class="pdf-brand-header header">
+    <img src="{% if brand_header_url %}{{ brand_header_url }}{% else %}{% static 'template/images/print/header.png' %}{% endif %}" class="header-img" alt="{{ site_name|default:'header' }}">
+</div>
+<div class="pdf-brand-footer footer">
+    <img src="{% if brand_footer_url %}{{ brand_footer_url }}{% else %}{% static 'template/images/print/footer.png' %}{% endif %}" class="footer-img" alt="{{ site_name|default:'footer' }}">
+</div>
+{% endif %}
+
+<div class="list-print{% if field_flags.brand %} has-brand{% endif %}"
+     id="pdf-preview"
+     data-download-url="{{ download_pdf_url }}"
+     data-fields='{"billboard_pic":{% if field_flags.billboard_pic %}true{% else %}false{% endif %},"id_code":{% if field_flags.id_code %}true{% else %}false{% endif %},"city":{% if field_flags.city %}true{% else %}false{% endif %},"name":{% if field_flags.name %}true{% else %}false{% endif %},"description":{% if field_flags.description %}true{% else %}false{% endif %},"address":{% if field_flags.address %}true{% else %}false{% endif %},"has_power":{% if field_flags.has_power %}true{% else %}false{% endif %},"size":{% if field_flags.size %}true{% else %}false{% endif %},"reservation_date":{% if field_flags.reservation_date %}true{% else %}false{% endif %},"brand":{% if field_flags.brand %}true{% else %}false{% endif %},"price":{% if field_flags.price %}true{% else %}false{% endif %}}'>
     {% for item in object_list %}
-    <div class="container">
-        {% if pdf_form.brand.value %}
-        <div class="pdf-brand-header header">
-            <img src="{% static 'template/images/print/header.png' %}" class="header-img" alt="{{ site_name|default:'header' }}">
-        </div>
-        {% endif %}
+    <div class="container pdf-page" data-billboard-id="{{ item.billboard.id }}">
         <div class="property">
-            {% if pdf_form.billboard_pic.value %}
+            {% if field_flags.billboard_pic %}
             <div class="image">
-                <a href="{{ item.billboard.billboard.get_absolute_url }}">
-                    <img src="{{ item.billboard.billboard_pic_url }}" alt="{{ item.billboard.name }}" />
+                <a href="{{ item.billboard.get_absolute_url }}">
+                    <img src="{{ item.print_pic_url }}" alt="{{ item.billboard.name }}" loading="lazy" />
                 </a>
             </div>
             {% endif %}
             <div class="property__grid">
-                {% if pdf_form.id_code.value %}
+                {% if field_flags.id_code %}
                 <div class="property-row">
                     <span class="property-name">کد بیلبورد: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.id }}</span>
+                    <span class="property-value" contenteditable data-field="id_code">{{ item.billboard.id }}</span>
                 </div>
                 {% endif %}
-                {% if pdf_form.name.value %}
+                {% if field_flags.name %}
                 <div class="property-row">
                     <span class="property-name">نام: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.name }}</span>
+                    <span class="property-value" contenteditable data-field="name">{{ item.billboard.name }}</span>
                 </div>
                 {% endif %}
-                {% if pdf_form.description.value %}
+                {% if field_flags.description %}
                 <div class="property-row">
                     <span class="property-name">توضیحات: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.description }}</span>
+                    <span class="property-value" contenteditable data-field="description">{{ item.billboard.description }}</span>
                 </div>
                 {% endif %}
-                {% if pdf_form.address.value %}
+                {% if field_flags.address %}
                 <div class="property-row">
                     <span class="property-name">محل بیلبورد: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
+                    <span class="property-value" contenteditable data-field="address_location">{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
                 </div>
                 <div class="property-row">
                     <span class="property-name">آدرس: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.address }}</span>
+                    <span class="property-value" contenteditable data-field="address">{{ item.billboard.address }}</span>
                 </div>
                 {% endif %}
-                {% if pdf_form.has_power.value %}
+                {% if field_flags.has_power %}
                 <div class="property-col">
                     <div class="property-row">
                         <span class="property-name">وضعیت روشنایی: </span>
-                        <span class="property-value" contenteditable>{{ item.billboard.has_power|boolean_value }}</span>
+                        <span class="property-value" contenteditable data-field="has_power">{{ item.billboard.has_power|boolean_value }}</span>
                     </div>
                 </div>
                 {% endif %}
-                {% if pdf_form.size.value %}
+                {% if field_flags.size %}
                 <div class="property-row">
                     <span class="property-name">طول: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.billboard_length|normalize_decimal }}</span>
+                    <span class="property-value" contenteditable data-field="size_length">{{ item.billboard.billboard_length|normalize_decimal }}</span>
                 </div>
                 <div class="property-row">
                     <span class="property-name">عرض: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.billboard_width|normalize_decimal }}</span>
+                    <span class="property-value" contenteditable data-field="size_width">{{ item.billboard.billboard_width|normalize_decimal }}</span>
                 </div>
                 {% endif %}
-                {% if pdf_form.reservation_date.value %}
+                {% if field_flags.reservation_date %}
                 <div class="property-row">
                     <span class="property-name">تاریخ قابل اجاره: </span>
-                    <span class="property-value" contenteditable>{{ item.billboard.reservation_date|jalali_slash }}</span>
+                    <span class="property-value" contenteditable data-field="reservation_date">{{ item.billboard.reservation_date|jalali_slash }}</span>
                 </div>
                 {% endif %}
-                {% if pdf_form.price.value %}
+                {% if field_flags.price %}
                 <div class="property-row">
                     <span class="property-name">قیمت: </span>
-                    <span class="property-value" contenteditable>{% if item.billboard.BillboardFinalPriceModel and item.billboard.BillboardFinalPriceModel.final_price %}{{ item.billboard.BillboardFinalPriceModel.final_price|intcomma }}{% else %}{{ item.billboard.price|intcomma }}{% endif %} تومان</span>
+                    <span class="property-value" contenteditable data-field="price">{% if item.billboard.BillboardFinalPriceModel and item.billboard.BillboardFinalPriceModel.final_price %}{{ item.billboard.BillboardFinalPriceModel.final_price|intcomma }}{% else %}{{ item.billboard.price|intcomma }}{% endif %} تومان</span>
                 </div>
                 {% endif %}
             </div>
         </div>
-        {% if pdf_form.brand.value %}
-        <div class="pdf-brand-footer footer">
-            <img src="{% static 'template/images/print/footer.png' %}" class="footer-img" alt="{{ site_name|default:'footer' }}">
-        </div>
-        {% endif %}
     </div>
-    <div class="pagebreak"></div>
+    {% if not forloop.last %}<div class="pagebreak"></div>{% endif %}
     {% endfor %}
 </div>
 
 <div class="container" id="btn-section">
     <div class="row">
-        <button class="button button--effect" id="get-pdf">
-            گرفتن خروجی
+        <button type="button" class="button button--effect download-pdf" id="download-pdf">
+            دانلود PDF
+        </button>
+        <button type="button" class="button button--effect" id="get-pdf">
+            چاپ / ذخیره از مرورگر
         </button>
         <a class="button button--effect exit" href="{% url 'WatchList' %}">
             خروج
         </a>
-
     </div>
 </div>
 
-
+{% csrf_token %}
 <script>
-    document.getElementById('get-pdf').addEventListener('click', function () {
-        window.print()
-    })
+(function () {
+    var printBtn = document.getElementById('get-pdf');
+    var downloadBtn = document.getElementById('download-pdf');
+    var preview = document.getElementById('pdf-preview');
 
+    if (printBtn) {
+        printBtn.addEventListener('click', function () {
+            window.print();
+        });
+    }
+
+    function getCookie(name) {
+        var match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+        return match ? decodeURIComponent(match[2]) : '';
+    }
+
+    function collectOverrides() {
+        var overrides = {};
+        if (!preview) return overrides;
+        var pages = preview.querySelectorAll('.pdf-page[data-billboard-id]');
+        pages.forEach(function (page) {
+            var id = page.getAttribute('data-billboard-id');
+            if (!id) return;
+            var fields = {};
+            page.querySelectorAll('[data-field]').forEach(function (el) {
+                var key = el.getAttribute('data-field');
+                if (key) {
+                    fields[key] = (el.textContent || '').trim();
+                }
+            });
+            overrides[id] = fields;
+        });
+        return overrides;
+    }
+
+    function parseFields() {
+        if (!preview) return {};
+        try {
+            return JSON.parse(preview.getAttribute('data-fields') || '{}');
+        } catch (e) {
+            return {};
+        }
+    }
+
+    if (downloadBtn && preview) {
+        downloadBtn.addEventListener('click', function () {
+            var url = preview.getAttribute('data-download-url');
+            if (!url) return;
+
+            downloadBtn.disabled = true;
+            var originalText = downloadBtn.textContent;
+            downloadBtn.textContent = 'در حال ساخت PDF...';
+
+            var payload = {
+                fields: parseFields(),
+                overrides: collectOverrides()
+            };
+
+            fetch(url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || ''
+                },
+                body: JSON.stringify(payload)
+            }).then(function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (t) {
+                        throw new Error(t || ('HTTP ' + response.status));
+                    });
+                }
+                return response.blob();
+            }).then(function (blob) {
+                var a = document.createElement('a');
+                var objectUrl = URL.createObjectURL(blob);
+                a.href = objectUrl;
+                a.download = 'billboard-list.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(objectUrl);
+            }).catch(function (err) {
+                alert('خطا در دانلود PDF: ' + (err && err.message ? err.message : err));
+            }).finally(function () {
+                downloadBtn.disabled = false;
+                downloadBtn.textContent = originalText;
+            });
+        });
+    }
+})();
 </script>
 </body>
 </html>
