@@ -17,11 +17,27 @@
         .list-print{
             display: block;
         }
+        .pdf-page-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 70vh;
+        }
+        .property {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            text-align: center;
+        }
         .image a img{
             height: 500px;
         }
         .property__grid{
             margin-top: 40px;
+            text-align: center;
         }
         .property-row {
             margin-top: 15px;
@@ -115,7 +131,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 0;
+            margin: 0 !important;
         }
 
         /* print styles */
@@ -129,10 +145,34 @@
                 print-color-adjust: exact;
             }
 
+            .list-print{
+                display: block;
+                width: 210mm;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Per-page brand bars (fixed headers often drop in Chrome print) */
+            .pdf-page {
+                position: relative;
+                width: 210mm;
+                max-width: 210mm;
+                min-height: 297mm;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                page-break-after: always;
+                break-after: page;
+            }
+            .pdf-page:last-child {
+                page-break-after: auto;
+                break-after: auto;
+            }
+
             .pdf-brand-header,
             .pdf-brand-footer {
                 display: block;
-                position: fixed;
+                position: absolute;
                 left: 0;
                 right: 0;
                 width: 210mm;
@@ -157,52 +197,55 @@
             .header-img,
             .footer-img {
                 display: block;
-                width: 210mm;
-                max-width: 210mm;
+                width: 210mm !important;
+                max-width: 210mm !important;
                 height: auto !important;
                 max-height: none !important;
                 margin: 0 !important;
+                padding: 0 !important;
             }
 
-            .list-print{
-                display: block;
+            .pdf-page-body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                box-sizing: border-box;
+                min-height: 297mm;
                 width: 210mm;
-                margin: 0;
-                padding: 0;
             }
-            .list-print.has-brand .container.pdf-page {
-                margin-top: 45mm;
-                margin-bottom: 40mm;
+
+            .list-print.has-brand .pdf-page-body {
+                padding-top: 38mm;
+                padding-bottom: 38mm;
+                padding-left: 8mm;
+                padding-right: 8mm;
+                min-height: 297mm;
             }
+
+            .list-print:not(.has-brand) .pdf-page-body {
+                padding: 8mm 10mm;
+            }
+
             .property .image img,
             .image a img {
-                margin-top: 1rem;
+                margin-top: 0.5rem;
                 max-width: 100%;
-                max-height: 120mm;
+                max-height: 110mm;
                 height: auto !important;
-            }
-            .container.pdf-page{
-                position: relative;
-                width: 210mm;
-                max-width: 210mm;
-                margin: 0;
-                padding: 0 10mm;
-                box-sizing: border-box;
             }
             #btn-section{
                 display: none !important;
             }
 
             .pagebreak {
-                page-break-before: always;
-                break-before: page;
-                clear: both;
+                display: none;
             }
 
             .image img {
                 max-width: 100%;
                 height: auto;
-                max-height: 120mm;
+                max-height: 110mm;
                 object-fit: contain;
             }
 
@@ -215,98 +258,105 @@
                 margin: 0 auto;
                 text-align: center;
             }
+
+            .property__grid {
+                margin-top: 16px;
+                text-align: center;
+            }
         }
 
     </style>
 
 </head>
 <body>
-{% if field_flags.brand %}
-<div class="pdf-brand-header header">
-    <img src="{% if brand_header_url %}{{ brand_header_url }}{% else %}{% static 'template/images/print/header.png' %}{% endif %}" class="header-img" alt="{{ site_name|default:'header' }}">
-</div>
-<div class="pdf-brand-footer footer">
-    <img src="{% if brand_footer_url %}{{ brand_footer_url }}{% else %}{% static 'template/images/print/footer.png' %}{% endif %}" class="footer-img" alt="{{ site_name|default:'footer' }}">
-</div>
-{% endif %}
-
 <div class="list-print{% if field_flags.brand %} has-brand{% endif %}"
      id="pdf-preview"
      data-download-url="{{ download_pdf_url }}"
      data-fields='{"billboard_pic":{% if field_flags.billboard_pic %}true{% else %}false{% endif %},"id_code":{% if field_flags.id_code %}true{% else %}false{% endif %},"city":{% if field_flags.city %}true{% else %}false{% endif %},"name":{% if field_flags.name %}true{% else %}false{% endif %},"description":{% if field_flags.description %}true{% else %}false{% endif %},"address":{% if field_flags.address %}true{% else %}false{% endif %},"has_power":{% if field_flags.has_power %}true{% else %}false{% endif %},"size":{% if field_flags.size %}true{% else %}false{% endif %},"reservation_date":{% if field_flags.reservation_date %}true{% else %}false{% endif %},"brand":{% if field_flags.brand %}true{% else %}false{% endif %},"price":{% if field_flags.price %}true{% else %}false{% endif %}}'>
     {% for item in object_list %}
-    <div class="container pdf-page" data-billboard-id="{{ item.billboard.id }}">
-        <div class="property">
-            {% if field_flags.billboard_pic %}
-            <div class="image">
-                <a href="{{ item.billboard.get_absolute_url }}">
-                    <img src="{{ item.print_pic_url }}" alt="{{ item.billboard.name }}" loading="lazy" />
-                </a>
-            </div>
-            {% endif %}
-            <div class="property__grid">
-                {% if field_flags.id_code %}
-                <div class="property-row">
-                    <span class="property-name">کد بیلبورد: </span>
-                    <span class="property-value" contenteditable data-field="id_code">{{ item.billboard.id }}</span>
+    <div class="pdf-page" data-billboard-id="{{ item.billboard.id }}">
+        {% if field_flags.brand %}
+        <div class="pdf-brand-header header">
+            <img src="{% if brand_header_url %}{{ brand_header_url }}{% else %}{% static 'template/images/print/header.png' %}{% endif %}" class="header-img" alt="{{ site_name|default:'header' }}">
+        </div>
+        {% endif %}
+        <div class="pdf-page-body">
+            <div class="property">
+                {% if field_flags.billboard_pic %}
+                <div class="image">
+                    <a href="{{ item.billboard.get_absolute_url }}">
+                        <img src="{{ item.print_pic_url }}" alt="{{ item.billboard.name }}" loading="lazy" />
+                    </a>
                 </div>
                 {% endif %}
-                {% if field_flags.name %}
-                <div class="property-row">
-                    <span class="property-name">نام: </span>
-                    <span class="property-value" contenteditable data-field="name">{{ item.billboard.name }}</span>
-                </div>
-                {% endif %}
-                {% if field_flags.description %}
-                <div class="property-row">
-                    <span class="property-name">توضیحات: </span>
-                    <span class="property-value" contenteditable data-field="description">{{ item.billboard.description }}</span>
-                </div>
-                {% endif %}
-                {% if field_flags.address %}
-                <div class="property-row">
-                    <span class="property-name">محل بیلبورد: </span>
-                    <span class="property-value" contenteditable data-field="address_location">{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
-                </div>
-                <div class="property-row">
-                    <span class="property-name">آدرس: </span>
-                    <span class="property-value" contenteditable data-field="address">{{ item.billboard.address }}</span>
-                </div>
-                {% endif %}
-                {% if field_flags.has_power %}
-                <div class="property-col">
+                <div class="property__grid">
+                    {% if field_flags.id_code %}
                     <div class="property-row">
-                        <span class="property-name">وضعیت روشنایی: </span>
-                        <span class="property-value" contenteditable data-field="has_power">{{ item.billboard.has_power|boolean_value }}</span>
+                        <span class="property-name">کد بیلبورد: </span>
+                        <span class="property-value" contenteditable data-field="id_code">{{ item.billboard.id }}</span>
                     </div>
+                    {% endif %}
+                    {% if field_flags.name %}
+                    <div class="property-row">
+                        <span class="property-name">نام: </span>
+                        <span class="property-value" contenteditable data-field="name">{{ item.billboard.name }}</span>
+                    </div>
+                    {% endif %}
+                    {% if field_flags.description %}
+                    <div class="property-row">
+                        <span class="property-name">توضیحات: </span>
+                        <span class="property-value" contenteditable data-field="description">{{ item.billboard.description }}</span>
+                    </div>
+                    {% endif %}
+                    {% if field_flags.address %}
+                    <div class="property-row">
+                        <span class="property-name">محل بیلبورد: </span>
+                        <span class="property-value" contenteditable data-field="address_location">{{ item.billboard.city.state.name }} - {{ item.billboard.city.name }}</span>
+                    </div>
+                    <div class="property-row">
+                        <span class="property-name">آدرس: </span>
+                        <span class="property-value" contenteditable data-field="address">{{ item.billboard.address }}</span>
+                    </div>
+                    {% endif %}
+                    {% if field_flags.has_power %}
+                    <div class="property-col">
+                        <div class="property-row">
+                            <span class="property-name">وضعیت روشنایی: </span>
+                            <span class="property-value" contenteditable data-field="has_power">{{ item.billboard.has_power|boolean_value }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if field_flags.size %}
+                    <div class="property-row">
+                        <span class="property-name">طول: </span>
+                        <span class="property-value" contenteditable data-field="size_length">{{ item.billboard.billboard_length|normalize_decimal }}</span>
+                    </div>
+                    <div class="property-row">
+                        <span class="property-name">عرض: </span>
+                        <span class="property-value" contenteditable data-field="size_width">{{ item.billboard.billboard_width|normalize_decimal }}</span>
+                    </div>
+                    {% endif %}
+                    {% if field_flags.reservation_date %}
+                    <div class="property-row">
+                        <span class="property-name">تاریخ قابل اجاره: </span>
+                        <span class="property-value" contenteditable data-field="reservation_date">{{ item.billboard.reservation_date|jalali_slash }}</span>
+                    </div>
+                    {% endif %}
+                    {% if field_flags.price %}
+                    <div class="property-row">
+                        <span class="property-name">قیمت: </span>
+                        <span class="property-value" contenteditable data-field="price">{% if item.billboard.BillboardFinalPriceModel and item.billboard.BillboardFinalPriceModel.final_price %}{{ item.billboard.BillboardFinalPriceModel.final_price|intcomma }}{% else %}{{ item.billboard.price|intcomma }}{% endif %} تومان</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% if field_flags.size %}
-                <div class="property-row">
-                    <span class="property-name">طول: </span>
-                    <span class="property-value" contenteditable data-field="size_length">{{ item.billboard.billboard_length|normalize_decimal }}</span>
-                </div>
-                <div class="property-row">
-                    <span class="property-name">عرض: </span>
-                    <span class="property-value" contenteditable data-field="size_width">{{ item.billboard.billboard_width|normalize_decimal }}</span>
-                </div>
-                {% endif %}
-                {% if field_flags.reservation_date %}
-                <div class="property-row">
-                    <span class="property-name">تاریخ قابل اجاره: </span>
-                    <span class="property-value" contenteditable data-field="reservation_date">{{ item.billboard.reservation_date|jalali_slash }}</span>
-                </div>
-                {% endif %}
-                {% if field_flags.price %}
-                <div class="property-row">
-                    <span class="property-name">قیمت: </span>
-                    <span class="property-value" contenteditable data-field="price">{% if item.billboard.BillboardFinalPriceModel and item.billboard.BillboardFinalPriceModel.final_price %}{{ item.billboard.BillboardFinalPriceModel.final_price|intcomma }}{% else %}{{ item.billboard.price|intcomma }}{% endif %} تومان</span>
-                </div>
-                {% endif %}
             </div>
         </div>
+        {% if field_flags.brand %}
+        <div class="pdf-brand-footer footer">
+            <img src="{% if brand_footer_url %}{{ brand_footer_url }}{% else %}{% static 'template/images/print/footer.png' %}{% endif %}" class="footer-img" alt="{{ site_name|default:'footer' }}">
+        </div>
+        {% endif %}
     </div>
-    {% if not forloop.last %}<div class="pagebreak"></div>{% endif %}
     {% endfor %}
 </div>
 

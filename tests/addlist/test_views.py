@@ -74,9 +74,13 @@ class AddListViewTests(TestCase):
         self.assertIn('class="pdf-brand-header header"', content)
         self.assertIn('class="pdf-brand-footer footer"', content)
         self.assertIn('list-print has-brand', content)
-        # Brand chrome must appear once (not per billboard)
-        self.assertEqual(content.count('class="pdf-brand-header header"'), 1)
-        self.assertEqual(content.count('class="pdf-brand-footer footer"'), 1)
+        # Per-page brand bars (same optimized URL; reliable across print engines)
+        self.assertGreaterEqual(content.count('class="pdf-brand-header header"'), 1)
+        self.assertGreaterEqual(content.count('class="pdf-brand-footer footer"'), 1)
+        self.assertEqual(
+            content.count('class="pdf-brand-header header"'),
+            content.count('class="pdf-brand-footer footer"'),
+        )
         self.assertIn('id="download-pdf"', content)
         self.assertIn(reverse('download-pdf'), content)
 

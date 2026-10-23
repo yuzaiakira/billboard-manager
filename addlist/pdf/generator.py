@@ -233,38 +233,42 @@ class WatchlistPdfGenerator:
         return buffer.getvalue()
 
     def _draw_page(self, c: canvas.Canvas, page: PdfPageData, build_input: PdfBuildInput) -> None:
-        margin_x = 15 * mm
-        content_top = PAGE_HEIGHT - 12 * mm
-        content_bottom = 12 * mm
+        margin_x = 12 * mm
+        content_top = PAGE_HEIGHT - 8 * mm
+        content_bottom = 8 * mm
 
         if build_input.show_brand:
-            brand_h = 28 * mm
+            header_h = 0.0
+            footer_h = 0.0
             if build_input.brand_header_path and os.path.isfile(build_input.brand_header_path):
-                self._draw_image_fit(
-                    c,
-                    build_input.brand_header_path,
-                    0,
-                    PAGE_HEIGHT - brand_h,
-                    PAGE_WIDTH,
-                    brand_h,
-                )
-                content_top = PAGE_HEIGHT - brand_h - 6 * mm
+                header_h = self._draw_brand_bar(c, build_input.brand_header_path, at_top=True)
             if build_input.brand_footer_path and os.path.isfile(build_input.brand_footer_path):
-                self._draw_image_fit(
-                    c,
-                    build_input.brand_footer_path,
-                    0,
-                    0,
-                    PAGE_WIDTH,
-                    brand_h,
-                )
-                content_bottom = brand_h + 6 * mm
+                footer_h = self._draw_brand_bar(c, build_input.brand_footer_path, at_top=False)
+            content_top = PAGE_HEIGHT - header_h - 4 * mm
+            content_bottom = footer_h + 4 * mm
 
-        y = content_top
-        max_img_h = 120 * mm
+        available_h = max(40 * mm, content_top - content_bottom)
+        max_img_h = min(110 * mm, available_h * 0.55)
         max_img_w = PAGE_WIDTH - 2 * margin_x
+        line_h = 7 * mm
+        gap_after_image = 6 * mm
 
-        if build_input.show_image and page.image_path and os.path.isfile(page.image_path):
+        field_keys = [key for key, _label in FIELD_ORDER if key in page.fields]
+        fields_h = len(field_keys) * line_h
+
+        # Estimate image height for vertical centering (actual draw may be shorter)
+        estimated_img_h = 0.0
+        will_draw_image = bool(
+            build_input.show_image and page.image_path and os.path.isfile(page.image_path)
+        )
+        if will_draw_image:
+            estimated_img_h = self._probe_image_draw_height(page.image_path, max_img_w, max_img_h)
+
+        block_h = estimated_img_h + (gap_after_image if will_draw_image else 0) + fields_h
+        # Start from top of vertically-centered block
+        y = content_top - max(0.0, (available_h - block_h) / 2.0)
+
+        if will_draw_image:
             drawn_h = self._draw_image_fit(
                 c,
                 page.image_path,
@@ -274,28 +278,65 @@ class WatchlistPdfGenerator:
                 max_img_h,
                 anchor_top=True,
             )
-            y = y - drawn_h - 8 * mm
-        else:
-            y = y - 4 * mm
+            y = y - drawn_h - gap_after_image
 
-        right_x = PAGE_WIDTH - margin_x
-        line_h = 8 * mm
-        c.setFont(self.FONT_REGULAR, 12)
-
+        center_x = PAGE_WIDTH / 2.0
         for key, label in FIELD_ORDER:
             if key not in page.fields:
                 continue
             if y < content_bottom + line_h:
                 break
             value = page.fields[key]
-            label_rtl = reshape_rtl(f'{label}: ')
-            value_rtl = reshape_rtl(value)
-            c.setFont(self.FONT_BOLD, 12)
-            c.drawRightString(right_x, y, label_rtl)
-            label_width = c.stringWidth(label_rtl, self.FONT_BOLD, 12)
+            line = reshape_rtl(f'{label}: {value}')
             c.setFont(self.FONT_REGULAR, 12)
-            c.drawRightString(right_x - label_width - 2 * mm, y, value_rtl)
+            c.drawCentredString(center_x, y, line)
             y -= line_h
+
+    def _probe_image_draw_height(self, path: str, max_w: float, max_h: float) -> float:
+        """Return height that _draw_image_fit would use, without drawing."""
+        try:
+            from reportlab.lib.utils import ImageReader
+            img = ImageReader(path)
+            iw, ih = img.getSize()
+            if iw <= 0 or ih <= 0:
+                return 0.0
+            scale = min(max_w / iw, max_h / ih)
+            return float(ih * scale)
+        except Exception:
+            return 0.0
+
+    def _draw_brand_bar(self, c: canvas.Canvas, path: str, at_top: bool) -> float:
+        """
+        Draw header/footer edge-to-edge (full page width, no side margins).
+        Height follows image aspect ratio, capped so content still fits.
+        Returns the drawn height in points.
+        """
+        try:
+            from reportlab.lib.utils import ImageReader
+            img = ImageReader(path)
+            iw, ih = img.getSize()
+            if iw <= 0 or ih <= 0:
+                return 0.0
+            max_brand_h = 42 * mm
+            dh = PAGE_WIDTH * (float(ih) / float(iw))
+            if dh > max_brand_h:
+                dh = max_brand_h
+            draw_y = PAGE_HEIGHT - dh if at_top else 0.0
+            # Full bleed: stretch to exact page width; height already matches aspect (or capped)
+            c.drawImage(
+                img,
+                0,
+                draw_y,
+                width=PAGE_WIDTH,
+                height=dh,
+                preserveAspectRatio=False,
+                anchor='c',
+                mask='auto',
+            )
+            return float(dh)
+        except Exception as exc:
+            logger.warning('Failed to draw brand bar %s: %s', path, exc)
+            return 0.0
 
     def _draw_image_fit(
         self,
