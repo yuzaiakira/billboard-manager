@@ -194,25 +194,43 @@ class WatchlistPdfGenerator:
 
         return values
 
+    def _font_candidates(self, filename: str) -> List[str]:
+        """Ordered search paths for a Vazirmatn FD TTF file."""
+        package_fonts = os.path.join(os.path.dirname(__file__), 'fonts', filename)
+        relative = os.path.join('template', 'fonts', 'vazir-Farsi-Digits', 'ttf', filename)
+        candidates = [package_fonts]
+        for root in getattr(settings, 'STATICFILES_DIRS', ()) or ():
+            candidates.append(os.path.join(root, relative))
+        static_root = getattr(settings, 'STATIC_ROOT', None) or ''
+        if static_root:
+            candidates.append(os.path.join(static_root, relative))
+        candidates.append(
+            os.path.join(settings.BASE_DIR, 'static', relative),
+        )
+        return candidates
+
+    def _resolve_font(self, filename: str) -> Optional[str]:
+        for path in self._font_candidates(filename):
+            if path and os.path.isfile(path):
+                return path
+        return None
+
     def _ensure_fonts(self) -> None:
         if self._fonts_ready:
             return
-        regular = os.path.join(
-            settings.BASE_DIR,
-            'static/template/fonts/vazir-Farsi-Digits/ttf/Vazirmatn-FD-Regular.ttf',
-        )
-        bold = os.path.join(
-            settings.BASE_DIR,
-            'static/template/fonts/vazir-Farsi-Digits/ttf/Vazirmatn-FD-Bold.ttf',
-        )
-        if not os.path.isfile(regular):
+        regular = self._resolve_font('Vazirmatn-FD-Regular.ttf')
+        bold = self._resolve_font('Vazirmatn-FD-Bold.ttf')
+        if not regular:
             raise PdfGenerationException(
                 'فونت فارسی یافت نشد',
-                response={'path': regular, 'error_code': 'FONT_MISSING'},
+                response={
+                    'paths': self._font_candidates('Vazirmatn-FD-Regular.ttf'),
+                    'error_code': 'FONT_MISSING',
+                },
             )
         if self.FONT_REGULAR not in pdfmetrics.getRegisteredFontNames():
             pdfmetrics.registerFont(TTFont(self.FONT_REGULAR, regular))
-        if os.path.isfile(bold) and self.FONT_BOLD not in pdfmetrics.getRegisteredFontNames():
+        if bold and self.FONT_BOLD not in pdfmetrics.getRegisteredFontNames():
             pdfmetrics.registerFont(TTFont(self.FONT_BOLD, bold))
         else:
             # Fall back to regular if bold missing

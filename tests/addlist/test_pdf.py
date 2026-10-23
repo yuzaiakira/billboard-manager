@@ -106,6 +106,16 @@ class WatchlistPdfGeneratorTests(TestCase):
         self.assertFalse(result['success'])
         self.assertEqual(result.get('error_code'), 'EMPTY_LIST')
 
+    def test_resolve_font_prefers_package_fonts(self):
+        gen = WatchlistPdfGenerator()
+        path = gen._resolve_font('Vazirmatn-FD-Regular.ttf')
+        self.assertIsNotNone(path)
+        self.assertTrue(path.endswith('addlist/pdf/fonts/Vazirmatn-FD-Regular.ttf') or
+                        Path(path).name == 'Vazirmatn-FD-Regular.ttf')
+        self.assertTrue(os.path.isfile(path))
+        # Bundled package path should be first candidate
+        self.assertEqual(path, gen._font_candidates('Vazirmatn-FD-Regular.ttf')[0])
+
     def test_reshape_rtl(self):
         out = reshape_rtl('سلام')
         self.assertTrue(isinstance(out, str))
