@@ -89,3 +89,31 @@ class ImportPermissionTests(TestCase):
         url = reverse('admin:billboard_billboardmodel_import')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse('admin:billboard_billboardmodel_import_sample'))
+
+    def test_import_sample_download(self):
+        user = make_admin()
+        ct = ContentType.objects.get_for_model(BillboardModel)
+        perm = Permission.objects.get(content_type=ct, codename='can_import_billboard')
+        user.user_permissions.add(perm)
+        self.client.force_login(user)
+        url = reverse('admin:billboard_billboardmodel_import_sample')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            'spreadsheetml',
+            response.get('Content-Type', ''),
+        )
+        self.assertTrue(
+            response.get('Content-Disposition', '').startswith('attachment'),
+        )
+        # FileResponse may stream; read content
+        content = b''.join(response.streaming_content) if hasattr(response, 'streaming_content') else response.content
+        self.assertTrue(content[:2] == b'PK')  # xlsx is a zip
+
+    def test_import_sample_requires_permission(self):
+        user = make_reseller()
+        self.client.force_login(user)
+        url = reverse('admin:billboard_billboardmodel_import_sample')
+        response = self.client.get(url)
+        self.assertIn(response.status_code, (302, 403))

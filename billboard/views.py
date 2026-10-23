@@ -1,7 +1,8 @@
+import os
 from urllib.parse import unquote
 
 from django.urls import reverse, reverse_lazy
-from django.http import Http404
+from django.http import FileResponse, Http404
 
 from django.views import View
 from django.views.generic.detail import DetailView
@@ -17,6 +18,13 @@ from django.db.models import Q
 from billboard.models import BillboardModel, BillboardCategory, CompanyModel
 from billboard.forms import ImportBillboardForm, UpdateBillboardForm, SearchForm
 from reservation.models import RentalListModel
+
+IMPORT_SAMPLE_FILENAME = 'import_billboard_sample.xlsx'
+IMPORT_SAMPLE_PATH = os.path.join(
+    os.path.dirname(__file__),
+    'samples',
+    IMPORT_SAMPLE_FILENAME,
+)
 
     
 class Home(View):
@@ -150,6 +158,22 @@ class ImportBillboard(PermissionRequiredMixin, FormView):
     def form_valid(self, form):
         form.import_from_file(self.request)
         return super().form_valid(form)
+
+
+class DownloadImportSample(PermissionRequiredMixin, View):
+    """Serve the Excel import sample from a git-tracked path (not gitignored static/)."""
+
+    permission_required = 'billboard.can_import_billboard'
+
+    def get(self, request, *args, **kwargs):
+        if not os.path.isfile(IMPORT_SAMPLE_PATH):
+            raise Http404('نمونه اکسل یافت نشد')
+        return FileResponse(
+            open(IMPORT_SAMPLE_PATH, 'rb'),
+            as_attachment=True,
+            filename=IMPORT_SAMPLE_FILENAME,
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        )
 
 
 def _parse_billboard_id_list(ids_param):

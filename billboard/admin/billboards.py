@@ -141,6 +141,11 @@ class BillboardAdmin(admin.ModelAdmin):
 
         custom_urls = [
             path('import/', wrap(views.ImportBillboard.as_view()), name='%s_%s_import' % info),
+            path(
+                'import/sample/',
+                wrap(views.DownloadImportSample.as_view()),
+                name='%s_%s_import_sample' % info,
+            ),
             path('update/', wrap(views.UpdateBillboard.as_view()), name='%s_%s_update' % info),
             path(
                 'media-library/',
